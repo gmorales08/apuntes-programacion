@@ -1,0 +1,50 @@
+Un coredump es una copia de la informacion del procesador en el momento que 
+un programa crashea. 
+La funcion del sistema ulimit permite establecer limites del sistema. Por 
+defecto el limite de coredump es 0, por lo que nunca se guardaran coredumps. 
+Para establecer un valor:
+$ ulimit -c unlimited
+    Para debugear desde el coredump:
+$ gdb a.out core
+
+
+*** COREDUMPCTL 
+En algunos sistemas, la gestion de los coredumps puede ser llevada por systemd
+con systemd-coredump. En este caso, systemd guarda y gestiona los core dumps en 
+otro directorio diferente a donde se han producido. Para acceder a ellos se usa
+coredumpctl.
+
+$ coredumpctl 
+o 
+$ coredumpctl list
+Muestra todos los coredumps con sus fechas, procesos, etc.
+
+$ coredumpctl info PID
+Muestra informacion detallada del coredump asociado al PID. Tambien se puede 
+indicar otro indentificador como la ruta al ejecutable.
+
+$ coredumpctl debug PID --debugger=debugger --debugger_arguments=args
+Invoca al debugger indicado (gdb por defecto) con los argumentos especificados
+pasandole el coredump asociado al PID.
+
+La configuracion de coredumpctl se puede editar en el fichero:
+/etc/systemd/coredump.conf. Por ejemplo la configuracion que yo uso es:
+
+[Coredump]
+# external guarda en /var/lib/systemd/coredump/
+Storage=external
+Compress=yes
+ProcessSizeMax=4G
+ExternalSizeMax=4G
+# al llegar a MaxUse se eliminan los coredumps mas antiguos
+MaxUse=4G
+
+
+
+
+
+
+
+
+
+

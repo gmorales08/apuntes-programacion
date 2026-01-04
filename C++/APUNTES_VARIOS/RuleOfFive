@@ -1,0 +1,34 @@
+La rule of three (pre C++11) o rule of five, al contrario que la rule of zero,
+se sugiere seguir en clases que manejen memoria, para ajustarlas al RAII. 
+
+Si una clase no maneja memoria y no necesita constructor explicito: rule of zero
+Si una clase maneja memoria y define explicitamente alguna funcion miembro
+especial: rule of three o rule of five 
+
+Rule of five: si una clase tiene que definir explicitamente un constructor por 
+copia, constructor por movimiento, operador de copia, operador de movimiento o 
+destructor, lo normal es que tenga que definirlos todos.
+El hecho de definir explicitamente una de estas funciones miembro, aunque sea 
+con = default, afecta a como el compilador genera el resto de los cinco:
+
+Ver diapositiva 23 en:
+https://github.com/CppCon/CppCon2023/blob/main/Presentations/B2B_Rule_of_Five.pdf
+
+Por eso es interesante y recomendable usar o rule of zero o rule of three/five.
+
+El seguir la rule of three puede evitar bugs. El seguir la rule of five no es
+obligatorio, pero permite la optimizacion.
+
+Definir un special member function como = default no es lo mismo que no 
+definirlo. Al no definirlo, generalmente se generara solo si se usa, y como 
+miembro publico. Al ponerlo = default se genera si o si, y tambien se puede 
+poner como protegido o privado. 
+
+
+Core guideline 21:
+https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#c21-if-you-define-or-delete-any-copy-move-or-destructor-function-define-or-delete-them-all
+
+
+
+
+

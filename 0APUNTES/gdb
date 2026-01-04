@@ -1,0 +1,179 @@
+Para que un binario se pueda debugear con gdb u otro debugger, es necesario
+compilarlo con informacion de debug. En GCC y Clang se hace con la opcion -g, 
+-ggdb o -g[0-3] (mirar en el manual de gcc/clang sobre cada opcion)
+
+
+COMANDOS
+
+>> info locals
+    muestra todas las variables y su valor en el contexto actual
+
+>> watch variable
+    cada vez que la variable cambie, la imprime
+
+> list 
+	muestra 10 lineas del programa
+	
+> list funcion
+	muestra la funcion
+	
+> start
+    ejecuta el programa creando un breakpoint temporal en main
+	
+> run 
+	ejecuta el programa
+	
+> break funcion
+	crea un breakpoint en la funcion
+> break funcion/fichero:linea
+	crea un breakpoint en la linea dentro de la funcion o fichero
+> break linea
+	crea un breakpoint en la linea indicada
+> break x if y
+    crea un break en x si se cumple y (ej.: i > 2)
+	
+> clear breakpoint
+	elimina un breakpoint
+	
+> delete 
+	elimina todos los breakpoints
+	
+> next 
+	continua la ejecucion
+> step
+	se mete dentro de una funcion
+> where
+	muestra donde estamos y de donde venimos
+Despues de usar where: > frame num
+	muestra donde se llamo a la funcion en el step num
+> up
+> down
+	para moverse entre diferentes steps
+	
+> finish
+	ejecuta el codigo restante hasta que termine la funcion
+> kill 
+	termina la ejecucion actual
+	
+> print 
+	imprime funciones, expresiones, variables, etc.
+	
+**********PARA ARGUMENTOS DE LINEA DE COMANDOS**********
+$ gdb --args ejecutable argumentos
+> set args argumentos
+
+**********HEAP Y STACK***********************************
+
+> backtrace
+    muestra el stack
+> info frame
+    muestra mas informacion del stack
+
+> call malloc_stats()
+    muestra informacion sobre la memoria utilizada
+
+
+
+	
+**********PARA FORK Y THREADS ************
+
+> set follow-fork-mode child/parent 
+	para seguir al hijo o al padre cuando se hace fork
+	
+> info threads
+    para ver los hilos del programa
+
+> thread n
+    cambia al thread n 
+	
+**********INSPECCIONAR MEMORIA******************************
+
+> x/[n][f] address
+  Comando para inspeccionar direcciones de memoria en tiempo de ejecucion
+  n: num. de posiciones a mostrar (por defecto 1)
+  f: formato: x hexadecimal, d decimal, b byte, i instruccion, etc.
+  detras del formato se puede poner h para halfwords. Por defecto esta activo.
+
+	
+************************************************************
+                         TUI
+************************************************************
+
+$ gdb -tui ejecutable
+    abre gdb en modo tui
+> tui enable
+    abre el modo tui dentro de gdb
+    
+>> tui layout 
+    muestra los layout disponibles. Para usar uno > layout nombre_layout
+
+>> layout next
+    cambia el layout. Por defecto hay varios configurados.
+
+> nexti 
+    el el layout de ensamblador, pasa a la siguiente instruccion.
+
+>> Ctrl+l 
+    refresca la pantalla. Para cuando se ve mal el layout.
+    
+    
+
+-D_GLIBCXX_DEBUG
+clang por defecto no provee informacion de debug para la libreria libstdc++, por
+eso no se pueden ver clases como std::string o std::vector. Para poder generar 
+esta informacion, que si genera gcc por defecto, hay que agregar el flag 
+-D_GLIBCXX_DEBUG
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Los hooks son comandos que se ejecutan despues de otros comandos
+por ejemplo hook-stop se ejecuta despues de que el programa se 
+detenga
+define hook-stop
+  ...
+end
+
+info frame imprime informacion del frame actual y la ubicacion de las variables e informacion de registros.
+
+Se pueden establecer variables personalizadas. En gdbinit:
+set variable $modo_debug = 1
+luego usarla:
+define hook-stop
+  if $modo_debug == 1
+    ...
+  else
+    ...
+  end
+end
+
+https://darkdust.net/files/GDB%20Cheat%20Sheet.pdf
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,55 @@
+=====PATRONES=====
+Ej.: all : d1 d2 d3
+
+$@ 
+    objetivo (all)
+$< 
+    primera dependencia (d1)
+$^ 
+    todas las dependencias (d1 d2 d3)
+$? 
+    dependencias que han cambiado
+    util para solo compilar los ficheros que se han modificado
+    
+$* 
+	dentro del cuerpo de un regla indica el stem de un patron
+	foo.c : ...
+		$* // equivale a foo (sin el .c)
+=====REGLAS=====
+
+.PHONY se pone en reglas cuyo nombre no hace referencia a un fichero.
+Por ejemplo en clean se tiene que poner .PHONY porque si hay un fichero 
+llamado clean en el mismo directorio, la regla no hace nada.
+
+===== ASIGNACION DE VARIABLES =====
+
+La asignacion con = es recursiva, y el contenido se expande cada vez que se
+llama a la variable con $(var). Esto es util cuando el contenido de la 
+variable puede cambiar con el tiempo. Por ejemplo si queremos usar una 
+variable en una regla, y luego asignar otro valor a esa misma variable para
+otra regla. 
+
+La asignacion con := es fija, y el primer valor que se asigna es el que se 
+queda. Es util para variables que no van a cambiar de valor, y es mas rapida.
+
+Con += se imprime primero la variable y luego se imprimen los nuevos valores.
+variable := value
+variable += more
+Es los mismo que:
+variable := value
+variable := $(variable) more
+
+===== PREREQUISITES =====
+
+targets : normal-prerequisites | order-only-prerequisites
+
+Hay dos tipos de prerequisitos, los normal-prerequisites y los 
+order-only-prerequisites. Los normal deben cumplirse antes que el target, y 
+si un normal-prerequisite es mas nuevo que el target, el target debe 
+recompilarse.
+Los order-only-prerequisites van despues de un pipe y tambien se tienen que 
+cumplir antes que el target sea construido, pero sin forzar al target a 
+buildearse en caso de que el requisito se actualice. Esto es util en directorios
+porque al guardar un fichero en un directorio, el timestamp del directorio lo
+marca como actualizado, por lo que obligaria al target a recompilarse si fuera
+un normal-prerequisite

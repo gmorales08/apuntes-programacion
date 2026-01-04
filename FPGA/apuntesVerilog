@@ -1,0 +1,172 @@
+Existe SystemVerilog que es una extension de verilog que agrega algunas 
+estructuras. VHDL esta basado en ADA y Verilog en C.
+
+Verilog puede especificar una definicion estructural y de comportamiento.
+
+VERILOG
+
+// Comentario 1 linea
+/* Comentario varias lineas */
+
+*** TIPOS DE DATOS ***
+
+wire (señal combinacional)
+reg (Contiene un valor que puede cambiar con el tiempo)
+
+// vectores / arrays [starting bit : ending bit] ambos valores constantes
+wire [3:0] w;
+reg [3:0] r;
+
+reg [63:0] registerFile[0:31] // 32 registros de 64 bits en grupo llamado 
+                              // registerFile
+                              
+-- valores
+0 o 1 (false o true)
+X , valor desconocido. Es el valor por defecto de los registros y los cables sin 
+conectar
+Z, estado de alta impedancia para puertas triestado                              
+
+-- asignacion
+
+non-blocking assigment <= se utiliza en logica secuencial y asegura que todos 
+los elementos inicializados en un bloque con <= se asignen en el mismo ciclo de
+reloj. 
+
+
+*** FORMATOS NUMERICOS ***
+
+El primer digito indica el numero de bits seguido del formato y el valor. Los 
+valores que exceden el tamano se trucan.
+
+4'b1011  // binario de 4 bits
+4'o15    // octal de 4 bits
+8'hF2    // hexadecimal de 8 bits
+8'd123
+"a" // ASCII
+
+-- replicacion de valores
+
+con la notacion {x{bitfield}} se replica bitfield x veces. Por ejemplo:
+{32{2'b01}} crea un valor de 64 bits con el patron 0101...01
+{A[31:16],B[15:0]} crea un valor cuyos 16 bits altos vienen de A y cuyos 16 bits
+bajo vienen de B.
+
+*** OPERADORES ***
+
+~A; // A invertido (complemento a 1)
+!A; // Igual que ~A
+
+De C hereada los operadores:
++, −, *. /
+&, |, ~
+= =, ! =, >, < , < =, > =
+<<, >>
+? (operador ternario)
+Verilog agrega operaciones unarios de reduccion logica: & | ^
+Por ejemplo : &A devuelve el AND de todos los bits de A
+
+
+*** PARAMETROS ***
+
+parameter N = 8;
+
+*** MODULOS ***
+
+Un modulo define un componente, que puede tener entradas y salidas.
+
+module comp;
+...
+endmodule
+
+Ejemplo de modulo para un half-adder:
+
+module half_adder (A,B,Sum,Carry);
+	input A,B;
+	output Sum,Carry;
+	assign Sum = A ^ B;
+	assign Carry = A & B;
+endmodule
+
+-- declaracion
+
+module nombreModulo(input a, output reg b, output c);
+Los IOs definen las entradas y salidas. Si son de tipo wire no se indica (a y c)
+si son de tipo registro se indica con reg (b).
+
+Debajo de la declaracion se escriben los bloques always, las asignaciones de 
+cables, etc.
+
+El cuerpo de un module puede tener: 
+- initial constructs, que pueden inicializar variables reg.
+- asignaciones continuas, que definen unicamente logica combinacional
+- constructos always, que pueden definir logica combinacional o secuencial
+
+-- Instanciacion
+
+Para crear una instancia de un modulo:
+nombreModulo nombreInstancia (.param1 (valParam1), .param2 (valParam2);
+
+
+*** ESTRUCTURAS DE CONTROL ***
+
+-- always
+
+always @(cond)
+begin
+    blq
+end
+
+-- sincronizacion 
+
+posedge indica sincronizacion en el flanco positivo/de subida
+negedge indica sincronizacion en el flanco negativo/de bajada
+
+-- if else 
+
+if (cond) begin ... end else begin ... end
+
+siempre que se cumpla cond se ejecuta blq
+
+*** CONTINUOUS ASSIGMENT ***
+Un continuous assigment se indica con la keyword assign y actua como una funcion
+combinacional. Dependiendo de las entradas, genera las salidas.
+Para definir logica combinacional tambien se puede usar un bloque always en un 
+modulo, pero hay que tener cuidado. Si no se indica la lista de señales a las 
+que la funcion es sensible (con @) el bloque always se estara reevaluando 
+constatemente, en lugar de unicamente cuando cambien las señales a las que es 
+sensible.
+
+A los wires solo se les puede asignar valores en los continuous assingments.
+A los regs solo se les puede asignar valores dentro de un always block usando 
+procedural assigment. Hay dos tipos de procedural assignment: el operador =, que 
+ejecuta la igualdad de manera secuencial (asigna el valor antes que los 
+operadores que esten debajo de el). Este operador tiene el nombre de blocking 
+assignment. El otro tipo de procedural assignment es el nonblocking assignment,
+indicado con <=. En un bloque always, todos los nonblocking assigment se 
+ejecutan simultaneamente en paralelo.
+
+
+Para asegurarse de que la logica combinacional se sintetiza de manera correcta
+hay que asegurar lo siguiente: 
+- Toda la logica combinacional esta dentro de un continuous assigment o un 
+always block
+- Todas las señales usadas como entradas aparecen en la sensitivity list de un 
+bloque always. 
+- Asegurar que cada camino hacia un always block asigna un valor al mismo set 
+de bits.
+
+
+*** USER CONSTRAINT FILE ***
+
+Es el fichero que indica como debe configurarse la FPGA. Depende del fabricante
+y caracteristicas de la placa.
+
+*** TEST BENCH ***
+
+Es conveniente utilizar un fichero verilog para hacer pruebas antes de 
+sintetizar en la FPGA. Los test bench son otros ficheros verilog que simulan la
+maquina haciendo pruebas que necesitemos, pero no son sintetizables.
+
+Se define un modulo testbench.
+
+

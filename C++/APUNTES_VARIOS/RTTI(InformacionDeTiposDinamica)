@@ -1,0 +1,20 @@
+Para identificar el tipo de un objeto en runtime, C++ utiliza RTTI (Runtime Type
+Information). Para las clases no polimorficas no se guarda informacion de tipo
+en el binario porque solo es necesario en tiempo de compilacion. Para las clases
+polimorficas se guarda informacion de tipo por clase, no por objeto (menos 
+overhead, a diferencia de otros lenguajes). Esta informacion esta almacenada en
+un objeto std::type_info que guarda el mangled name, entre otras cosas. Este 
+objeto es unico por cada clase y es accesible por el puntero de la vtable de 
+cada objeto polimorfico. 
+std::type_index es un wrapper que se introdujo en c++11 que sirve para dar un 
+identificador a cada std::type_info (el std::type_info::hash_code no es estandar
+y por eso no se usa) ademas de operaciones de comparacion para poder identificar
+unicamente a cada std::type_info y poder usarlos por ejemplo en hash tables. 
+
+Esta informacion de tipos es util cuando se usa typeid() o dynamic_cast en el 
+programa, y por tanto si no se usa una de estas dos caracteristicas, se puede 
+desactivar para ahorrar un poco de espacio (los punteros en cada objeto al 
+std::type_info). Para hacerlo se usa el flag -fno-rtti en los compiladores.
+
+La libreria boost::typeindex mejora este aspecto de la STL agregando mas 
+funcionalidades como nombre legibles (no mangled) y portables.

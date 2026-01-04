@@ -1,0 +1,63 @@
+Apuntes sobre el libro:
+
+Effective C++ Third Edition
+Scott Meyers
+ISBN: 0-321-33487-6
+
+--------------------------------------------------------------------------------
+Item 30: Understand the ins and outs of inlining.
+--------------------------------------------------------------------------------
+inline no siempre proporciona una mejora, a veces el aumento de tamaño de los 
+programas puede ser un problema.
+inline es una sugerencia para los compiladores, no una orden.
+Se pueden solicitar inline de manera explicita o implicita (definiendo el cuerpo
+de la funcion dentro de la definicion de la clase).
+Things to remember:
+- Limitar inline a funciones pequeñas y frecuentemente llamadas. 
+- No declarar function templates inline solo porque aparezcan en el header.
+
+
+--------------------------------------------------------------------------------
+Item 34: Differentiate between inheritance of interface and inheritance of 
+implementation
+--------------------------------------------------------------------------------
+
+La diferencia entre herencia de interfaz y de implementacion se corresponde 
+con la diferencia entre declaracion de funcion y definicion de funcion.
+El poder declarar las funciones como virtuales puras, virtuales simples o no 
+virtaules, permite especificar con precision como se deben heredar las clases
+derivadas, aunque al hacerlo hay que evitar dos grandes errores:
+1. declarar todas las funciones como no virtuales. Esto impide especializacion
+en clases hijas, ademas del problema mas importante: los destructores no 
+virtuales.
+2. declarar todos los miembros como virtuales. A veces esto es lo que se 
+necesita hacer (clases interfaz), aunque muchas veces hay funciones que no se
+deberian redefinir en las clases heredadas.
+Cosas que recordar:
+	- Herencia de interfaz es diferente de herencia de implementacion. Bajo 
+	herencia publica, las clases derivadas siempre heredan interfaces de la
+	clase base.
+	- Funciones virtuales puras especifican herencia de interfaz unicamente.
+	- Funciones virtuales simples (impuras) especifican herencia de interafaz
+	mas herencia de una implementacion por defecto. 
+	- Funciones no virtuales especifican herencia de interfaz mas herencia de 
+	una implementacion obligatoria.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,56 @@
+La inyeccion de dependencias se utiliza para desacoplar la creacion de los 
+objetos que los que depende o son parte de una clase o funcion. Por ejemplo una
+clase tiene una funcion process que necesita un objeto CalcEngine que se 
+encargara de realizar operaciones. El objeto de CalcEngine en vez de ser creado
+por la propia clase que contiene process, es creada desde fuera y pasada a la 
+clase, generalmente por el constructor.
+Esta tecnica es practica para hacer mocks, dado que no se necesita tener la 
+implementacion para acceder a los metodos.
+
+Existen varios metodos para implementarla: 
+
+Por herencia (funciones virtuales):
+Se crea una interfaz ICalcEngine de la que una clase CalcEngine heredara e 
+implementara los metodos. El metodo de la clase que tiene la dependencia 
+necesita la dependencia como parametro: bool process(ICalcEngine& engine) {...}.
+La clase tambien puede tener un miembro ICalcEngine que apunte a la dependencia 
+y se inicialice en el constructor.
+Ventajas: facil de agregar a codigo legacy. Drawbacks: tabla virtual
+
+Por templates:
+template<typename CalcEngine>
+bool process(CalcEngine& engine) {
+    engine.metodo1();
+    engine.metodo2();
+    ...
+}
+
+struct RealCalcEngine {
+    RealCalcEngine(...);
+    
+    void metodo1();
+    void metodo2();
+}
+Ventajas: compile time. Desventajas: menos legible, mas dificil de anadir.
+
+
+Por type-erasure (con std::function/std::move_only_function/std::invoke):
+using CalculateYield = std::function<double(const Data&)>;
+struct YieldProcessor {
+    YieldProcessor(CalculateYield yield_calc) :
+        YieldCalculator_(std::move(yield_calc)){};
+    // Se usa YieldCalculator_ en los metodos 
+    // ...
+private:
+    CalculateYield YieldCalculator_;    
+};
+Ventajas: versatil y facilmente invocable. Drawbacks: solo puede manejar un 
+metodo. Overhead como funciones virtuales.
+
+
+
+Entre las tecnicas para inyectar las dependencias, esta el uso de setter, que no
+es recomendado porque el setter no se usara en produccion y ademas la clase se
+crea sin la dependencia (hay que agregarla manualmente despues). Otra tecnica
+mas comun es inyectarlas por el constructor o pasarlas como parametro al metodo
+que las usa.

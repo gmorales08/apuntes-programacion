@@ -1,0 +1,128 @@
+Apuntes del tutorial:
+https://lazyfoo.net/tutorials/SDL
+
+
+### 01 Hello world
+
+Para utilizar la libreria:
+g++ 01_hello_SDL.cpp -w -lSDL2 -o 01_hello_SDL
+ #include <SDL2/SDL.h>
+ 
+SDL requiere que la funcion main sea asi:
+int main( int argc, char* args[])
+
+Una SDL surface es una imagen 2D. Puede ser cargada de un fichero o puede ser
+la imagen dentro de la ventana por defecto.
+
+SDL_GetError contiene los errores producidos dentro de cualquier funcion SDL.
+
+Primero hay que inicializar SDL con SDL_Init( SDL_INIT_VIDEO ) y despues se 
+puede crear una ventana con: SDL_CreateWindow
+El primer argumento es el titulo de la ventana
+El segundo y el tercero son las posiciones x e y iniciales
+El cuarto y quinto son el width y el height
+El ultimo argumento son las flags de creacion
+
+El metodo SDL_GetWindowSurface nos devuelve la superficie de una Window.
+
+Aunque se dibuje algo en la pantalla, no se mostrara hasta que no se ejecute:
+SDL_UpdateWindowSurface
+
+Si se ejecuta el codigo, la pantalla se crea, muestra su contenido y desaparece
+en pocos milisegundos. Para forzar a que se mantenga abierta se utiliza este 
+"hack":
+SDL_Event e; bool quit = false; while( quit == false ){ 
+    while( SDL_PollEvent( &e ) ){ if( e.type == SDL_QUIT ) quit = true; } }
+
+Para destruir la ventana y salir de SDL:
+    //Destroy window
+    SDL_DestroyWindow( window );
+
+    //Quit SDL subsystems
+    SDL_Quit();
+    
+    
+### 02 Image into the screen
+
+Una estructura tipica de un programa SDL es:
+//Starts up SDL and creates window
+bool init();
+//Loads media
+bool loadMedia();
+//Frees media and shuts down SDL
+void close();
+
+Las surface se suele utilizar con punteros para ahorrar recursos. Si se utiliza
+varias veces una imagen en una pantalla solo se reserva memoria una vez.
+
+Normalmente las superficies se inicializan a un valor o a NULL.
+
+SDL_LoadBMP carga una imagen en una superficie a partir de una ruta.
+
+Es una buena practica apuntar a NULL cuando un puntero deja de ser util para 
+evitar comportamiento indefinido:
+void close()
+{
+    //Deallocate surface
+    SDL_FreeSurface( gHelloWorld );
+    gHelloWorld = NULL;
+
+    //Destroy window
+    SDL_DestroyWindow( gWindow );
+    gWindow = NULL;
+
+    //Quit SDL subsystems
+    SDL_Quit();
+}
+
+SDL_BlitSurface copia un surface en otra
+
+
+### 03 Event driven programming 
+
+SDL_Event es un union que guarda informacion sobre lo sucedido en un evento.
+
+Los eventos se pueden revisar con un poll de eventos:
+//Handle events on queue
+while( SDL_PollEvent( &e ) != 0 )
+{
+    //User requests quit
+    if( e.type == SDL_QUIT )
+    {
+        quit = true;
+    }
+}
+
+SDL_PollEvent revisa los eventos de un SDL_Event hasta que no haya ninguno mas,
+entonces devuelve un 0.
+
+
+### 04 Key presses
+
+Recomienda hacer un enum con los tipos de pulsaciones al principio:
+//Key press surfaces constants
+enum KeyPressSurfaces
+{
+    KEY_PRESS_SURFACE_DEFAULT,
+    KEY_PRESS_SURFACE_UP,
+    KEY_PRESS_SURFACE_DOWN,
+    KEY_PRESS_SURFACE_LEFT,
+    KEY_PRESS_SURFACE_RIGHT,
+    KEY_PRESS_SURFACE_TOTAL
+};
+
+
+### 05 Optimized Surface Loading and Soft Stretching
+
+
+
+
+
+
+
+
+
+
+
+
+

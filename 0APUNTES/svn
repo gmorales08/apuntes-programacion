@@ -1,0 +1,27 @@
+Clonar un repo en local
+$svn checkout repo
+
+Lista los contenidos del repo
+$svn list repo
+
+Actualizar el repo en local 
+$svn update 
+
+Muestra el estado
+$svn status 
+
+Agregar un fichero
+$svn add file
+
+Eliminar un objeto
+$svn delete file
+
+Agregar un directorio
+$svn mkdir dir
+
+Muestra informacion sobre el repositorio
+$svn info
+
+Hacer commit
+$svn commit -m 'msg'
+

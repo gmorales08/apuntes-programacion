@@ -1,0 +1,1413 @@
+Apuntes sobre el libro:
+
+x86-64 Assembly Language Programming with Ubuntu
+Ed Jorgensen, Ph.D.
+Version 1.1.58
+September 2024
+
+Este libro se centra en x86 de 64 bits
+##### 2.0 Architecture Overview
+***** 2.2 Data Storage Sizes
+byte            : 1 byte
+word            : 2 bytes
+double-word     : 4 bytes
+quadword        : 8 bytes
+double quadword : 128 bytes
+
+***** 2.3 Central Processing Unit
+--- 2.3.1 CPU Registers
+
+GPR registers:
+
++-----------------+----------------+----------------+---------------+
+| 64-bit register | Lowest 32-bits | Lowest 16-bits | Lowest 8-bits |
++-----------------+----------------+----------------+---------------+
+| rax             | eax            | ax             | al            |
++-----------------+----------------+----------------+---------------+
+| rbx             | ebx            | bx             | bl            |
++-----------------+----------------+----------------+---------------+
+| rcx             | ecx            | cx             | cl            |
++-----------------+----------------+----------------+---------------+
+| rdx             | edx            | dx             | dl            |
++-----------------+----------------+----------------+---------------+
+| rsi             | esi            | si             | sil           |
++-----------------+----------------+----------------+---------------+
+| rdi             | edi            | di             | dil           |
++-----------------+----------------+----------------+---------------+
+| rbp             | ebp            | bp             | bpl           |
++-----------------+----------------+----------------+---------------+
+| rsp             | esp            | sp             | spl           |
++-----------------+----------------+----------------+---------------+
+| r8              | r8d            | r8w            | r8b           |
++-----------------+----------------+----------------+---------------+
+| r9              | r9d            | r9w            | r9b           |
++-----------------+----------------+----------------+---------------+
+| r10             | r10d           | r10w           | r10b          |
++-----------------+----------------+----------------+---------------+
+| r11             | r11d           | r11w           | r11b          |
++-----------------+----------------+----------------+---------------+
+| r12             | r12d           | r12w           | r12b          |
++-----------------+----------------+----------------+---------------+
+| r13             | r13d           | r13w           | r13b          |
++-----------------+----------------+----------------+---------------+
+| r14             | r14d           | r14w           | r14b          |
++-----------------+----------------+----------------+---------------+
+| r15             | r15d           | r15w           | r15b          |
++-----------------+----------------+----------------+---------------+
+
+En los registros a, b, c y d se puede acceder al nibble superior del ultimo 
+byte con ah, bh, ch y dh. A excepcion de ah, esto se permite por motivos de 
+legacy support.
+
+La capacidad para acceder a porciones de registro significa que si el quadword
+register rax se establece en 0xB'A43B'7400, el registro queda:
+
+rax = 0000 000B A43B 7400
+
+Si una operacion posterior establece ax a C350, los 48 bits superiores no son
+alterados:
+
+rax = 0000 000B A43B C350
+
+Si una operacion posterior establece al a 32 rax quedara asi:
+
+rax = 0000 000B A43B C332
+
+sin afectar a los 56 bits superiores
+
+Para operaciones con registros de 32 bits, los 32 bits superiores son 
+establecidos a cero. Esto generalmente no es un issue porque las operaciones de
+32 bits no usaran los 32 bits superiores. Para valores sin signo esto puede ser
+util para convertir de 32 a 64 bits. Sin embargo esto no funciona para 
+conversiones con signo. (mas en el capitulo 3).
+
+2.3.1.2 Stack Pointer Register (RSP)
+Apunta al actual tope del stack. No debe usarse para datos. (ch 9)
+
+2.3.1.3 Base Pointer Register (RBP)
+Se usa como puntero base durante las llamadas a funciones. (ch. 12)
+
+2.3.1.4 Instruction Pointer Register (RIP)
+Ademas de los GPRs, hay un registro especial, rip, que apunta a la siguiente
+instruccion que debe ser ejecutada (no la actual).
+
+2.3.1.5 Flag Register (rFlags)
+Guarda informacion del estado de la CPU tras la instruccion que acaba de ser 
+ejecutada. De los 64 bits de este registro, muchos estan reservados para uso
+futuro. Algunos de los flags son:
+
+- Carry (CF, bit 0): indica si la operacion anterior resulto en acarreo
+- Parity (PF, bit 2): indica si el ultimo byte tiene un numero impar de 1s
+- Adjust (AF, bit 4): para dar soporte a operaciones BCD
+- Zero (ZF, bit 6): si la ultima operacion resulto en cero
+- Sign (SF, bit 7): si el resultado de la ultima operacion tiene un 1 en su bit
+mas significativo.
+- Direction (DF, bit 10): indica la direccion (incremento o decremento) para 
+algunas operaciones de strings.
+- Overflow (OF, bit 11): si la ultima operacion resulto en overflow
+
+2.3.1.6 XMM Registers
+Set de registros dedicados para dar soporte a instrucciones de 32 y 64 bits de 
+coma flotante y SIMD. Hay 16 registros de 128 bits numerados de xmm0 a xmm15.
+Nota: algunos procesadores modernos soportan registros de 256 bits. 
+Adicionalmente, los registros XMM se usan para dar soporte a Streaming SIMD
+Extensions (SSE). Estas extensiones no se estudian en el libro, se pueden 
+encontrar en las referencias de intel.
+
+***** 2.5 Memory Layout
+
++--------------------------+  high memory
+| stack                    |
+|   .                      |
+|   .                      |
+|   .                      |
+| heap                     |
++--------------------------+
+| BSS - uninitialized data |
++--------------------------+
+| data                     |
++--------------------------+
+| text (code)              |
++--------------------------+
+| reserved                 |
++--------------------------+  low memory
+
+
+##### 3.0 Data Representation
+
+***** 3.1 Integer Representation
+Para representar valores sin signo, se usa binario estandar. Para representar 
+valores con signo, se usa complemento a 2. Especificamente el proceso de 
+codificacion de complemento a 2 aplica para valores en el rango negativo. Para
+valores en el rango positivo, se usa binario estandar.
+
+Como los valores sin signo tienen un rango positivo y diferente a los valores 
+con signo, puede haber un overlap entre los valores, que puede confundir al 
+examinar las variables en memoria. Por ejemplo, cuando los valores con y sin 
+signo estan dentro del mismo rango positivo (0 a +127)
+ - Un signed byte con valor 12 es 0x0C
+ - Un unsigned byte con valor -12 es 0x0C tambien
+Cuando los valores con signo y sin signo estan fuera del rango superpuesto:
+ - Un signed byte con valor -15 es 0xF1
+ - Un unsigned byte con valor 241 es 0xF1 tambien
+Esta superposicion puede causar confusion a menos que los tipos de datos estan 
+claramente y correctamente definidos.
+
+***** 3.2 Unsigned and Signed Addition
+La suma entre valores signed o unsigned da como resultado un numero signed o 
+unsigned (igual que sus operandos) y se realiza de la misma manera que una suma
+binaria. 
+
+***** 3.3 Floating-point Representation
+Existen varias representaciones de los numeros de coma flotante para varios
+rangos de valor. Por simplicidad, se estudia el IEEE 754 32-bit floating-point
+standard.
+
+--- 3.3.1 IEEE 32-bit Representation
+
+bit     31: s (signo)
+bits 23-30: biased exponent
+bits  0-22: fraction
+
+N = (-1)^s x 1.F x 2^(E-127)
+
+El primer paso es convertir el valor de punto flotante en binario. Por ejemplo
+0b100.101 -> 4.625
+El segundo paso es convertir el valor en notacion cientifica normalizada en 
+binario, es decir, el numero debe tener un unico valor no cero a la izquierda 
+del punto decimal. Por ejemplo 8.125 es 0b1000.001 (o 0b1000.001 x 2^0) y en 
+notacion cientifica binaria normalizada se escribe 0b1.000001 x 2^3. Si el 
+numero fuera 0.125, el binario seria 0b0.001 (o 0b0.001 x 2^0), y la notacion
+cientifica normalizada seria 0b1.0 x 2^-3.
+Los numeros a la izquierda del primer 1, sin incluirle, se almacenan 
+justificados a la izquierda en la porcion "fraction" de la double-word.
+El tercer paso es calcular el biased exponent, que es el expontente de la 
+notacion cientifica normalizada mas el bias. El bias para IEEE 754 32-bit 
+floating-point standard es 127. El resultado debe ser convertido a byte y 
+almacenado en la porcion "biased" en la doble-word.
+
+Para convertir de IEEE 754 32-bit floating-point a decimal, se hacen los pasos
+contrarios, agregando el 1 que se sustrajo.
+
+3.3.1.1 IEEE 32-bit Representation Examples
+En el libro hay varios ejemplos.
+
+--- 3.3.2 IEEE 64-bit Representation
+
+bit     63: s (signo)
+bits 52-62: biased exponent
+bits  0-51: fraction
+
+El biased exponent es de 11 bits y usa un bias de +-1023
+
+
+--- 3.3.3 Not a Number (NaN)
+Cuando se intenta representar un valor como float sin que este pueda ser 
+representado por el estandar se denomina NaN.
+
+3.4.1.1 American Standard Code for Information Interchange
+Los caracteres usan el formato ASCII para ser impresos. Unicode es un estandar
+actual que incluye soporte para varios lenguajes a traves de diferentes 
+encoding schemes (UTF-8, UTF-16, etc.)
+
+--- 3.4.2 String Representation
+Un string es una cadena de caracteres ASCII terminados tipicamente en un NULL.
+Como el NULL no es imprimible, se usa como terminador.
+
+
+##### 4.0 Program Format
+El formato utilizado en el libro es especifico para el ensamblador yasm. Otros
+ensambladores pueden usar un formato ligeramente diferente.
+Un assembly source file consiste en:
+ -Data section: donde se declaran e inicializan datos
+ -BSS section: donde estan los datos sin inicializar
+ -Text section: donde se ubica el codigo del programa  
+
+***** 4.1 Comments
+Comienzan con ; y pueden ser ubicados en cualquier lugar
+
+***** 4.2 Numeric Values
+Los valores hexadecimales se preceden de 0x: 0x7f
+Los valores octales terminan en q: 777q
+
+***** 4.3 Defining Constants
+Las constantes se definen como:
+<name> equ <value>
+Durante el ensamblado, son sustituidas donde son utilizadas, por lo que no se 
+les asigna una direccion de memoria. Esto las hace mas flexibles porque no se 
+les asigna un tipo o tamaño especifico (byte, double-word, etc.). 
+Los valores de las variables determinan el tipo donde podran ser usadas. Por 
+ejemplo:
+SIZE equ 10000
+puede ser usada como una double word pero no como un byte.
+
+***** 4.4 Data Section
+Las variables inicializadas deben ir en la "section .data" con el siguiente 
+formato:
+
+<variableName> <dataType> <initialValue>
+
+Los tipos de datos soportados son: 
+
+db: 8-bit
+dw: 16-bit
+dd: 32-bit
+dq: 64-bit
+ddq: 128-bit integer
+dt:  128-bit float
+
+Los arrays inicializados se definen con valores separados por coma. 
+Ejemplos:
+
+bVar     db    10               ; byte variable
+cVar     db    "H"              ; single character
+strng    db    "Hello World"    ; string
+wVar     dw    5000             ; 16-bit variable
+dVar     dd    50000            ; 32-bit variable
+arr      dd    100, 200, 300    ; 3 element array
+flt1     dd    3.14159          ; 32-bit float
+qVar     dq    1000000000       ; 64-bit variable
+
+Si los valores definidos no encajan en el tipo definido, el ensamblador deberia
+mostrar un error.
+
+***** 4.5 BSS Section
+Los datos sin inicializar se declaran en la "section .bss":
+
+<variableName> <resType> <count>
+
+Los tipos de datos soportados son:
+
+resb: 8-bit
+resw: 16-bit
+resd: 32-bit
+resq: 64-bit
+resdq: 128-bit
+
+Algunos ejemplos son: 
+
+bArr    resb    10     ; 10 element byte array
+wArr    resw    50    ; 50 element word array
+dArr    resd    100    ; 100 element double array
+qArr    resq    200    ; 200 element quad array
+
+Los allocated array no estan inicializados a ningun valor especifico.
+
+
+***** 4.6 Text Section
+En la "section .text" se escriben las instrucciones, una por linea. 
+En esta seccion se pueden incluir headers o labels que definan el punto de 
+entrada inicial del programa. Por ejemplo se pueden incluir las declaraciones:
+
+global _start
+_start:
+
+No se necesita una directiva o label especificos para indicar el final del
+programa, pero se deberia usar un servicio del sistema para informar al OS que 
+se ha terminado para que pueda liberar los recursos como la memoria.
+
+***** 4.7 Example Program
+En el libro se muestra un programa de ejemplo.
+
+
+##### 5.0 Tool Chain
+
+***** 5.1 Assemble/Link/Load Overview
+Ver: Illustration 6: Overview: Assemble, Link, Load
+
+--- 5.2.1 Assemble Commands
+Para ensamblar un programa con yasm se ejecuta: 
+yasm -g dwarf2 -f elf64 example.asm -l example.lst
+	-g dwarf2: incluye debugging info al final del objeto
+	-f elf64: indica que el ejecutable se genere usando el formato ELF64, 
+	apropiado para sistemas Linux de 64 bits.
+	-l example.lst: indica que se cree una list file llamada example.lst
+
+--- 5.2.2 List File
+Un list file muestra el numero de linea, la direccion relativa, la version en 
+lenguaje maquina de la instruccion y la linea fuente original. Esta lista se
+puede usar para hacer debugging. Por ejemplo:
+
+36 00000009 40660301        dVar1    dd  17000000
+37 0000000D 40548900        dVar2    dd  9000000
+38 00000011 00000000        dResult  dd  0
+
+En la primera linea, 36 es el numero de linea, 0x00000009 es la direccion 
+relativa en el data area donde la variable sera almacenada. Como dVar1 es una
+double-word, que requiere 4 bytes, la direccion de la siguiente variable es 
+0x0000000D. El valor 0x40660301 es el valor que se ubica en memoria (el valor
+17000000 en little endian en hexadecimal).
+
+Un fragmento de la text section se puede ver asi:
+
+95                             last:
+96 0000005A 48C7C03C000000        mov     rax, SYS_exit
+97 00000061 48C7C300000000        mov     rdi, EXIT_SUCCESS
+98 00000068 0F05                  syscall
+
+El numero 0x48C7C03C000000 es el codigo maquina equivalente a la instruccion.
+El label last: no tiene codigo maquina porque es una referencia a una direccion 
+de memoria.
+
+--- 5.2.3 Two-Pass Assembler
+Cuando existen instrucciones que cambian el flujo del programa (ifs, jumps, 
+etc.), el compilador debe saber si la direccion a la que referencian existe
+realmente o no. Para ello hace dos pasadas.
+
+mov    rax, 0
+jmp    skipRest
+...
+...
+skipRest:
+
+5.2.3.1 First Pass
+La tareas realizadas en la primera pasada dependen del ensamblador en cuestion.
+Algunas tareas basicas son:
+ -Crear la tabla de simbolos
+ -Expandir macros
+ -Evaluar expresiones constantes
+ 
+Una macro es un elemento de programacion que se expande en un set de 
+instrucciones predefinidas por el programador (ch. 11).
+
+Una expresion constante es una expresion compuesta unicamente por constantes, 
+por lo que puede ser evaluada completamente en tiempo de compilacion.
+
+Se asignan direcciones a todos los statements del programa. La tabla de simbolos
+es un listado o tabla de todos los simbolos del programa, nombres de variable y
+program labels con sus respectivas direcciones de memoria.
+
+Algunas directivas del ensamblador son procesadas en la primera pasada.
+
+5.2.3.2 Second Pass
+Las tareas realizadas en la segunda pasada tambien dependen del ensamblador. 
+Algunas tareas basicas son:
+ -Generacion del codigo final
+ -Creacion de un list file (si se ha solicitado)
+ -Crear el fichero objeto
+
+Para la generacion de codigo final, se convierten las instrucciones a su 
+correspondiente codigo maquina. Esto se puede hacer para instrucciones que no
+usan simbolos en la primera o segunda pasada. Para ello se usa la tabla de 
+simbolos para obtener las direcciones apropiadas.
+
+***** 5.3 Linker
+El linker se encarga de combinar varios ficheros objeto en un solo ejecutable.
+Tambien agrega las rutinas de las librerias del sistema necesarias.
+
+Para linkar con el GNU gold linker se usa:
+ld -g -o example example.o
+
+-g agrega informacion de debug
+
+Para linkar varios objetos:
+ld -g -o example main.o funcs.o
+
+Para usar funciones ubicadas en otros ficheros, se debe indicar con extern.
+
+
+--- 5.3.2 Linking Process
+El linker junta los ficheros objeto con las library routines en un solo 
+executable. Como parte de este proceso, el linker debe ajustar las direcciones
+realocables si es necesarios. 
+Cuando cada fichero es ensamblado, las llamadas a rutinas externas al objeto
+son declaradas con la external assembler directive. Como el codigo no esta 
+disponible para la referencia externa, se marca como externa. El list file
+muestra una R para estas direcciones realocables. El linker debe satisfacer 
+estas referencias externas.
+Por ejemplo en main.o las llamadas a una funcion de funcs.o debe ser actualizada
+por el linker con la direccion apropiada: Illustration 8: Linking Multiple Files
+
+--- 5.3.3 Dynamic Linking
+El sistema operativo linux suporta enlazado dinamico, que permite postponer la
+resolucion del algunos simbolos para cuando el programa sea ejecutado. Las 
+instrucciones reales no son copiadas al fichero ejecutable y por tanto son 
+resueltas y accedidas en runtime. Aunque sea complejo, esto da dos ventajas:
+
+ -Librerias frecuentemente usadas (por ejemplo la libreria estandar del sistema)
+ puede ser almacenada en una sola ubicacion en vez de ser duplicada en cada 
+ binario.
+ -Si se corrige un bug en una libreria, todos los programas que la usen se 
+ beneficiaran dinamicamente de la correccion, en vez de tener que volver a 
+ compilarse.
+ 
+Tambien hay desventajas:
+ -La actualizacion de una libreria incompatible rompera un ejecutable que 
+ dependia de su version anterior.
+ -Un programa que cumple una certificacion (correctness, performance, etc.) 
+ puede dejar de cumplirla despues de que una libreria se actualice, aunque el
+ programa no se haya tocado.
+ 
+***** 5.4 Assemble/Link Script
+
+#!/bin/bash
+# Simple assemble/link script.
+if [ -z $1 ]; then
+	echo "Usage: ./asm64 <asmMainFile> (no extension)"
+	exit
+fi
+
+# Verify no extensions were entered
+if [ ! -e "$1.asm" ]; then
+	echo "Error, $1.asm not found."
+	echo "Note, do not enter file extensions."
+	exit
+fi
+
+# Compile, assemble, and link.
+yasm -Worphan-labels -g dwarf2 -f elf64 $1.asm -l $1.lst
+ld -g -o $1 $1.o
+
+
+El script debe ser guardado como asm64
+
+El fichero fuente no deberia tener extension ".asm" porque ya se la agrega el 
+script
+
+
+***** 5.5 Loader
+El loader es parte del sistema operativo y se encarga de cargar el programa en
+memoria, asignandole un proceso y metiendolo en el planificador de procesos.
+El loader es llamado implicitamente al ejecutar:
+./example
+
+
+##### 7.0 Instruction Set Overview
+En el libro se explica un subset de instrucciones centradas en operaciones con
+enteros. Para una referencia de todas las instrucciones se pueden mirar las
+referencias del libro.
+
+Las instrucciones presentadas son:
+ -Data movement
+ -Conversion instructions
+ -Arithmetic instructions
+ -Logical instructions
+ -Control instructions
+Las instrucciones para function calls se discuten el capitulo 12.
+El listado completo de instrucciones esta en el apendice B.
+
+--- 7.1.1 Operand Notation
+<reg> : register operand
+<reg8>, <reg16>, ... : register with specific size requirements.
+<dest>: destination operand
+<RXdest>: floating point destination operand
+<src>: source operand
+<imm>: immediate value
+<imm8>, <imm16>, ... : immediate of specified size
+<imm8/16/32>: immediate value either 8-bits, 16-bits or 32-bits.
+<mem>: memory location. Variable name or indirect reference.
+<op> or <operand>: operand, register or memory
+<op8>, <op16>, ... : operand, register or memory with size requirement.
+<label> : label
+
+***** 7.2 Data Movement
+mov <dest>, <src>
+
+el operando src es copiado en el operando dest. Ambos deben de ser del mismo 
+tamaño. El destino no puede ser un inmediato. No pueden ser ambas memoria. Si 
+se requiere una operacion de memoria a memoria, se deben usar dos 
+instrucciones.
+
+Cuando el operando registro de destino y double-word y el funete tambien, la 
+double-word superior del registro se establece a cero. Esto solo aplica cuando 
+el destino es un registro entero double-word. Especificamente, si se realizan 
+las siguientes operaciones:
+
+mov    eax, 100    ; eax = 0x00000064
+mov    rcx, -1     ; rcx = 0xffffffffffffffff
+mov    ecx, eax    ; ecx = 0x00000064
+
+la ultima operacion rellena de 0 los 32 bits superiores de rcx, lo que 
+sobrescribe los bits escritos por la segunda instruccion.
+
+El tipo de los datos que se utilizan se puede indicar con la siguiente notacion:
+mov    dword [dAns], eax
+Aqui por ejemplo indicamos que dAns es una double-word. Esto es opcional y puede
+ser inferido por el compilador.
+
+***** 7.3 Addresses and Values
+Para acceder a memoria es necesario poner corchetes []. Al omitirlos obtenemos
+la direccion de memoria en vez de su contenido:  
+
+mov    rax, word [wNum]    ; value of wNum in rax
+mov    rax, wNum           ; address of wNum in rax
+
+La direccion de una variable puede ser obtenida con la instruccion lea (load 
+effective address):
+
+lea    <reg64>, <mem> ; guarda la direccion de mem en reg64
+
+***** 7.4 Conversion Instructions
+--- 7.4.1 Narrowing Conversions
+Se puede producir una narrowing conversion cuando ubicamos datos muy grandes en
+registros pequeños. Esto es un error del programador y el compilador no genera
+ningun aviso, por lo que hay que tener cuidado. Por ejemplo:
+
+mov    rax, 500       ; rax  <- 0x1f4
+mov    byte[bVal], al ; bVal <- 0xf4 , el 1 no se lee
+
+--- 7.4.2 Widening Conversions
+Al promocionar un tipo, se debe extender el signo de la variable. Dependiendo de
+si el tipo es signed o unsigned, se usara un tipo de instrucciones u otras.
+
+7.4.2.1 Unsigned Conversions
+Cuando un numero no tiene signo se asume que es positivo, por lo que se cubre de
+ceros la parte superior de la variable. Esta operacion se puede hacer en memoria
+o en registro.
+
+Se puede realizar un conversion sin signo de un tipo mas pequeño a uno mas 
+grande con:
+
+movzx    <dest>, <src> 
+
+que rellena de ceros la parte superior de la variable destino. Esta instruccion
+no permite un destino quadword con un source double-word. Como se ha visto 
+anteriormente, una instruccion mov con un registro destino double-word y un 
+registro origen double-word rellenara de ceros la parte superior del registro
+quard-word.
+
+7.4.2.2 Signed Conversions
+Las conversiones con signo extienden el signo del valor original. Existe una 
+serie de instrucciones dedicadas a convertir valores con signo en el registro A
+de un tamaño menor a uno mayor. Estas instrucciones funcionan solo con el 
+registro A, a veces con el registro D para el resultado. 
+Por ejemplo la instruccion cwd convierte un valor con signo en el registro ax 
+en una double-word en dx (porcion superior) y ax (porcion inferior). Esto se 
+escribe por convencion como dx:ax. 
+La instruccion cwde convierte un valor con signo en ax a una double-word en 
+eax. 
+
+Una conversion con signo mas generalizada se puede realizar con algunas 
+instrucciones move especiales:
+
+movsx     <dest>, <src>  ; caso general
+movsxd    <dest>, <src>  ; caso especial quadword <- doubleword
+
+Resumen de las instrucciones que extienden el signo:
+
+cbw: convierte el byte en al en una word en ax
+cwd: convierte la word en ax en una double-word en dx:ax
+cwde: convierte la word en ax en una double-word en eax
+cdq: convierte la double-word en eax en una quadword en edx:eax
+cdqe: convierte la double-word en eax en una quadword en rax
+cqo: convierte la quadword en rax en una double-quadword en rdx:rax
+
+Valores aceptados por las instrucciones de conversion con extension de signo:
+movsx    <dest>, <src>
+movsx    <reg16>, <op8>
+movsx    <reg32>, <op8>
+movsx    <reg32>, <op16>
+movsx    <reg64>, <op8>
+movsx    <reg64>, <op16>
+movsxd   <reg64>, <op32>
+Nota 1: ambos operandos no pueden ser memoria
+Nota 2: los operandos de destino no pueden ser un inmediato
+Nota 3: No se permiten valores inmediatos
+Nota 4: Se requiere movsxd para extension 32-64 bits
+
+***** 7.5 Integer Arithmetic Instructions
+--- 7.5.1 Addition
+
+add    <dest>, <src>    ; dest = dest + src
+
+src y dest deben ser del mismo tamaño. Si se requiere una suma memoria a
+memoria, se deben usar dos instrucciones.
+
+La instruccion de incremento es:
+
+inc    <operand>    ; operand = operand + 1
+
+La suma funciona igual en tipos con signo y sin signo, es responsabilidad del
+programador usarla bien. Las intrucciones son:
+
+add    <dest>, <src>
+
+add    <reg>, <reg>
+add    <reg>, <imm8/16/32>
+add    <reg>, <mem>
+add    <mem>, <reg>
+add    <mem>, <imm8/16/32>
+
+Nota: dest no puede ser inmediato
+Nota: inmediatos de 64 bits no estan permitidos 
+
+7.5.1.1 Addition with Carry
+adc    <dest>, <src>    ; dest = dest + src + carryBit
+
+La instruccion adc sirve para realizar una suma utilizando el acarreo de la 
+operacion anterior. Esto es util para sumar numeros mas grandes que el tamaño
+del registro.
+
+Por ejemplo: para 17 + 25 = 42, primero se suma 7 y 5, que da 2 con acarreo 1,
+y luego se suma 2 y 1 con el acarreo. La primera operacion es un add, y la 
+segunda un adc. La segunda instruccion debe seguir inmediatamente a la primera
+para asegurarse de que no haya otras operaciones que alteren el carry flag. 
+
+Si se quieren sumar numeros de 128-bits se deben separar en dos registros:
+
+dquad1    ddq 0x1A000000000000000
+dquad2    ddq 0x2C000000000000000
+dqSum     ddq 0
+
+mov    rax, qword [dquad1]
+mov    rdx, qword [dquad1+8]
+
+add    rax, qword [dquad2]
+adc    rdx, qword [dquad2+8]
+ 
+mov    qword [dqSum], rax
+mov    qword [dqSum+8], rdx
+
+--- 7.5.2 Subtraction
+
+sub    <dest>, <src>    ; dest = dest - src
+
+dec    <operand>        ; operand = operand - 1
+
+--- 7.5.3 Integer Multiplication
+
+La multiplicacion es diferente si los operandos tienen signo o no. El resultado
+producido es tipicamente del doble de tamaño que los operandos.
+
+7.5.3.1 Unsigned Multiplication
+
+mul    <src>
+
+Para esta version de un operando, el registro A (al/ax/eax/rax) se debe usar
+para un operando y el otro debe estar en memoria o registro (src), pero no 
+puede ser inmediato. El resultado se ubicara en A y posiblemente en D, 
+dependiendo del tamaño. 
+
+En el libro se muestran los tipos de multiplicaciones: 
+Illustration 15: Integer Multiplication Overview
+
+Cuando se multiplican dos valores, el resultado siempre se guarda en dos 
+registros, partido por la mitad. Esto puede ser util cuando se multiplican
+valores cuyo resultado no cabria en un registro (64bitx64bit), pero por legacy
+support tambien se aplica la misma regla con valores pequeños, que podrian 
+caber perfectamente en un registro sin necesidad de dividirse.
+
+7.5.3.2 Signed Multiplication
+
+imul    <source>
+imul    <dest>, <src/imm>     ; dest = dest * src/imm
+imul    <dest>, <src>, <imm>  ; dest = src * imm
+
+Para cualquier caso dest debe ser un registro. No esta soportada la 
+multiplicacion de operandos byte con multiples operandos.
+
+Cuando se usa un solo operando, la instruccion es igual que mul, pero teniendo
+en cuenta el signo de los valores.
+
+Notese que para ciertas operaciones donde se proporciona un dest grande, el 
+resultado puede caber en la mitad de ese dest y por tanto solo haria falta 
+obtener el resultado del registro menor de dest. Por ejemplo si se hace una 
+operacion 32-bit x 32-bit y el dest es de 64-bit, pero el resultado cabe en 
+32-bit, se puede leer de la mitad inferior del registro. Esto suele ser 
+habitual en valores con signo (en C seria como hacer int = int * int). 
+
+--- 7.5.4 Integer Division
+
+Division entera: dividendo/divisor = cociente
+El dividendo debe ser mas grande que el divisor (16bit/8bit, 32bit/16bit, etc.).
+En el libro vienen la distribucion del dividendo, cociente y resto para las 
+divisiones con diferentes tamaños.
+
+La division con signo y sin signo operan de la misma manera.
+
+div  <src>  ; unsigned division
+idiv <src>  ; signed division
+
+En algunas instrucciones de division es necesario indicar el tipo explicitamente
+con byte, word, etc.
+
+div <op8>   ; al=ax/src ah=rem
+div <op16>  ; ax=dx:ax/src dx=rem
+div <op32>  ; eax=edx:eax/src edx=rem 
+div <op64>  ; rax=edx:rax/src rdx=rem
+
+idiv <op8>  ; al=ax/src ah=rem
+idiv <op16> ; ax=dx:ax/src dx=rem
+idiv <op32> ; eax=eax/src edx=rem
+idiv <op64> ; rax=rax/src rdx=rem
+
+***** 7.6 Logical Instructions
+--- 7.6.1 Logical Operations
+
+and <dest>, <src>
+or  <dest>, <src>
+xor <dest>, <src>
+not <dest>, <src>
+
+--- 7.6.2 Shift Operations
+
+7.6.2.1 Logical Shift
+El desplazamiento logico desplaza un registro 1 bit a la dcha/izda agregando un
+0, tratando el contenido como un grupo de bits en vez de como un numero.
+Se usa para division y multiplicacion enteras en potencias de 2.
+
+shl <dest>, <imm8>
+shl <dest>, cl
+shr <dest>, <imm8>
+shr <dest>, cl
+
+imm8 y cl deben valer entre 1 y 64
+
+7.6.2.2 Arithmetic Shift
+El desplazamiento aritmetico tiene en cuenta el signo del operando para 
+preservarlo al desplazarlo a la derecha. El desplazamiento aritmetico a la 
+izquierda es el mismo que el desplazamiento logico a la izquierda, porque en 
+complemento a dos el signo no cambia al desplazar a la izquierda (si a la 
+derecha). Por esto shl suele ser alias de sal en los compiladores o 
+procesadores.
+
+sal <dest>, <imm8>
+sal <dest>, cl
+sar <dest>, <imm8>
+sar <dest>, cl
+
+El shift aritmetico no se suele usar para dividir entre dos porque redondea 
+hacia abajo el resultado, en lugar de truncarlo como la division estandar.
+
+imm8 y cl deben valer entre 1 y 64
+
+--- 7.6.3 Rotate Operations
+Las rotaciones desplazan el bit mas significativo al comienzo del registro, o 
+el menos significativo al final del registro.
+
+rol <dest>, <imm8>
+rol <dest>, cl
+ror <dest>, <imm8>
+ror <dest>, cl
+
+imm8 y cl deben valer entre 1 y 64
+
+***** 7.7 Control Instructions
+--- 7.7.2 Unconditional Control Instructions
+jmp    <label>
+
+--- 7.7.3 Conditional Control Instructions
+Para hacer un salto condicional se debe realizar primero una comparacion, que
+guarda el resultado en rFlag, y luego una instruccion de salto que comprueba 
+rFlag y salta a un label en funcion del lo leido.
+
+Para comparar se usa:
+
+cmp    <op1>, <op2> ; op1 y op2 del mismo tamano, y op1 no imm
+
+Para saltar se usa:
+
+je     <label>    ; if <op1> == <op2>
+jne    <label>    ; if <op1> != <op2>
+
+jl     <label>    ; signed, if <op1> < <op2>
+jle    <label>    ; signed, if <op1> <= <op2>
+jg     <label>    ; signed, if <op1> > <op2>
+jge    <label>    ; signed; if <op1> >= <op2>
+
+jb     <label>    ; unsigned, if <op1> < <op2>
+jbe    <label>    ; unsigned, if <op1> <= <op2>
+ja     <label>    ; unsigned, if <op1> > <op2>
+jae    <label>    ; unsigned, if <op1> >= <op2>
+
+7.7.3.1 Jump Out of Range
+El target label en una instruccion de salto condicional se conoce como 
+short-jump, y debe estar a +-128 bytes de la instruccion de salto. Esto no suele 
+ser un problema, pero si estuviera mas lejos, el ensamblador daria un error 
+“jump out-of-range”. Para el salto incondicional jmp no hay restricciones.
+
+Un salto condicional se puede convertir en incondicional. Por ejemplo:
+
+	cmp rcx, 0
+	jne startOfLoop
+
+es equivalente a:
+
+	cmp rcx, 0
+	je  endOfLoop
+	jmp startOfLoop
+endOfLoop:
+
+--- 7.7.4 Iteration
+Un loop basico puede implementarse con un contandor que se comprueba al 
+principio o al final del bucle con una comparacion y un salto condicional. Por 
+ejemplo, el siguiente programa suma numeros impares entre 1 y 30:
+
+	lpCnt    dq    15
+	sum      dq    0
+
+	mov      rcx, qword [lpCnt]   ; loop counter
+	mov      rax, 1               ; odd integer counter
+sumLoop:
+	add      qword [sum], rax     ; sum current odd integer
+	add      rax, 2               ; set next odd integer
+	dec      rcx                  ; decrement loop counter
+	cmp      rcx, 0
+	jne      sumLoop
+	
+Existe una instruccion especial que permite realizar este proceso:
+
+loop <label>  ; equivale a: dec rcx ; cmp rcx, 0 ; jne <label>
+
+decrementa rcx, lo compara con 0 y salta a label si rcx!=0
+
+El ejemplo anterior se podria reescribir como:
+
+	mov     rcx, qword [maxN] ; loop counter
+	mov     rax, 1            ; odd integer counter
+sumLoop:
+	add     qword [sum], rax  ; sum current odd integer
+	add     rax, 2            ; set next odd integer
+	loop    sumLoop
+
+
+##### 8.0 Addressing Modes
+
+***** 8.1 Addresses and Values
+Para acceder al valor de una direccion de memoria, se usa []. Si se omiten los 
+corchetes se esta usando la direccion de memoria del registro o variable.
+
+mov    rax, qword [var1]    ; value of var1 in rax
+mov    rax, var1            ; address of var1 in rax
+
+Al acceder a memoria, la mayoria de veces el tamano del operando esta claro:
+
+mov    eax, [rbx] ; mueve una double-word de memoria
+
+peor en algunas instrucciones el tamano puede ser ambiguo:
+
+inc     [rbx] ; error, no se sabe si la direccion accedida contiene un byte, 
+              ; word o double-word. En estos casos se debe ser explicito.
+              
+inc     byte [rbx]
+inc     word [rbx]
+inc     dword [rbx]
+
+--- 8.1.1 Register Mode Addressing
+mov     eax, ebx
+
+--- 8.1.2 Immediate Mode Addressing
+mov     eax, 123
+
+--- 8.1.3 Memory Mode Addressing
+El acceso a memoria tambien se conoce como indirection o dereferencing. La forma
+mas basica es:  mov  rax, qword [qNum] , y suele llevar mas tiempo que con un 
+inmediato, porque la CPU debe obtener el dato de memoria.
+Cuando se accede a un array, se requiere un metodo mas generalizado. Por 
+ejemplo:
+
+lst     dd    101, 103, 105, 107
+
+lst[0] = lst + 0, lst[1] = lst + 4, lst[2] = lst + 8, etc
+
+Por ejemplo, para acceder al tercer elemento de la lista se puede usar una de 
+estas tres opciones:
+
+mov     rbx, lst
+mov     rsi, 8
+
+mov     eax, dword [lst+8]   ; 1
+mov     eax, dword [rbx+8]   ; 2
+mov     eax, dword [rbx+rsi] ; 3
+
+Ademas, el desplazamiento se puede calcular de manera mas compleja:
+
+[ baseAddr + (indexReg * scaleValue ) + displacement ]
+
+donde baseAddr es el nombre de un registro o variable, indexReg debe ser un 
+registro, scaleValue es un inmediato con valor 1,2,4 o 8, y displacement debe 
+ser un inmediato. El total representa una direccion de 64 bits.
+
+
+mov     eax, dword [var1]
+mov     rax, qword [rbx+rsi]
+mov     ax, word [lst+4]
+mov     bx, word [lst+rdx+2]
+mov     rcx, qword [lst+(rsi*8)]
+mov     al, byte [buff-1+rcx]
+mov     eax, dword [rbx+(rsi*4)+16]
+
+
+##### 9.0 Process Stack
+***** 9.2 Stack Instructions
+push    <operand64> ; ajusta rsp (rsp-8) y luego copia el operado a [rsp]
+pop     <operand64> ; saca el ultimo valor del stack y ajusta rsp (rsp+8)
+
+***** 9.3 Stack Implementation
+El registro rsp apunta al tope del stack en memoria. En esta arquitectura, el 
+stack crece hacia abajo.
+
+
+##### 11.0 Macros
+***** 11.1 Single-Line Macros
+%define    mulby4(x)    shl x, 2
+
+mulby4 (rax)
+
+***** 11.2 Multi-Line Macros
+%macro <name> <number of arguments>
+  ; [body of macro]
+%endmacro
+
+%macro abs 1
+	cmp %1, 0
+	jge %%done
+	neg %1
+%%done:
+%endmacro
+
+Uso: abs eax
+
+
+##### 12.0 Functions
+***** 12.1 Updated Linking Instructions
+Se puede usar el linker de gcc para los programas en asm:
+
+yasm -g dwarf2 -f elf64 example.asm -l example.lst
+gcc -g -o example example.o (en Ubuntu 18 o superior, agregar -no-pie) 
+
+***** 12.4 Function Declaration
+global <procName>
+<procName>:
+	; function body
+ret
+
+***** 12.5 Standard Calling Convention
+La calling convention que usa C de 64 bits es System V AMD64 ABI. En Linux es 
+ligeramente diferente que en Windows.
+
+***** 12.6 Linkage
+El linkage se refiere al proceso de entrar y salir de una funcion. Para ello se
+usan las instrucciones call <funcName> y ret. 
+
+call guarda la return address, es decir, el contenido del rip en el stack para 
+poder volver cuando salga de la funcion a la que va a entrar. rip contiene la 
+direccion de la siguiente instruccion, por lo que al volver de la funcion, esta
+instruccion sera la siguiente.
+
+ret extrae el rsp (top del stack) en rip para restaurar la return address.
+
+Como el stack se va a usar para soportar el linkage, no debe corrmoperse, es 
+decir, si se meten valores con pop, se deben extraer con push antes de retornar
+para que quede igual que antes.
+
+***** 12.7 Argument Transmission
+Hay varias maneras de pasar argumentos a una funcion:
+
+Por registros:
+	-Limitado al numero de registros
+	-Usado para los 6 primeros argumentos enteros
+	-Usado para las system calls
+Variables definidas globalmente:
+	-Util en algunas circustancias, pero generalmente confuso
+Por el stack:
+	-No hay limite de argumentos
+	-Tiene mas overhead en runtime
+	
+La calling routine se denomina caller y la routine llamada se denomina callee.
+
+***** 12.8 Calling Convention
+El prologo de la funcion es el codigo al comienzo de la funcion, y el epilogo es
+el codigo al final. Las operaciones realizadas en el prologo y el epilogo se 
+encargan de seguir la calling convention. Generalmente guardan el estado previo 
+a la llamada de la funcion, y luego lo restauran antes de retornar.
+
+--- 12.8.1 Parameter Passing
+Los primeros seis argumentos enteros se pasan por: 
+
++--------+---------+---------+---------+---------+
+| Arg no | 64-bits | 32-bits | 16-bits |  8-bits |
++--------+---------+---------+---------+---------+
+|       1|   rdi   |   edi   |    di   |   dil   | 
++--------+---------+---------+---------+---------+
+|       2|   rsi   |   esi   |    si   |   sil   |
++--------+---------+---------+---------+---------+
+|       3|   rdi   |   edx   |    dx   |    dl   |
++--------+---------+---------+---------+---------+
+|       4|   rci   |   ecx   |    cx   |    cl   |
++--------+---------+---------+---------+---------+
+|       5|    r8   |   r8d   |   r8w   |   r8b   |
++--------+---------+---------+---------+---------+
+|       6|    r9   |   r9w   |   r9w   |   r9b   |
++--------+---------+---------+---------+---------+
+
+Si se necesita pasar mas argumentos se pasan por el stack en orden inverso. Por
+ejemplo func(one, two, three, four, five, six, seven, eight, nine) haria un push
+order de nine, eight y seven.
+
+Para argumentos de coma flotante se usan los registros xmm0 a xmm7.
+
+Para ajustar el valor del stack despues de la funcion, se ajusta rsp en vez de 
+hacer pop con los valores.
+
+Para el valor de retorno de las funciones, se usa el registro A (al, ax, eax,
+rax o xmm0 dependiendo del tamaño del valor).
+
+--- 12.8.2 Register Usage
+El uso de cada registro es el siguiente:
+
+rax: return value 
+rbx: callee saved (by function)
+rcx: 4th argument
+rdx: 3th argument
+rsi: 2nd argument
+rdi: 1st argument
+rbp: callee saved (by function)
+rsp: stack pointer
+r8 : 5th argument
+r9 : 6th argument
+r10: temporary
+r11: temporary
+r12: callee saved (by function)
+r13: callee saved (by function)
+r14: callee saved (by function)
+r15: callee saved (by function)
+
+Los registros temporales (rax, r10 y r11), los registros de argumentos (rdi, 
+rsi, rdx, rcx, r8 y r9) y ninguno de los registros flotantes no se preservan 
+entre llamadas a funcion.
+
+--- 12.8.3 Call Frame
+Basandose en la calling convention, los items del stack deben seguir un formato
+concreto. Los posibles items en un call frame son:
+
+-return address (necesaria)
+-preserved registers (si hay)
+-argumentos pasados (si hay)
+-variables locales dinamicas del stack (si hay)
+
+La standard calling convention no requiere explicitamente el uso del rbp y 
+algunos compiladores pueden no usarlo por optimizaciones.
+
+--- 12.8.3.1 Red Zone
+En las calling conventions de Linux, los primeros 128 bytes despues de rsp estan
+reservados para su uso en la funcion. Esto permite a los compiladores realizar 
+optimizaciones.
+
+***** 12.9 Ejemplo
+Funcion: stats1(arr, len, &sum, &ave);
+
+Caller:
+
+mov     rcx, ave         ; 4th arg, addr of ave
+mov     rdx, sum         ; 3rd arg, addr of sum
+mov     esi, dword [len] ; 2nd arg, value of len
+mov     rdi, arr         ; 1st arg, addr of arr
+call    stats1
+
+Callee:
+
+global stats1
+stats1:
+	push    r12 ; prologue
+	...
+	pop     r12 ; epilogue
+	ret
+	
+La eleccion de r12 es arbritaria, sirve cualquier saved register.
+
+***** 12.11 Stack-Based Local Variables
+Para allocar variables locales en el stack se ajusta el rsp. Cuando la funcion
+acaba, se libera todo el espacio usado haciendo mov rsp, rbp.
+
+Por ejemplo para crear un array de 100 enteros y otro entero que guarde el 
+resultado, el preambulo seria:
+
+push    rbp       ; guardar rbp
+mov     rpb, rsp  ; apuntar al rbp guardado
+sub     rsp, 404  ; allocar espacio para las dos variables en el stack
+push    rbx       
+push    r12
+
+Las variables pueden ser accedidas con un offset desde el rbp:
+mov     dword [rbp-404], 0
+
+Finalmente el epilogo quedaria:
+
+pop     r12
+pop     rbx
+mov     rsp, rbp  ; clear locals
+pop     rbp
+ret
+
+
+##### 13.0 System Services
+
+***** 13.1 Calling System Services
+Cuando se llama a system services, los argumentos se ubican en los registros
+estandar, y no se suelen pasar argumentos por el stack.
+El system services call code se ubica en rax, y los argumentos en di, rsi, rdx,
+rcx, r8, y r9 en el mismo orden que funciones normales. Cuando se han 
+establecido los registros, se ejecuta la instruccion syscall, que detiene la 
+ejecucion del programa y transfiere el control al sistema operativo hasta que 
+termine de realizar el servicio.
+
+***** 13.3 Console Output
+Como en otros lenguajes de alto nivel, en ensamblador tambien se imprime por el
+descriptor STDOUT, que ya esta abierto previamente. 
+
+SYS_write
+
+rax: Call code = SYS_write (1)
+rdi: Output location, STDOUT (1)
+rsi: address of characters to output
+rdx: number of characteres to output
+
+Ejemplo:
+STDOUT       equ    1
+SYS_write    equ    1
+msg          db     "Hello World"
+msgLen       dq     11
+
+mov       rax, SYS_write
+mov       rdi, STDOUT
+mov       rsi, msg
+mov       rdx, qword [msgLen]
+syscall
+
+***** 13.4 Console Input
+Para leer caracteres de entrada se usa el descriptor STDIN del teclado.
+Al leer caracteres puede suceder que se lean mas caracteres que los indicados, 
+en cuyo caso seran ignorados. Pero tambien puede suceder que se lean menos de lo
+esperado. 
+Cuando se lee de un fichero si se leen mas caracteres de la cuenta, se puede
+terminar leyendo lineas posteriores a la deaseada.
+Para solucionar este problema, se lee de un caracter en un caracter hasta que se
+lea un LF. Cada caracter leido se almacena en un array. 
+
+SYS_read
+
+rax: Call code = SYS_read (0)
+rdi: Input location, STDIN (0)
+rsi: Address of where to store characters read
+rdx: Number of characters to read
+
+***** 13.5 File Open Operations
+Para poder leer y escribir en ficheros, hace falta abrirlos primero. Esto se
+realiza con las operaciones open y open/create. Al solicitar estas operaciones
+se intenta abrir el fichero y se devuelve el descriptor en caso de que se abra
+bien o un error en caso contrario. 
+El descriptor de fichero es usado por el sistema operativo para tener 
+informacion sobre el fichero. Esta informacion se guarda en una estructura de 
+datos conocida como FCB (File Control Block). En esencia el FD referencia al
+FCB correcto.
+
+--- 13.5.1 File Open
+Para especificar el modo de acceso se usan flags:
+
+-Read-Only  = O_RDONLY
+-Write-Only = O_WRONLY
+-Read/Write = O_RDWR
+
+Ademas de estos modos, se puede agregar otros haciendo ORing con ellos.
+
+SYS_open
+
+rax: Call code = SYS_open (2)
+rdi: Address of NULL terminated file name string
+rsi: File access mode flag
+
+Si tiene exito, rax contiene el FD
+
+--- 13.5.2 File Open/Create
+Si no existe el fichero se crea y si existe, se elimina y se crea uno con el 
+mismo nombre. Como se esta creando el fichero, se deben especificar los permisos
+de user, group y world.
+
+SYS_creat
+
+rax: Call code = SYS_creat (85)
+rdi: Address of NULL terminated file name string
+rsi: File access mode flag
+
+***** 13.6 File Read
+SYS_read
+
+rax: Call code = SYS_read (0)
+rdi: File descriptor (of open file)
+rsi: Address of where to store characters read
+rdx: Number of characters to read
+
+***** 13.7 File Write
+SYS_write
+
+rax: Call code = SYS_write (1)
+rdi: File descriptor (of open file)
+rsi: address of characters to output
+rdx: number of characteres to output
+
+Nota: en el libro hay codigos de ejemplo para leer y escribir en ficheros
+
+
+##### 14.0 Multiple Source Files
+***** 14.1 Extern Statement
+Para informar al assembler que el codigo de una funcion no se encuentra en el 
+fichero actual se usa el statement extern:
+
+extern <symbolName>
+
+Ejemplo:
+
+extern stats
+
+section .text
+global _start
+_start:
+	...
+	call stats
+	...
+
+Donde se defina stats no hace falta declararlo de ninguna manera en especifico,
+sino como una funcion mas.
+
+***** 14.3 Interfacing with a High-Level Language
+--- 14.3.1 Example, C++ Main / Assembly Function
+En C++ en el fichero donde se use la funcion asm se debe declarar:
+
+extern "C" void stats(int[], int, int *, int *);
+
+En C:
+
+extern void stats(int[], int, int *, int *);
+
+Al compilar se deben juntar los .o del asm y de c/c++ para producir el 
+ejecutable.
+
+
+##### 15.0 Stack Buffer Overflow
+Un stack buffer overflow se produce cuando se guarda un buffer en el stack y 
+en este buffer se guarda mas bytes que los que se supone que iba a tener, 
+sobreescribiendo otras variables del stack.
+Por ejemplo el siguiente stack ha guardado el rip y el rbp como cualquier otra
+funcion, y ademas tiene una varible local que es un buffer de 48 bytes (int[12]
+por ejemplo):
+
+...
+rip
+rbp
+^         <- buffer[-1]
+|
+48 bytes
+|
+v         <- buffer[0]
+...
+
+Si el buffer se escriben mas de 48 bytes, los bytes a partir del 48 
+sobreescribiran el rbp y el rip, lo que puede ser usado malintencionadamente 
+para un ataque.
+Cuando la funcion termine su ejecucion restablecera el rbp y el rip con el valor
+del stack. Si el rip sobreescrito es una direccion que no es accesible, se 
+producira un segmentation fault. En el caso de un ataque, se suele sobreescribir
+con una direccion de una funcion payload para que el programa la ejecute.
+
+En los ataques por stack smashing se suele llenar el buffer con NOPs, destuir el
+rbp con NOPs y establecer el rip para que apunte al comienzo del buffer con los
+NOPs. Al final de los NOPs y antes del rip se puede inyectar codigo, como una
+syscall para obtener una terminal como root. De esta forma al llamar a la 
+funcion, el programa se quedara en bucle atrapado en el codigo inyectado. 
+Este codigo se suele inyectar si el programa solicita informacion por stdin, 
+entonces el atacante introduce en hexadecimal el codigo.
+
+Hay ciertas medidas de seguridad contra este tipo de ataques, como los stack 
+canaries, que son direcciones randomizadas que se ponen antes del rip , y que el
+programa vigila que no se sobreescriban, para que cuando sean sobrescritas 
+eviten el posible ataque. Tambien se pueden usar rip randomizados u otras 
+medidas.  
+
+
+##### 16.0 Command Line Arguments
+***** 16.3 Argument Count and Argument Vector Table
+Por convencion el argc se pasa por rdi, y el argv se pasa por rsi. A donde 
+apunte rsi se encuentran los argumentos en formato ascii con terminacion en \0
+en orden del 0 al n. 
+
+
+##### 17.0 Input/Output Buffering
+Al leer un fichero de disco se tiene que usar una syscall, que involucra cambiar
+a modo kernel, DMA, interrupciones, etc. Por eso suele ser costoso leer de 
+disco. Para evitar esta sobrecarga, se realiza una llamada a la syscall y se 
+guarda un bloque del fichero en un buffer en memoria para leer de este buffer 
+sin involucrar al SO. El buffer se va rellenando cada vez que se acaba hasta 
+leer el fichero completo, resultando en muchas menos llamdas a syscall. Este
+procedimiento lo realizan funciones como getLine() internamente.  
+
+
+##### 18.0 Floating-Point Instructions
+En x86 de 64 bits existen dos tipos flotantes: de precision simple (32-bits) o
+de precision doble (64-bits).
+Los registros xmm0 a xmm15 miden 128 o 256 bytes y sirven para guardar estos 
+datos.
+
+***** 18.3 Data Movement
+
+movss    <dest>, <src>  ; 32bits <- 32bits
+movsd    <dest>, <src>  ; 64bits <- 64bits
+
+***** 18.4 Integer / Floating-Point Conversion Instructions
+;float a float
+cvtss2sd     <RXdest>, <Rxsrc>  ; Rxdest(64b) <- Rxsrc(32b)
+
+cvtsd2ss     <RXdest>, <Rxsrc>  ; Rxdest(32b) <- Rxsrc(64b) redondea
+cvttsd2ss    <RXdest>, <Rxsrc>  ; Rxdest(32b) <- Rxsrc(64b) trunca
+
+; float a int
+cvtss2si     <reg>, <Rxsrc>     ; reg(32/64b) <- Rxsrc(32b) redondea
+cvttss2si    <reg>, <Rxsrc>     ; reg(32/64b) <- Rxsrc(32b) trunca
+
+cvtsd2si     <reg>, <Rxsrc>     ; reg(32/64b) <- Rxsrc(64b) redondea
+cvttsd2si    <reg>, <Rxsrc>     ; reg(32/64b) <- Rxsrc(64b) trunca
+
+; int a float
+cvtsi2ss     <RXdest>, <src>    ; RXdest(32b) <- src(32b)
+cvtsi2sd     <RXdest>, <src>    ; RXdest(64b) <- src(32b)
+
+***** 18.5 Floating-Point Arithmetic Instructions
+
+--- 18.5.1 Floating-Point Addition
+
+; <RXdest> = <RXdest> + <src>
+addss    <RXdest>, <src>
+addsd    <RXdest>, <src>
+
+--- 18.5.2 Floating-Point Subtraction
+
+; <RXdest> = <RXdest> - <src>
+subss    <RXdest>, <src>
+subsd    <RXdest>, <src>
+
+--- 18.5.3 Floating-Point Multiplication
+
+; <RXdest> = <RXdest> * <src>
+mulss    <RXdest>, <src>
+mulsd    <RXdest>, <src>
+
+--- 18.5.4 Floating-Point Division
+
+; <RXdest> = <RXdest> / <src>
+divss    <RXdest>, <src>
+divsd    <RXdest>, <src>
+
+--- 18.5.5 Floating-Point Square Root
+
+; <RXdest> = sqrt(<src>)
+sqrtss    <RXdest>, <src>
+sqrtsd    <RXdest>, <src>
+
+***** 18.6 Floating-Point Control Instructions
+La instruccion cmp no sirve para datos flotantes. En su lugar hay que usar otras
+dos instrucciones que configuran las rFlag como lo hace cmp con datos enteros.
+
+ucomiss    <RXsrc>, <src>
+ucomisd    <RXsrc>, <src>
+
+Despues de esto se pueden usar los saltos condicionales je, jne, etc. de la 
+misma manera que con numeros enteros.
+
+***** 18.7 Floating-Point Calling Conventions
+Los primeros 8 argumentos enteros se pasan por xmm0-xmm7, el resto por el stack.
+Los registros xmm no se preservan despues de la llamada.
+
+19.0 Parallel Processing
+20.0 Interrupts
+
+

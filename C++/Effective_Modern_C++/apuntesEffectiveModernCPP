@@ -1,0 +1,184 @@
+Apuntes sobre el libro:
+
+Effective Modern C++
+by Scott Meyers
+isbn=9781491903995
+
+
+********************************************************************************
+* Chapter 1. Deducing Types ****************************************************
+********************************************************************************
+
+***** ITEM 1: Understand template type deduction.
+
+Cuando se llama a una function template:
+
+template<typename T>
+void f(ParamType param);
+
+f(expr)
+
+se deducen el tipo T y el tipo ParamType, que suelen ser diferentes (Paramtype
+puede tener decoradores como const). Por ejemplo en:
+
+
+template<typename T>
+void f(const T& param); 
+
+int x = 0;
+f(x);
+
+T es int y ParamType es const int&. No suele ser tan intuitivo en todos los 
+casos, porque T no depende directamente del tipo del argumento, sino tambien de 
+ParamType. Hay tres casos:
+
+1. ParamType es un tipo puntero o referencia, pero no una referencia universal
+(explicadas en el item 24)
+2. ParamType es una referencia universal
+3. ParamType no es un puntero o referencia
+
+template<typename T>
+void f(ParamType param);
+
+f(expr);                // deduce T and ParamType from expr
+
+Caso 1: si el tipo de expr es una referencia, se ignora la parte de la 
+referencia y se hace pattern matching sobre el tipo de expr contra ParamType 
+para determinar T. Por ejemplo:
+
+int x = 27;             // x is an int
+const int cx = x;       // cx is a const int
+const int& rx = x;      // rx is a reference to x as a const int
+ 
+f(x);                   // T is int, param's type is int&
+f(cx);                  // T is const int,
+                        // param's type is const int&
+f(rx);                  // T is const int,
+                        // param's type is const int&
+
+Si se cambia el parametro de f a const T&:
+
+template<typename T>
+void f(const T& param);  // param is now a ref-to-const
+
+int x = 27;              // as before
+const int cx = x;        // as before
+const int& rx = x;       // as before
+
+f(x);                    // T is int, param's type is const int&
+f(cx);                   // T is int, param's type is const int&
+f(rx);                   // T is int, param's type is const int&
+
+Si param fuera un puntero o un puntero a const, funcionaria igual.
+
+Caso 2: si el tipo del parametro es T, el tipo de la referencia universal es 
+T&&.
+Si expr es un lvalue, T y ParamType se deducen como referencias a lvalue. Esto 
+es extraño porque es la unica ocasion en la que T se deduce como una referencia,
+y ParamType, que fue declarado como una rvalue reference, se declara como una
+lvalue reference. 
+Si expr es un rvalue, se aplica la regla normal (Caso 1).
+
+template<typename T>
+void f(T&& param);       // param is now a universal reference
+
+int x = 27;              // as before
+const int cx = x;        // as before
+const int& rx = x;       // as before
+
+f(x);                    // x is lvalue, so T is int&,
+                         // param's type is also int&
+f(cx);                   // cx is lvalue, so T is const int&,
+                         // param's type is also const int&
+f(rx);                   // rx is lvalue, so T is const int&,
+                         // param's type is also const int&
+f(27);                   // 27 is rvalue, so T is int,
+                         // param's type is therefore int&&
+
+Este caso se explica en el Item 24. 
+
+Caso 3: cuando ParamType no es un puntero o referencia, es paso por valor. T se 
+deduce de expr, ignorando las referencias o const.
+
+int x = 27;          // as before
+const int cx = x;    // as before
+const int& rx = x;   // as before
+
+f(x);                // T's and param's types are both int
+f(cx);               // T's and param's types are again both int
+f(rx);               // T's and param's types are still both int
+
+El hecho de que se quite las referencia y const se debe a que el objeto de la
+funcion es una copia.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+***** ITEM 7: Distinguish between () and {} when creating objects 
+
+
+De forma general una variable se puede inicializar de cuatro formas:
+ - int x(0)
+ - int y = 0
+ - int z{0}
+ - int z = {0}
+Las dos ultimas son equivalentes y el compilador las trata igual.
+
+Para built-in types la diferencia entre {} y = es academica. Pero para tipos
+definidos por el usuario es diferente:
+
+Widget w1;      // call default constructor
+Widget w2 = w1; // not an assignment; calls copy ctor
+w1 = w2;        // an assignment; calls copy operator=
+
+Las braced initialization permite indicar el contenido inicial de un 
+contenedor:
+
+std::vector<int> v{ 1, 3, 5 }; // v's initial content is 1, 3, 5
+
+Para inicializar tipos de valores no estaticos es equivalente a la 
+inicializacion con =
+
+class Widget {
+…
+private:
+    int x{ 0 }; // fine, x's default value is 0
+    int y = 0;  // also fine
+    int z(0);   // error!
+};
+
+Los objetos incopiables deben ser inicializados con {} o () pero no con =. Por
+ejemplo los std::atomic<>
+
+Una de las caracteristicas de {} es que no permite el estrechamiento y por 
+tanto comprueba que el tipo es valido en tiempo de compilacion.
+
+El uso de {} puede ser problematico cuando se definen constructores con 
+std::initilizer_list porque en algunos casos no sabremos que constructor se
+va a aplicar.
+
+
+
+
+
+
+
+
+
+
+

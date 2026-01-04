@@ -1,0 +1,93 @@
+Las lambdas son functores, que el compilador crea como una clase nueva en la que
+sobrecarga el operator() con el contenido del lambda.
+
+El tipo de una lambda es por tanto desconocido por el programador. Una lambda se
+puede almacenar de tres formas:
+
+- En un puntero a funcion: unicamente si la clausula de captura esta vacia:
+double (*addNumeros1)(double,double) {
+    [](double a, double b) {
+        return (a + b);
+    }
+};
+
+- En un objeto std::function:
+std::function<double(double,double)> addNumeros2 {
+    [](double a, double b) {
+        return (a + b),
+    }
+};
+
+- En una variable auto con su tipo real:
+auto addNumeros3 {
+    [](double a, double b) {
+        return (a + b);
+    }
+};
+
+El formato de una labmda es:
+
+[clausulaCaptura](parametros) -> tipoRetorno {
+    declaraciones
+}
+
+en clausula de captura se ponen las variables externas que se quieren usar en la
+lambda. El compiladores crear una variable dentro de la clase de la lambda con 
+el mismo nombre que la externa, pero le agregara el modificador const. Si se 
+quiere modificar esta variable, habria que marcar como mutable la lambda. P.e:
+
+int variable;
+auto lambda1 {
+    [variable]() mutable {
+        --variable; // Si el mutable no se podria hacer esto
+    }
+};
+
+Al ser copias, variable seguira igual despues de la lambda, pues solo se habra 
+modificado en la variable copiada en la lambda.
+
+Si no se quiere este comportamiento, se puede usar captura por referencia, que 
+afectaria a las variables capturadas. Al capturar por referencia las variables 
+solo son const si la original es const.
+
+int variable;
+auto lambda1 {
+    [&variable]() mutable {
+        --variable;
+    }
+};
+
+Se puede mezclar capturas por copia con capturas por referencia. Ademas, se 
+puede indicar al compilador que agregue como capturas las variables que usemos
+en el cuerpo del lambda, y asi evitar cometer fallos al escribirlas manualmente.
+Para ello se indica con = para copia y & para referencia:
+
+int variable;
+auto lambda1 {
+    [=]() mutable {
+        --variable; // variable capturada por copia
+    }
+};
+
+int variable;
+auto lambda1 {
+    [&]() mutable {
+        --variable; // variable capturada por referencia
+    }
+};
+
+
+En vez de por copia y por referencia, se puede capturar por movimiento:
+
+int variable;
+auto lambda1 {
+    [var=std::move(variable)]() mutable {
+        --var; // variable capturada por referencia
+    }
+};
+
+Esto inutiliza variable, pero es mas eficiente si no se va a usar mas.
+
+
+
+

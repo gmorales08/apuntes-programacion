@@ -1,0 +1,75 @@
+Al compilar un programa con GCC, usar la opcion -g para agregar informacion de 
+debug.
+
+> valgrind ./programa 
+	para analizar el programa. Importante poner ./ o la ruta correspondiente.
+	mirar HEAP SUMMARY y LEAK SUMMARY
+	El parametro --tool=memcheck esta implicito si no se indica otra tool
+	
+> -v
+    Verbose. Ofrece informacion adicional 
+	
+	
+==Algunos flags y tips== 
+https://stackoverflow.com/questions/5134891/how-do-i-use-valgrind-to-find-memory-leaks
+
+
+------------------
+CALLGRIND
+------------------
+Tool util para contar el numero de instrucciones del programa
+
+> valgrind --tool=callgrind ./programa 
+	La ultima linea indica el numero de instrucciones
+	
+> valgrind --tool=callgrind --dump-line=yes ./program
+> callgrind_annotate --auto=yes callgrind.out 
+	produce una salida comentada con el numero de instrucciones de cada funcion
+	
+-------------------
+CACHEGRIND
+-------------------
+Tool para contar el numero de cache misses que hay en cada funcion
+
+> valgrind --tool=cachegrind ./programa
+	Muestra I refs que indica el numero de "Instruction cache references", que 
+	es equivalente al numero de instrucciones del programa.
+	
+> valgrind --tool=cachegrind --cache-sim=yes ./programa
+	Simula una maquina con cache de nivel 1 y 2.
+	I refs son las referencias a la cache de instrucciones (nº de instrucciones)
+	I1 es el primer nivel de cache de instrucciones
+	LLi es el segundo nivel de cache de instrucciones
+	D refs son las referencias a la cache de datos (nº de accesos a memoria)
+	D1 es el primer nivel de cache de datos
+	LLd es el segundo nivel de cache de datos
+	La informacion mostrada permite ver cuantos accesos hay a cada cache y los
+	cache misses en cada nivel.
+	
+	Para mirar la cache de mi ordenador: lscpu
+	Para modificar la cache del simulador de cachegrind:
+	--I1=<size>,<associativity>,<line size>
+	--D1=<size>,<associativity>,<line size>
+	--LL=<size>,<associativity>,<line size>
+	
+> cg_annotate cachegrind.out.xxxx
+	Analiza el dump generado por cachegrind
+	
+-------
+MASSIF 
+-------
+Tool para perfilar el uso de heap. Sirve para rastrear las allocaciones del 
+programa.
+
+> valgrind --tool=massif ./programa
+    esto genera un massif.out.xxx
+> ms_print massif.out.xxx
+    imprime toda la informacion del uso del heap. Mirar la lista de llamadas en
+    cascada, donde indica el origen de cada malloc/new.
+
+Por defecto hay un threshold que indica el porcentaje para el que las llamadas a
+alloc con menos de ese porcentaje respecto total no sera trackeadas. Por defecto
+es 1%. Para suprimirlo hay que indicar --threshold=% en valgrind y ms_print:
+
+> valgrind --tool=massif --threshold=0 ./programa
+> ms_print --threshold=0 massif.out.xxx

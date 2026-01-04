@@ -1,0 +1,338 @@
+============= COMANDOS ================
+$ git status --untracked-files=all
+o
+$ git status -uall
+Muestra el status por cada fichero (no agrupa en directorios)
+
+$ git init 
+Para crear un .git con la informacion de un nuevo repo
+
+============= GIT CONFIG =============
+La configuracion de git por usuario se puede guardar en el fichero ~/.gitconfig
+con una estructura como:
+
+[user]
+    name = gmorales08
+    email = 888.gmd@gmail.com
+
+El fichero ~/.gitconfig guarda la informacion global para todos los repositorios
+y cada repositorio tiene su propio .git/config
+Para editar el global se agrega --global despues de git config, y para editar el 
+del repositorio, --local. Por defecto se asume --local
+Para ver la configuracion global actual:
+$ git config --global --list
+
+Algunos ejemplos para cambiar configuraciones:
+$ git config --global user.name "Nombre de usuario"
+$ git config --global user.email "email"
+$ git config --global color.ui "auto"
+$ git config --global core.editor "vim"
+
+Para windows:
+$ git config --global core.autocrlf true
+
+Hay algunas opciones que git autoconfigura por lo que no es recomendable 
+modificarlas.
+
+============= FICHEROS ================
+.git/info/exclude
+    los ficheros indicados aqui se ignoran localmente.
+
+============= BRANCHES ================
+$ git branch
+    muestra la rama actual
+$ git branch --list
+    muestra las ramas
+$ git branch feature-caracteristica
+    crea un rama nueva 
+    con -b se mueve a ella directamente
+$ git branch -d <rama>
+    elimina una rama
+$ git checkout <rama>
+    cambia de rama
+    
+$ git branch -m nombreAntiguo nombreNuevo
+    cambia el nombre de la rama
+    
+$ git log --oneline --graph --decorate --all
+    muestra el branch graph
+
+ESTRATEGIAS PARA INCORPORAR CAMBIOS A MASTER
+    1. MERGE:
+        ● Se crea un nuevo commit basado en el último commit de
+        master y en el último commit de documentation
+        ● La rama master ahora incluye los cambios de la rama
+        documentation
+        ● Nos posicionamos en la rama en la que queremos continuar
+        trabajando (master) y solicitamos el merge de la otra rama
+        (documentation)
+        
+        Comandos:
+        $ git checkout master
+        $ git merge <rama>
+
+    2. MERGE CON SQUASH:
+        ● Todos los commits de una rama se “fusionan” en un único
+        commit sobre la rama destino
+        ● El comando deja en el directorio de trabajo la fusión de los
+        commits
+        ● No hace el commit para que el usuario pueda revisar y editar
+        y haga él mismo el commit (con el mensaje que quiera)
+        ● La historia es lineal, pero se pierde trazabilidad
+        ● El repositorio no vincula las ramas master y documentation
+    
+        Comandos:
+        $ git checkout master
+        $ git merge <rama> --squash
+        
+    3. FAST-FORWARD MERGE:
+        ● Cuando no ha habido commits en master desde que se creó
+        la otra rama, no es necesario crear un commit de merge
+        ● Basta con hacer que la rama master apunte al último
+        commit de la rama que se quiere mezclar
+        ● Cuando se puede evitar el commit de merge se llama fast-
+        forward
+        ● Se puede forzar la creación del commit merge con la opción
+        --no-ff
+        ● El resultado obtenido con el merge con fast-forward hace
+        que el repositorio siga una evolución lineal sin perder
+        ningún commit (como con squash)
+        ● Pero si ha habido commits en master posteriores a la
+        creación de la rama, no se puede hacer
+        ● Existe una forma de transformar la rama para que
+        “empiece” en el último commit de máster > el “rebase”
+    
+        Comandos:
+        $ git checkout master
+        $ git merge <rama>
+        Git detecta que se puede hacer FF y lo hace. Para que no lo haga
+        hay que indicarlo con --no-ff
+        
+    4. FAST-FORWARD MERGE CON REBASE:
+        ● ¿Qué ocurre si se han hecho commits en master después de
+        haber creado la rama que se quiere mezclar?
+        ● No se permite el fast-forward merge
+        ● El rebase desplaza la nueva rama para que se base en el
+        último commit de la rama master
+        ● De esa forma se puede aplicar el fast-forward
+        
+        Comandos:
+        Intentamos el merge forzando fast-forward
+        $ git merge <rama> --ff-only
+        Rebasamos la rama sobre master
+        $ git checkout <rama>
+        $ git rebase master
+        Ahora se cumplen las condiciones para el fast-forward merge
+        Volvemos a intentar el merge
+        $ git merge <rama> --ff-only
+
+
+
+========== STASH ==========
+Stash es una zona separada temporal donde se pueden guardar los cambios locales
+para poder cambiar a otras ramas sin necesidad de comitearlos. Luego al volver a
+la rama donde estaba el stash se recupera y vuelve a como estaba antes. Se puede
+hacer stash varias veces, y los cambios se guardan en una pila.
+
+$ git stash list
+    muestra todos los stash en la pila
+    
+$ git stash show idStash
+    muestra informacion sobre un stash en concreto
+    
+Para guardar el working directory en un stash se hace:
+$ git stash 
+Para ponerle un nombre identificativo al stash:
+$ git stash save "Comentario sobre el stash"
+
+Para sacar un stash al working directory se hace:
+$ git stash apply // Guarda en la pila
+$ git stash drop  // Elimina de la pila
+Esto se puede hacer en un solo comando mejor:
+$ git stash pop
+
+En ambos casos se puede indicar tambien el numero de stash en la pila y no sacar
+unicamente la cabeza
+
+
+========== TAGS ==========
+$ git tag nombreTag
+    crea el tag en el commit actual
+    con -a se introduce un comentario sobre el tag
+$ git tag nombreTag hashCommit
+    crea el tag en el commit indicado
+$ git tag
+    muestra los tags
+$ git tag -d nombreTag
+    elimina los tags
+$ git show tag
+    informa sobre el tag 
+$ git push --tags
+    sube los tags al repositorio
+    
+-- Anotated tags
+guardan metadata como hora, mensaje, etc.
+
+$ git tag -a v1.0.0 -m "Release version 1.0.0"
+
+para hacer un tag de un commit en concreto: 
+
+$ git tag -a v1.1.0 abc1234 -m "Release 1.1.0"
+
+Si se quiere agregar un binario a la release se tiene que hacer desde la 
+interfaz de github
+
+-- Git package
+Git package permite empaquetar todo un commit excluyendo el .git con el 
+historico. Es util para hacer un snapshot de una release. Github lo hace 
+automaticamente al subir un tag.
+
+$ git archive --format=zip --output=release.zip HEAD
+	hace un package del ultimo commit
+	
+$ git archive --format=tar.gz --output=v2.1.0.tar.gz v2.1.0
+	crea un package de un tag especifico
+	
+$ git archive --format=tar --output=no-tests.tar HEAD \
+  --prefix=myproject/ \
+  --exclude="tests/*" \
+  --exclude="*.test.js"
+  excluye el directorio tests/ y todos los ficheros test.js 
+
+============= CONCEPTOS BASICOS ================
+
+ Working-Directory Staging-area Local-repo Remote-repo
+        |                 |          |           |
+        |----- add ------>|          |           | 
+        |                 |--commit->|           |
+        |                 |          |---push--->|
+        |                 |          |           |
+        |                 |          |<--fetch---|
+        |                 |          |           |
+        |<-----------checkout--------|           |
+        |                 |          |           |
+        |<-------------merge---------|           |
+        |                 |          |           |
+        |                 |          |           |
+        |                 |          |           |
+
+HEAD es una referencia que indica el commit del repositorio que ha
+cargado el directorio de trabajo
+
+HEAD apunta al commit que será parent commit del nuevo commit
+que hagamos
+
+
+PUSH: $git push <repo> <rama>
+      repo es el repositorio remoto, normalmente origin
+      rama es la rama remota, por ejemplo main
+
+FETCH: $git fetch
+        descarga el servidor remoto pero no integra su contenido en la 
+        rama master que tenemos en local
+        debemos hacer un git status para que nos diga que difiere del repo
+        remoto y como poder fusionarlo (merge) (ej. FF).
+        
+MERGE: $git merge
+        sirve para integrar los cambios de remoto a local
+        
+PULL: $git pull
+       equivale a git fetch seguido de git merge
+
+
+============= MODELOS DE DESARROLLO ================
+
+GIT FLOW
+
+TRUNK BASED DEVELOPMENT
+    De la rama master salen feature branches. El deploy se hace siempre
+    desde master, no desde las feature branches como GitHub flow.
+    
+    De master salen ramas release con el codigo de produccion. Esto es 
+    opcional.
+    En vez de release branches se puede poner un tag directamente a los
+    commits de master que queramos marcar como release.        
+        
+GITHUB FLOW:
+    Master está siempre lista para ser versionada y desplegada
+    Las ramas no se mezclan con master hasta que están listas
+    Pull requests para mezclar una feature en master
+    
+    De la rama master salen ramas por cada feature, que se integran
+    cuando esten listas a master.
+    Se hace deploy de las feature branches, no de master.
+    Cuando pasa un tiempo de haber hecho el deploy y se ve que funciona
+    bien, se hace merge a master. Esto asegura que main siempre sea
+    fiable.
+    
+    Ramas: feature/fix/update
+
+
+========== BLAME ==========
+$ git blame fichero
+    muestra el blame de un fichero concreto, con su numero de commit y autor
+    
+$ git blame numeroDeCommit fichero
+    muestra el blame pero de un commit concreto
+    
+Si se quiere ver que habia antes de ese commit, se puede usar la sintaxis de git
+para indicar el numero de commits antes de uno en concreto: 
+
+$ git blame numeroDeCommit~1 fichero
+
+Con el numero de commit podemos ver mas informacion haciendo un git show:
+$ git show numeroDeCommit
+
+
+========== GIT CHERRY PICK ==========
+$ git cherry pick hash1 hash2
+Toma uno o varios commits, copia sus cambios y crea un nuevo commit en la rama
+actual con esos cambios. Se utiliza para traer a una rama ciertos cambios de 
+otra sin hacer merge entero. 
+
+
+========== GIT RESET ==========
+$ git reset --hard <commit>
+Borra el contenido actual del area de trabajo y del area de staging (salvo los 
+ficheros untracked)
+Retrocede hasta el commit indicado
+Saca el contenido del mismo al directorio de trabajo
+No habrá posibilidad de recuperar los commits posteriores a menos que estén 
+apuntados por otra rama o tag
+
+$ git reset --hard HEAD
+Borra el contenido actual del area de trabajo y del area de staging (salvo los 
+ficheros untracked)
+Restaura en el directorio de trabajo el contenido del último commit de la rama
+
+$ git reset --soft <commit>
+Deja el area de trabajo y el area de staging sin cambios
+Retrocede hasta el commit que le digamos
+Como el area de trabajo (y staging) se mantienen, no se pierde contenido de los
+ficheros si se hace commit
+El histórico de commits si se pierde con el reset
+
+$ git reset --mixed <commit>
+Deja el area de trabajo sin cambios
+Borra el area de staging
+Retrocede hasta el commit que le digamos
+Como el area de trabajo se mantiene, no se pierde contenido de los ficheros si
+se hace commit
+El histórico de commits si se pierde con el reset
+Es el modo por defecto
+
+
+Si en algun caso se pierde un commit y no se ve en log, se puede ejecutar:
+
+$ git reflog
+
+y muestra los cambios de HEAD, incluidos los que no aparecen en git log
+
+
+========== PROBLEMAS Y SOLUCIONES ==========
+Si da problemas con el ssl (por ejemplo desde Windows), se puede intentar 
+desactivarlo:
+
+$ git config --global http.sslVerify false
+
+

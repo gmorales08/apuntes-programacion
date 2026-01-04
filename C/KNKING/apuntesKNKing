@@ -1,0 +1,176 @@
+Apuntes sobre el libro:
+
+C Programming: A Modern Approach Second Edition
+K. N. KING
+ISBN 978-0-393-97950-3 (pbk.)
+
+
+
+***** 16.4 Unions
+En una union, el compilador alloca espacio para el miembro mas largo. Al asignar
+valor a un miembro, puede que se sobrescriba el resto de miembros. Por ejemplo:
+union {
+int i;
+double d;
+} u;
+
+ocupa sizeof(double) y al escribir sobre u.i, se escribe tambien en los primeros
+sizeof(int) bytes de d.
+
+Unicamente se puede inicializar un primer miembro de la union:
+
+union {
+int i;
+double d;
+} u = {.d = 10.0};
+
+
+***** 22.2 File Operations
+<stdio.h> prove operaciones para entrada/salida con ficheros.
+
+El tipo de datos FILE es implementation specific y contiene diferentes variables
+para gestionar un fichero y su contenido.
+
+Para abrir un fichero se usa fopen: 
+
+FILE *fopen(const char * restrict filename,
+		    const char * restrict mode);
+
+Nota: la keyword restrict se puede usar en punteros y determina que esa zona de
+memoria a la que apunta no va a ser solapada. Es decir si se pasan dos punteros
+restrict a una funcion, esos dos punteros no pueden ser iguales o apuntar a la
+misma zona. Esto es una sugerencia para el compilador para optimizar el uso de
+esos punteros sin realizar ciertas comprobaciones. Aun asi, es solo una promesa
+del programador y se pueden pasar el mismo puntero y el programa puede romperse.
+
+Cuando fopen no puede abrir un fichero devuelve un nullpointer, se deberia 
+comprobar siempre si es asi.
+
+Modos de apertura:
+
+"r" : reading
+"w" : writing (file need not exist)
+"a" : appending (file need not exist)
+"r+": reading and writing. starting at beginning
+"w+": reading and writing (truncate if file exists)
+"a+": reading and writing (append if file exists)
+
+Para abrir en modo binario en vez de texto, se debe incluir una "b":
+
+"rb" : reading
+"wb" : writing (file need not exist)
+"ab" : appending (file need not exist)
+"r+b" or "rb+": reading and writing. starting at beginning
+"w+b" or "wb+": reading and writing (truncate if file exists)
+"a+b" or "ab+": reading and writing (append if file exists)
+
+
+Para cerrar un fichero se usa fclose:
+
+int fclose(FILE *stream);
+
+fclose devuelve zero si el fichero se ha cerrado con exito, y en otro caso 
+devuelve la macro EOF definida en <stdio.h>.
+
+
+Attaching a File to an Open Stream : 
+
+FILE *freopen(const char * restrict filename,
+		      const char * restrict mode,
+			  FILE * restrict stream);
+
+freeopen asigna un fichero diferente a un stream que ya esta abierto. Un uso 
+comun es asociar un fichero con stdin, stdout o stderr.
+freeopen devuelve el tercer argumento si lo abrio bien y si no NULL.
+
+
+Temporary files:
+
+<stdio.h> provee dos funciones para trabajar con ficheros temporales, que 
+existen unicamente durante la ejecucion del programa y se eliminan al llamar a 
+fclose: 
+
+FILE *tmpfile(void);   // Crea un fichero y lo abre con wb+
+char *tmpnam(char *s); // Genera un nombre para el archivo temporal
+
+
+File buffering:
+
+Las funciones de stdio generalmente usan buffering interno para mejorar el 
+rendimiento. En caso de querer gestionar manualmente el buffering se pueden usar 
+algunas funciones : 
+int fflush(FILE *stream);           
+void setbuf(FILE * restrict stream,
+            char * restrict buf);
+int setvbuf(FILE * restrict stream,
+            char * restrict buf,
+            int mode, size_t size);
+
+fflush hace flush del buffer interno del stream para vaciarlo. El buffer se 
+vacia automaticamente cuando se llena o se cierra el fichero.
+fflush(NULL); vacia todos los buffer de todos los streams.
+fflush devuelve zero si tiene exito o EOF si hay un error.
+
+setvbuf permite cambiar la forma en la que un fichero es buffered. El tercer 
+argumento especifica el tipo de buffering deseado y puede ser una de las 
+siguientes macros:
+
+ _IOFBF (full buffering), es la usada por defecto
+ _IOLBF (line buffering)
+ _IONBF (no buffering), no se usa ningun buffer y se lee directamente del stream
+
+Por ejemplo: 
+char buffer[N];
+...
+setvbuf(stream, buffer, _IOFBF, N);
+
+! setvbuf debe ser llamado despues de abrir el stream y antes de realizar 
+cualquier operacion sobre el.
+
+Si el segundo parametro es NULL, la funcion crea el buffer.
+
+
+setbuf es una funcion antigua que asume valores por defecto para setvbuf. Por 
+ejemplo setbuf(stream, buf) es igual a setvbuf(stream, buf, _IONBF, BUFSIZ);
+donde BUFSIZ es una macro definida en stdio.h. setbuf se considera obsoleta y
+no se recomienda su uso.
+
+
+Miscellaneous File Operations
+
+int remove(const char *filename);
+int rename(const char *old, const char *new);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

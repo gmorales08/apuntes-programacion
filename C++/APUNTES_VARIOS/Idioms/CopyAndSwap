@@ -1,0 +1,38 @@
+Este idiom se utiliza para sobrecargar el operador de asignacion cuand se sigue
+la rule of 3 o rule of 5. Define una manera sencilla de copiar un objeto sin 
+producir errores de liberacion de punteros o mas copias de las necesarias. Por 
+ejemplo:
+
+NaiveVector& NaiveVector::operator=(const NaiveVector& rhs) {
+    NaiveVector copy(rhs); // Llama al constructor de copia (habria que implementarlo)
+    copy.swap(*this);      // Se hace swap con implementacion propia
+    return *this;
+} // Se destruye copy (que ahora apunta al antiguo this)
+
+Para copy and swap con rvalues seria: 
+
+NaiveVector& NaiveVector::operator=(const NaiveVector&& rhs) {
+    NaiveVector copy(std::move(rhs)); 
+    copy.swap(*this);      
+    return *this;
+}
+Es necesario hacer el std::move explicito para que el compilador sepa que es 
+temporal
+
+
+Si el codigo no necesita diferenciar entre copia rvalue y copia lvalue, se puede
+dejar que el llamador del operador cree la copia por parametro y asi se pueden
+unificar:
+
+NaiveVector& NaiveVector::operator=(NaiveVector copy) {
+    copy.swap(*this);
+    return *this;
+}
+
+Aun asi esto no es tan comun, y se suele escribir explicitamente la copia rvalue
+y la lvalue, pero no habria problema en hacerlo asi.
+
+Mas explicado en este video de cppcon: 
+https://youtu.be/7Qgd9B1KuMQ?list=PLHTh1InhhwT4CTnVjJqnAKeMfGzOWjsRa
+
+

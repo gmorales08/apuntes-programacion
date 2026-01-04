@@ -1,0 +1,8 @@
+Interface inheritance
+	Se heredan las firmas de los metodos de la clase base y se deben implementar
+	en las clases derivadas. Es la tipica clase interfaz. 
+
+
+Implementation inheritance
+	La clase base define la implementacion de metodos que facilitara el que no
+	se tenga que implementar en clases derivadas.

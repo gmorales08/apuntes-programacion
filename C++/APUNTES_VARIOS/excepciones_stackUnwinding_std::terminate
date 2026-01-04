@@ -1,0 +1,83 @@
+Cuando un programa termina por un throw, se intenta capturar el objeto lanzado
+por ese throw en algun catch a traves del stack trace de funciones llamadas.
+Si no se encuentra ningun catch, se llama a std::terminate, que es 
+implementation defined. En algunas implementaciones termina directamente el 
+programa y en otras hace stack unwinding. 
+Stack unwinding consiste en que el programa va llamando a los destructores de 
+los objetos inicializados en el momento de que se hizo el throw a lo largo del 
+stack trace. De esta forma se libera toda la memoria inicializada aunque ocurra
+una excepcion.
+
+El hecho de que sea implementation defined hace que sea necesario hacer catch de
+las excepciones y no confiar en std::terminate.
+
+Si durante el stack unwinding se lanza otra excepcion, se llama automaticamente
+a std::terminate, por eso es mala practica lanzar excepciones en destructores o 
+no hacer catch de posibles excepciones en el destructor.
+
+Al hacer throw, el runtime crea una instancia del objeto lanzado en memoria.
+
+El runtime de gestion de excepciones suele estar en una libreria como 
+libgcc_s.so y tiene las funciones:
+    __cxa_throw       ; Para lanzar la excepcion
+    __cxa_begin_catch ; Para manejar la excepcion
+    __cxa_end_catch   ; Para continuar con la ejecucion
+
+Un ejemplo con gcc/clang es:
+---------------------------------------------------
+#include <iostream>
+
+void foo() {
+    throw std::runtime_error("Error!"); 
+}
+
+int main() {
+    try {
+        foo();
+    } catch (const std::exception& e) {
+        std::cout << "Caught: " << e.what() << "\n";
+    }
+}
+---------------------------------------------------
+foo():
+    mov edi, OFFSET FLAT:.LC0  ; Load exception message
+    call _ZNSt13runtime_errorC1EPKc ; Call std::runtime_error constructor
+    call __cxa_throw  ; Call runtime function to throw exception
+
+main():
+    call foo
+    jmp .L1
+.L1:
+    call __cxa_begin_catch  ; Start handling the exception
+    mov rdi, rax
+    call std::cout << e.what()
+    call __cxa_end_catch  ; End catch block
+---------------------------------------------------
+
+
+Hay varias alternativas para la gestion de excepciones, como el uso de tablas
+(zero-cost, c++), la integracion en el binario (setjmp/longjmp, c), etc.
+La alternativa de c++ es zero-cost porque solo agrega overhead cuando ocurre una
+excepcion, pero si ocurre suele agregar mucho overhead por el stack unwinding.
+
+https://gist.github.com/MangaD/8c22b388733b2d0b734969e58c94f58c#-2-how-compilers-optimize-exception-handling
+
+
+
+NOEXCEPT
+
+marcando un metodo como noexcept el compilador no realiza las comprobaciones de
+excepcion. Por ejemplo:
+
+sin noexcept:
+mov eax, [rsp+8]  ; Load function parameter
+cmp eax, 0
+jne throw_error   ; Check if an exception should be thrown
+
+con noexcept:
+mov eax, [rsp+8]  ; Load function parameter
+
+Contenedores como std::vector usan std::move si el constructor de movimiento es
+no except, si no usan el de copia!
+
+

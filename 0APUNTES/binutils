@@ -1,0 +1,48 @@
+*** OBJDUMP
+$ objdump -d a.out 
+    muestra el desensamblado de a.out
+$ objdump -Mintel
+    para que utilice sintaxis intel
+    
+    
+*** HEXDUMP
+$ hexdump binario --canonical
+$ hexdump -C fichero
+$ hd fichero
+	para mostrar el binario en formato canonico
+	
+$ hd -c 
+    Muestra la linea ascii debajo del hexadecimal
+    
+    
+*** STRINGS
+$ strings binario
+    imprime todas las cadenas del binario que tengan al menos 4 letras
+    
+    
+*** LTRACE
+$ ltrace ./a.out
+    muestra las llamadas a librerias dinamicas del programa durante su ejecucion
+    
+    
+*** STRACE
+$ strace ./a.out
+    muestra las syscalls y las signals que afecten al programa durante su 
+    ejecucion
+
+
+*** READELF
+Sirve para leer el contenido de un elf
+$ readelf -h elf
+    Muestra la informacion de la cabecera del elf
+$ readelf -WS elf
+    Muestra la informacion de la cabecera de las secciones
+    W es para que se pueda mostrar en mas de 80 columnas y se vea mejor
+
+
+
+
+
+
+
+

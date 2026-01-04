@@ -1,0 +1,30 @@
+"Non Virtual Interface"
+Este idiom propone crear un metodo publico no virtual que expone una 
+funcionalidad de una API que va a tener varias clases derivadas. 
+Este metodo publico no virtual se encarga de realizar un preprocesado y un 
+postprocesado comun a todas las implementaciones que se haran, y entre medias
+llama a un metodo protegido "impl". Este metodo impl es el que implementaran las
+clases derivadas.
+
+
+Ejemplo de CppCon2019/Presentations/back_to_basics_oop/
+
+// No NVI
+struct Logger
+{
+virtual void LogMessage(char const* message) = 0;
+virtual ~Logger() = default;
+};
+// NVI
+struct NVILogger
+{
+void LogMessage(char const* message)
+{ /* do prep */ DoLogMessage(message); /* do finish */ }
+virtual ~Logger() = default;
+private:
+virtual void DoLogMessage(char const* message) = 0;
+};
+
+
+Este idiom se usa como practica para asegurar "Consider making virtual functions
+non-public, and public functions non-virtual".

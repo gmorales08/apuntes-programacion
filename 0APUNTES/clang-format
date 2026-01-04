@@ -1,0 +1,6 @@
+clang format busca automaticamente un .clang-format desde el directorio en el 
+que se invoca hacia la raiz del sistema.
+Normalmente imprime las correcciones por stdout. Para hacer que guarde las 
+correcciones en los ficheros hay que pasarle la opcion -i:
+
+$ clang-format -i file1 file2 file3

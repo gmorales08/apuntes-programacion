@@ -1,0 +1,295 @@
+******************************
+***** Picking a compiler *****
+******************************
+
+Cmake respeta las variables CC y CXX del sistema. Si se quieren editar se tiene
+que hacer antes de llamar a cmake:
+
+$ CC=clang CXX=clang++ cmake ..
+
+
+*******************************
+***** Picking a generator *****
+*******************************
+
+con $ cmake --help podemos ver los generadores disponibles y el predeterminado
+Por defecto se suele usar make pero se puede cambiar con -G"My tool" o con la
+variable CMAKE_GENERATOR
+
+
+***************************
+***** Setting options *****
+***************************
+
+Las opciones se pueden establecer con -D individualmente o con -L para 
+especificar una lista de opciones.
+
+
+*******************
+***** Options *****
+*******************
+
+Cmake soporta cached options, que permiten escribir las variables marcadas como
+cached en un CMakeCache.txt.
+
+Standard options:
+ -DCMAKE_BUILD_TYPE= // Release, RelWithDebInfo, Debug u otras
+ -DCMAKE_INSTALL_PREFIX= // directorio de instalacion. Por defecto suele ser 
+                         // /usr/local
+ -DBUILD_SHARED_LIBS= // ON o OFF para controlar las shared lib. (el autor puede
+  elegir una u otra en vez de la opcion por defecto)
+ -DBUILD_TESTING= // Para establecer tests
+
+
+**************************************
+***** Debugging your CMake files *****
+**************************************
+
+Se puede anadir el parametro --trace para imprimir todas las lineas de CMAKE 
+ejecutadas.
+Con --trace-source="filename" se imprimiran solo las que afecten a fileName.
+ 
+
+***************************
+***** Do's and Don'ts *****
+***************************
+
+CMake Antipatterns:
+ - Do not use global functions: This includes link_directories , 
+ include_libraries , and similar.
+ - Don't add unneeded PUBLIC requirements: You should avoid forcing something on 
+ users that is not required ( -Wall ). Make these PRIVATE instead.
+ - Don't GLOB files: Make or another tool will not know if you add files without 
+ rerunning CMake. Note that CMake 3.12
+adds a CONFIGURE_DEPENDS flag that makes this far better if you need to use it.
+ - Link to built files directly: Always link to targets if available.
+ - Never skip PUBLIC/PRIVATE when linking: This causes all future linking to be 
+ keyword-less.
+ 
+Cmake Patterns:
+ - Treat CMake as code: It is code. It should be as clean and readable as all 
+ other code.
+ - Think in targets: Your targets should represent concepts. Make an (IMPORTED) 
+ INTERFACE target for anything that should stay together and link to that.
+ - Export your interface: You should be able to run from build or install.
+ - Write a Config.cmake file: This is what a library author should do to support 
+ clients.
+ - Make ALIAS targets to keep usage consistent: Using add_subdirectory and 
+ find_package should provide the same targets and namespaces.
+ - Combine common functionality into clearly documented functions or macros: 
+ Functions are better usually.
+ - Use lowercase function names: CMake functions and macros can be called lower or 
+ upper case. Always use lower case. Upper case is for variables.
+ - Use cmake_policy and/or range of versions: Policies change for a reason. Only 
+ piecemeal set OLD policies if you have to.
+
+
+***************************************
+***** Selecting a minimum in 2022 *****
+***************************************
+
+What minimum to choose - OS support:
+
+3.4: The bare minimum. Never set less.
+3.7: Debian old-stable.
+3.10: Ubuntu 18.04.
+3.11: CentOS 8 (use EPEL or AppSteams, though)
+3.13: Debian stable.
+3.16: Ubuntu 20.04.
+3.19: First to support Apple Silicon.
+latest: pip/conda-forge/homebew/chocolaty, etc.
+
+
+What minimum to choose - Features:
+
+3.8: C++ meta features, CUDA, lots more
+3.11: IMPORTED INTERFACE setting, faster, FetchContent, COMPILE_LANGUAGE in IDEs
+3.12: C++20, cmake --build build -j N , SHELL: , FindPython
+3.14/3.15: CLI, FindPython updates
+3.16: Unity builds / precompiled headers, CUDA meta features
+3.17/3.18: Lots more CUDA, metaprogramming
+
+
+
+######################################
+##### Introduction to the basics #####
+######################################
+
+***************************
+***** Minimum Version *****
+***************************
+
+La primera linea de CMakeLists.txt deberia contener:
+
+cmake_minimum_required(VERSION 3.1)
+
+Desde Cmake 3.12 se permiten rangos, asi que una buena forma de establecer la
+version es:
+
+cmake_minimum_required(VERSION 3.7...3.29)
+if(${CMAKE_VERSION} VERSION_LESS 3.12)
+    cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
+endif()
+
+Si la version de CMake es menor que 3.12 la policy se establecera como la 
+current CMake version y si es menor se mantendra la linea 
+cmake_minimum_required(VERSION 3.7...3.29) que indica que soporta desde la 3.7
+y se ha probado hasta la 3.29.
+
+
+*****************************
+***** Setting a project *****
+*****************************
+
+project(MyProject VERSION 1.0
+                  DESCRIPTION "Very nice project"
+                  LANGUAGES CXX)
+                  
+La keyword VERSION sirve para establecer algunas variables como 
+MyProject_VERSION o PROJECT_VERSION.
+Los lenguajes pueden ser: C, CXX, Fortran, ASM, CUDA, CSharp o SWIFT.
+
+
+********************************
+***** Making an executable *****
+********************************
+
+add_executable(one two.cpp three.h)
+
+
+****************************
+***** Making a library *****
+****************************
+
+add_library(one STATIC two.cpp three.h)
+
+el tipo puede ser: STATIC, SHARED o MODULE. Si no se especifica se utilizara el
+valor de BUILD_SHARED_LIBS.
+
+
+***********************************
+***** Targets are your friend *****
+***********************************
+
+Una vez que se ha creado un target, se puede anadir informacion sobre el:
+
+target_include_directories(one PUBLIC include)
+
+esta linea indica que include es un directorio include para one. Para 
+ejecutables no es muy util, pero para librerias, si esta en PUBLIC, indica que
+los targets que enlacen esa libreria, deberan incluir estos directorios.
+
+
+Se pueden encadenar targets:
+
+add_library(another STATIC another.cpp another.h)
+target_link_libraries(another PUBLIC one)
+
+
+
+###################################
+##### Variables and the Cache #####
+###################################
+
+***************************
+***** Local Variables *****
+***************************
+
+Una variable local se establece como:
+set(MY_VARIABLE "value")
+Para acceder a ella: ${MY_VARIABLE}
+CMake tiene el concepto de scope, por lo que si una variable es definida en una
+funcion o fichero dejara de estar disponible al salir del scope.
+
+Se puede establecer una lista como:
+set(MY_LIST "one" "two")
+o
+set(MY_LIST "one;two")
+
+Cuando se expande una variable con ${} se aplican las mismas reglas de espacios.
+Por eso los paths se deben expandir como "${}"
+
+
+***************************
+***** Cache Variables *****
+***************************
+
+Para establecer una variable desde la linea de comandos Cmake ofrece las cache
+variables.
+
+set(MY_CACHE_VARIABLE "VALUE" CACHE STRING "Description")
+
+La variable MY_CACHE_VARIABLE se establece con el valor VALUE y es de tipo
+STRING. "Description" aparecera sin se ejecuta CMake con -L.
+
+Para forzar la actualizacion de la variable cada vez que se ejecute, se tiene
+que anadir FORCE
+
+set(MY_CACHE_VARIABLE "VALUE" CACHE STRING "" FORCE)
+
+
+*********************************
+***** Environment variables *****
+*********************************
+
+Se pueden establecer y obtener variables de entorno, pero es buena idea no 
+hacerlo.
+
+set(ENV{variable_name} value) 
+$ENV{variable_name}
+
+
+**********************
+***** Properties *****
+**********************
+
+Las propiedades son como variables que estan asociadas a un target.
+
+set_property(TARGET TargetName
+             PROPERTY CXX_STANDARD 11)
+             
+set_target_properties(TargetName PROPERTIES
+                      CXX_STANDARD 11)
+
+La primera forma es mas general y la segunda es un atajo.
+
+
+
+################################
+##### Programming in CMake #####
+################################
+
+*********************************
+***** generator-expressions *****
+*********************************
+
+Las generator-expressions se evaluan en la propiedades de un target, por lo 
+que no se evaluan en config-time si no en build-time, install-time, etc.
+
+Pueden ser del tipo $<KEYWORD> o $<KEYWORD:value> donde KEYWORD es una keyword
+que controla la evaluacion y value es el objeto evaluado. Si KEYWORD es una 
+generator-expression que evalua 0 o 1, value es sustituido por ese valor.
+
+Por ejemplo para establecer my-flag solo cuando se esta en DEBUG:
+
+target_compile_options(MyTarget PRIVATE "$<$<CONFIG:Debug>:--my-flag>")
+
+
+Algunos usos comunes son:
+
+ -Limiting an item to a certain language only, such as CXX, to avoid it mixing 
+ with something like CUDA, or wrapping it so that it is different depending on 
+ target language.
+ -Accessing configuration dependent properties, like target file location.
+ -Giving a different location for build and install directories.
+
+Esta ultima es muy comun:
+
+target_include_directories(
+    MyTarget
+  PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>
+)
+
+

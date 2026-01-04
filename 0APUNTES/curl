@@ -1,0 +1,29 @@
+
+$ curl -I peticion
+devuelve la informacion del header
+
+$ curl -i peticion
+devuelve la informacion del header ademas de la respuesta
+
+$ curl -o file peticion
+redirige la salida a file
+
+$ curl --form/-F <name=content> peticion
+emula el submit de un formulario haciendo POST del contenido usando el 
+Content-Type multipart/form-data. Se puede indicar el content de muchas formas
+(ver manpage). curl -F name=John -F shoesize=11 https://example.com/
+
+$ curl -d/--data <data> peticion
+como --form pero el formato del Content-Type es 
+application/x-www-form-urlencoded. Ejemplo:
+curl -d "name=curl" -d "tool=cmdline" https://example.com
+
+$ curl -H "header" peticion
+permite indicar el header de una peticion. Por ejemplo:
+culr -H "Content-Type: application/json" --data 'json...'
+
+
+
+
+
+

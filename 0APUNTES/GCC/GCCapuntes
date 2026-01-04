@@ -1,0 +1,53 @@
+************************************************************
+                        FLAGS
+************************************************************
+$ gcc -gN 
+    establece un nivel de debug donde
+        -g0: no anade info. de debug
+        -g1: info. minima
+        -g2: por defecto (alias -g)
+        -g3: toda la info. posible.
+$ gcc -gdbN
+    igual que -g pero produce info. especifica para gdb
+    tiene tres niveles igual que -g.
+    -g es portable, -ggdb es para gdb
+
+$ -Wall
+    activa otros flags de deteccion de errores
+$ -Wextra
+    activa mas flags (no es redundante con -Wall)
+$ -pedantic
+    controla errores referentes al estandar utilizado
+    
+$ -Ox
+    establece un nivel de optimizacion (-00, -03) (-O0 por defecto)
+    
+$ -Og
+	es el recomendado para debug. Utiliza las optimizaciones de O1 salvo las 
+	que interfieran en la informacion de debug. Recomendado sobre O0
+	
+$ -gdwarf-version
+	usa dwarf como informacion de debug en la version indicada.
+	
+$ -fno-omit-frame-pointer / fomit-frame-pointer
+	elimina las instrucciones que guardan y restauran el frame pointer. Util
+	omitirlo para optimizar un poco, pero para hacer debug es practicamente 
+	obligatorio en muchas herramientas. Omitir para release y no omitir para 
+	debug.
+	
+    
+****************************
+
+$ gcc -dM -E - < /dev/null | grep STDC_VERSION
+    para saber la version de std que usa el ordenador
+    
+*********FSANITIZE***********
+
+$ gcc -fsanitize=address
+    Emula la ejecucion del codigo, para que cuando se produzca un error de 
+    memoria, lo muestre en detalle.
+    
+    
+********* Para ASM ************
+$ gcc -fverbose-asm 
+    agrega comentarios al generar el codigo ensamblador

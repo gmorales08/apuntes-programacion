@@ -1,0 +1,65 @@
+perf es una herramienta de profiling del kernel de linux que soporta diferentes
+arquitecturas, por lo que los eventos soportados dependen de la arquitectura 
+donde se instale. Para obtener la lista de eventos soportados: perf list
+
+Para medir los stats de uno o varios eventos se ejecuta: 
+$ perf stat -e e1,e2,e3 ./comando  
+
+Para medir el tiempo de CPU y los page fault
+$ perf stat -e cpu-clock,fault ./comando
+
+stat es bastante rapido y sirve para medir tiempos sin hacer profiling
+
+Esto da informacion generalizada de toda la ejecucion, pero si se quiere 
+obtener informacion detallada para ubicar los hot spots hay que hacer un 
+profile:
+
+1. Generar el profile data
+$ perf record -e cpu-clock,faults ./comando
+
+Si se quiere tener mayor precision se puede incrementar el numero de samples que
+se toman por segundo (por defecto 4000):
+
+$ perf recod -e cpu-clock --freq=8000 ./comando
+
+2. Mostrar la informacion del profile
+$ perf report 
+Por defecto se usa la interfaz tui (--tui) pero se le puede indicar --stdio
+Con --sort se puede ordenar la informacion por command (comm), dynamically 
+shared objet (dso), process identifier (pid) y mas:
+$ perf report --stdio --sort comm,dso
+
+Para filtrar y que solo muestre informacion de ciertos objetos:
+$ perf report --stdio --dsos=programa,libc.so.6,etc
+
+Con perf annotate se muestra el ensablador y el codigo fuente (con --source) 
+para ubicar los bottle necks. Si no funciona la anotacion del codigo fuente 
+puede ser por objdump de binutils o por dwarf-5. En caso de que sea por objdump
+se puede cambiar por el de llvm desde $HOME/.perfconfig o con el comando:
+$ perf config annotate.objdump=llvm-objdump
+Si sigue sin funcionar probar a compilar con dwarf-4
+
+$ perf annotate --source --stdio --dsos=programa,libc.so.6,etc
+
+Si solo queremos ver un symbol en concreto se puede indicar con --symbol:
+
+$ perf annotate --source --stdio --dsos=programa --symbol=funcion
+
+
+Para seguir aprendiendo:
+https://sandsoftwaresound.net/perf/perf-tut-count-hw-events/
+https://sandsoftwaresound.net/perf/perf-tut-profile-hw-events/
+
+
+
+
+
+
+
+
+
+
+
+
+
+

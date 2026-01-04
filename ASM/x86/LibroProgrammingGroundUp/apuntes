@@ -1,0 +1,257 @@
+Apuntes sobre el libro:
+
+Programming from the Ground Up
+by Jonathan Bartlett
+Edited by Dominick Bruno, Jr.
+Copyright © 2003 by Jonathan Bartlett
+
+En el curso se utiliza x86 de 32 bits y para compilarlo y enlazarlo es necesario
+indicarlo:
+    $ as --32 programa.s -o programa.o
+    $ ld -m elf_i386 programa.o -o programa
+    
+    
+=== AS ===
+
+con --gstabs se genera informacion para debug
+
+
+=== C2. COMPUTER ARCHITECTURE ===
+
+El tamano de palabra de un ordenador es el tamano tipico de sus registros.
+        
+En 32-bit x86 los modos de direccionamientos se resumen en:
+
+    A: B + (C * N) + D    Siendo
+    
+    A = CS, DS, SS, ES, FS, GS
+    B = EAX, EBX, ECX, EDX, ESP, EBP, ESI, EDI
+    C = EAX, EBX, ECX, EDX, EBP, ESI, EDI
+    N = 1, 2, 4, 8
+    D = desplazamiento 
+    
+    
+=== C3. YOUR FIRST PROGRAMS ===
+
+.section indica al compilador que se va a definir una seccion
+
+.data es la seccion donde se inicializan las variables estaticas 
+
+.text es la seccion donde se encuentra el contenido del programa
+
+SYMBOL: un simbolo es algo que se reemplaza por otra cosa durante el compilado
+o el enlazado. 
+Normalmente hacen referencia a direcciones de memoria.
+
+.globl significa que el assembler no debe descartar el simbolo despues del 
+ensamblado porque el linker lo va a necesitar.
+
+_start es un simbolo que indica el comienzo del programa y por ello se debe 
+marcar como globl
+
+
+Registros de proposito general: 
+    eax, ebx, ecx, edx, edi, esi
+    
+Registros de proposito especial:
+    ebp, esp, eip, eflags
+
+
+.byte : 8 bits
+.int  : 2 bytes
+.long : 4 bytes
+.ascii: cadena acabada en \0
+
+
+ADDRESSING MODES
+
+La forma general de referirse a una direccion de memoria es:
+    ADDRESS_OR_OFFSET(%BASE_OR_OFFSET,%INDEX,MULTIPLIER)
+Todos los campos son opicionales. Para calcular la direccion se hace:
+    FINAL ADDRESS = ADDRESS_OR_OFFSET + %BASE_OR_OFFSET + MULTIPLIER * %INDEX
+
+
+ADDRESS_OR_OFFSET y MULTIPLIER tienen que ser constantes mientras que los 
+otros dos pueden ser registros.
+Si algun campo no se indica, se sustituye por 0.
+
+
+direct addressing mode:
+    movl ADDRESS, %eax
+    
+indexed addressing mode:
+    movl string_start(,%ecx,1), %eax
+    
+indirect addressing mode:
+    movl (%eax), %ebx
+    
+base pointer addressing mode:
+    movl 4(%eax), %ebx
+    
+inmediate mode:
+    movl $12, %eax
+    
+register addressing mode:
+    mueve datos en o desde un registro. Es usado por todos los modos anteriores
+    
+    
+
+=== C4. ALL ABOUT FUNCTIONS ===
+    
+Las funciones que ofrece el sistema por defecto son llamadas privimitive 
+functions.
+
+Una funcion esta compuesta por:
+    -function name:
+        symbol que representa la direccion de memoria donde comienza la funcion
+        
+    -function parameters
+        parametros que va a usar la funcion
+        
+    -local variables
+        datos que utiliza la funcion internamente. No son accesibles por 
+        otras funciones.
+        
+    -static variables
+        son variables que se reutilizan cada vez que se llama a la funcion.
+        No son accesibles desde fuera. Su uso no es recomendable salvo que sea
+        extrictamente necesario.
+        
+    -global variables
+        datos que utiliza la funcion pero son manejados fuera de ella.        
+
+    -return address
+        direccion a la que se tiene que retornar despues de haber procesado la
+        funcion. Este valor es implicito y lo utilizan call y ret.
+        
+    -return value
+        valor devuelto por la funcion.
+
+Calling convention: define la forma en la que se pasan los parametros y se 
+retornan los valores. En ASM se puede usar cualquier calling convention.
+La calling convention de C es la mas extendida y el estandar en Linux.
+
+Cada vez que un valor se introduce en el stack, %esp resta 4 bytes de su valor 
+implicitamente (en 32 bits) (el stack crece hacia abajo).
+
+
+
+=== C8. SHARING FUNCTIONS WITH CODE LIBRARIES ===
+
+Para compilar un programa que usa librerias compartidas:
+
+as helloworld-lib.s -o helloworld-lib.o
+ld -dynamic-linker /lib/ld-linux.so.2 -o helloworld-lib helloworld-lib.o -lc
+
+La opcion -lc indica que se debe usar la libreria dinamica libc.so
+
+
+Cuando un programa con librerias dinamicas es ejecutado,
+primero se carga el dynamic linker (/lib/ld-linux.so.2), que
+compruebe que librerias necesita el programa, y las busca en
+los directorios listados en /etc/ld.so.conf. Luego mira los
+simbolos del programa que hacen referencia a estas librerias
+y sustituye su contenido por el de la parte de la libreria
+que necesite.
+
+Con el programa ldd se puede saber que librerias dinamicas
+utiliza un ejecutable.
+
+El manual de las funciones de libc se encuentra en:
+http://www.gnu.org/software/libc/manual/
+
+
+Para compilar una libreria compartida se ejecuta:
+as write-record.s -o write-record.o
+as read-record.s -o read-record.o
+ld -shared write-record.o read-record.o -o librecord.so
+
+
+
+=== C9. Intermediate Memory Topics ===
+
+Terminos basicos:
+    - Word: el tamano de un registro. En x86 es 32 bits. La 
+    mayoria de operaciones de un ordenador trabajan con el 
+    tamano de una palabra.
+    
+    - Address: numero que refiere a un byte en memoria.
+    
+    - Pointer: registro o palabra cuyo valor es una address.
+
+El layout de la memoria en un programa linux:
+Al cargar el programa, todas las .section son separadas en 
+diferentes zonas de memoria.
+La seccion .text se carga en la direccion 0x08048000
+La seccion .data se carga a continuacion y la la seccion .bss
+a continuacion de esta.
+El ultimo byte direccionable por Linux es 0xbfffffff. Aqui es
+donde empieza el stack, que crece hacia abajo hacia las otras
+secciones.
+El layout inicial del stack es: en el fondo del stack 
+(direccion mas alta) hay una palabra que vale zero. Despues
+viene el nombre del programa en ASCII terminado en \0. 
+Despues vienen las variables de entorno del programa. 
+Despues vienen los argumentos de la linea de comandos y el 
+numero de argumentos. Cuando el programa empieza, aqui es 
+donde apunta el stack pointer.
+La parte intermedia entre el programa (que empieza en la 
+direccion mas baja y crece hacia arriba) y el stack (que empieza en la direccion
+mas alta y crece hacia abajo) es 
+inaccesible por el usuario y solo puede accederla el kernel. Si se
+intenta acceder a esta zona intermedia o a una direccion anterior
+a la 0x08048000 se obtiene un segmentation fault. 
+La ultima direccion accesible por un programa se denomina system
+break.
+
+Todos los programas en linux parece que se asignan a la misma zona
+de memoria. Esto es debido a que se usa memoria virtual, que hace
+referencia a memoria fisica, pero utiliza direcciones virtuales que
+son mas faciles de referenciar por el programador.
+El motivo por el que la zona entre .bss y el stack no es accesible
+es porque esas direcciones no estan mapeadas en la memoria fisica.
+Esto se debe a que el mapeo requiere espacio y tiempo, y como 
+estas direcciones no van a ser usadas en su totalidad, se ahorra
+tiempo.
+
+Cuando el stack se llena y no queda mas espacio para direccionar en
+la memoria virtual del programa, se solicita a linux mas memoria
+con la instruccion break que devuelve la direccion en
+la que comienza una pagina nueva de memoria.
+El problema de esto es que la memoria no se libera y se queda una
+zona de memoria ocupada que no vamos a usar. Para ello se usa un 
+memory manager que se encarga de alocar y desalocar memoria.
+
+En la pagina 157 del libro programa un gestor de memoria
+
+
+
+=== C12. Optimization ===
+
+Local Optimizations:
+ - Precomputing calculations: a veces una funcion puede tener un 
+ numero determinado de entradas y salidas. Es conveniente 
+ precalcular todas las opciones y no dejarlo para el tiempo de 
+ ejecucion. (G: esto creo que es por ejemplo usar un switch con las
+ opciones posibles).
+ - Remembering Calculation Results: se trata de guardar el resultado
+ de una funcion cuando es llamada para que si la proxima vez se 
+ llama con los mismos parametros, el resultado se devuelva 
+ directamente. Esto se llama memoizing o caching.
+ - Locality of reference: explica los niveles de memoria.
+ - Register Usage: los registros se pueden usar en algunos lenguajes
+ de bajo nivel.
+ - Inline functions: llamar a una funcion implica introducir datos
+ en el stack y requiere tiempo. La funciones inline permiten que el
+ compilador copie el contenido de la funcion y lo pegue donde es 
+ llamada para ahorrar el overhead del stack.
+ - Optimized Instructions: hay ciertas instrucciones de ensamblador
+ que sirve para optimizar el tiempo de procesador. Por ejemplo hacer
+ un movl $0, %eax tarda mas que hacer un xorl %eax, %eax
+ - Addressing modes: de mas rapido a mas lento los modos de 
+ direccionamiento se ordenan: inmediate, register addressing,
+ direct, indirect, base pointer, indexed indirect. 
+ - Data alignment: el acceso a datos alineados a palabras es mas 
+ rapido que si no lo estan. Algunos procesadores en algunos modos no
+ pueden acceder a datos no alineados.
+

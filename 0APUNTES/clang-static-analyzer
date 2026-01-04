@@ -1,0 +1,21 @@
+Para hacer uso de clang-static analyzer hay que usar un frontend que muestre los
+analisis. Existe scan-build y CodeChecker, y llvm recomienda CodeChecker.
+
+CodeChecker se instala con pip3 (a 2025)
+
+Hace falta un compile-commands.json. Para analizar el proyecto:
+
+$ CodeChecker analyze compile_commands.json -o ./reports
+
+Los resultados se pueden ver en la consola:
+
+$ CodeChecker parse --print-steps ./reports
+
+o en el navegador:
+
+$ CodeChecker parse ./reports -e html -o ./reports_html
+$ librewolf ./reports_html/index.html
+
+
+Mas informacion en la web oficial:
+https://clang.llvm.org/docs/analyzer/user-docs/CommandLineUsage.html

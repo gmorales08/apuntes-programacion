@@ -1,0 +1,83 @@
+Object a('a'); // 1
+Object b('b'); // 2 
+Object c(a);   // 3
+Object d = b;  // 4
+d = a;         // 5
+
+En 1 y 2 el compilador lo interpreta como inicializacion por constructor:
+Object a = Object('a');
+Object b = Object('b');
+En 3 y 4 lo interpreta como inicializacion por constructor de copia:
+Object c = Object(a);
+Object d = Object(b);
+En 5 lo interpreta como un operador de asignacion. En los casos anteriores el =
+no era un operador de asignacion sino de inicializacion! Esto es porque d y a ya
+existen:
+operator=(d, a);
+
+
+NVRO (Named-return-value-optimization) se utiliza cuando se devuelve una 
+variable con nombre. Si escribimos:
+
+Object create(char c) {
+    Object tmp(c);
+    return tmp;
+}
+
+El compilador lo traduce como:
+
+Object create(char c) {
+    Object tmp = Object(c); // NRVO variable
+    return Object(tmp);
+}
+
+
+RVO (return-value-optmization) es lo mismo pero para variables sin nombre.
+
+Cuando se utiliza = en una declaracion , el compilador requiere que los tipos a 
+ambos lados del igual sean identicos. Por eso si no son iguales, tiene que hacer
+un paso adicional para castear. De esta forma si escribimos:
+Fraccion nueve = 9;
+El compilador lo traduce como:
+Fraccion nueve = Fraccion(9);
+En este caso, se ejecuta un constructor para Fraccion(9), y luego un constructor
+de copia Fraccion nueve(Fraccion(9)) que toma como parametro el objeto anonimo 
+creado por Fraccion(9). Se han ejecutado dos constructores.
+
+El compilador puede optimizar esto, si existe un constructor por copia y un 
+constructor por parametro. Por ejemplo:
+
+Fraccion(const Fraccion& f) : _d{f._d} {...} // Constructor por copia
+Fraccion(int d) : _d{d} {...}                // Constructor por parametros
+
+Cuando se utiliza una inicializacion con el constructor por copia:
+
+Fraccion siete {Fraccion{7}};
+o
+Fraccion siete_2 {siete};
+
+El compilador por debajo siempre que puede utiliza el constructor por parametro
+en su lugar:
+
+Fraccion siete {7};
+Fraccion siete_2 {7};
+
+Evitando asi las dos operaciones del constructor por copia. Esto se llama 
+elision.
+elision o rvo: proceso de omitir ciertos pasos en copias o movimientos de datos
+
+Esto tiene la ventaja de ser mas eficiente, pero la desventaja de que el 
+programador puede querer que se ejecute el cuerpo del constructor por copia, y 
+el compilador, al saltarselo, no lo ejecuta.
+
+Antes de C++17 RVO era opcional, lo que puede dar diferentes comportamientos 
+dependiendo del compilador. A partir de C++17 es obligatoria en todos los
+compiladores.
+
+Estas optimizaciones se aplican por el compilador en tiempo de compilacion, es
+decir, no pueden ser aplicadas cuando no se tiene suficiente informacion en el
+contexto de la compilacion.
+
+https://youtu.be/opJvT6pb-j8
+https://youtu.be/OIh3i0mm39s
+

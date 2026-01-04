@@ -1,0 +1,29 @@
+Las manpages contienen manuales de informacion en sistemas UNIX. Suelen estar 
+clasificadas en 8 secciones. Al hacer:
+$ man entrada
+Se busca entrada en todas las secciones y se muestra el manual si se encuentra.
+Para leer una entrada en una seccion concreta se indica con el numero:
+$ man 3 entrada
+Busca entrada en la seccion 3. Se puede indicar otro numero del 1 al 8. Las 
+secciones generales son:
+
+1: comandos generales. Aqui estan documentados la mayoria de ejecutables.
+2: system calls
+3: funciones de libreria de C. Util para buscar informacion sobre como funcionan
+las funciones, sus alternativas, su firma, etc. cuando se programa en C.
+4: ficheros especiales en /dev y drivers. Por ejemplo man 4 null, man 4 tty, 
+man 4 sd, etc. 
+5: formatos de archivos (man 5 btrfs, man 5 ext2, etc.) y convenciones (por 
+ejemplo, sobre ficheros de configuracion: man 5 xorg.conf, man 5 locale, etc.).
+6: juegos y screensavers (man 6 mame, man 6 steam, man 6 xscreensaver-systemd)
+7: miscelanea
+8: comandos de administración del sistema
+
+
+Para listar todas las entradas de manpages en local:
+$ man -k .
+Para filtrar por una seccion se puede hacer: 
+$ man -k . | grep '(4)'
+
+Tambien se puede encontrar online en webs como:
+https://manpages.org/

@@ -1,0 +1,15 @@
+Es una buena practica ejecutar cmake desde un directorio build
+para no ensuciar el directorio de trabajo:
+$ mkdir build
+$ cd build
+$ cmake ..
+    
+$ cmake -B build -S src
+    build indica el directorio de build
+    src es la raiz del proyecto
+    Si no se indica alguna de las dos se asume que es el directorio actual
+    
+$ cmake -S src -G generator
+    indica el generator para el que Cmake producira los ficheros. Por defecto
+    es GNU Make, pero se puede indicar otro como Ninja.
+

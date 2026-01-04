@@ -1,0 +1,34 @@
+Un function pointer es un puntero a funcion como en C, que para llamar a su 
+funcion solo hay que desreferenciarlo. 
+
+Con las lambdas, el compilador genera una clase oculta a la que se le pasan los
+argumentos de la lambda por referencia o copia, y tiene sobreescrito el 
+operator() que es el que ejecuta el codigo de la funcion. Su desventaja es que 
+es mas pesado que el function pointer y no guarda informacion del tipo, pero es
+mas optimizable.
+
+std::function<R(Args...)> es un wrapper polimorfico que puede almacenar 
+cualquier callable que cumpla su firma. Utiliza type-erasure para ocultar el 
+tipo de la funcion. Es util cuando se quiere ocultar el tipo, pero agregar mas
+sobrecarga (hay que hacer dos o tres saltos hasta llamar a la funcion). Una 
+implementacion simplificada seria: 
+
+template <typename R, typename... Args>
+class function {
+    void* object;        // puntero al callable real
+    ops_table* ops;      // tabla de operaciones para manejar object
+};
+
+struct ops_table {
+    R (*invoke)(void* obj, Args...);        // Cómo llamar al objeto
+    void (*destroy)(void* obj);             // Cómo destruirlo
+    void (*copy)(void* dest, void* src);    // Cómo copiarlo
+    void (*move)(void* dest, void* src);    // Cómo moverlo
+};
+
+Esta ops_table se suele generar en tiempo de compilacion para cada tipo que 
+pueda ser llamado por std::function
+
+
+Falta profundizar un poco. 
+Para mas detalles: https://youtu.be/aC-aAiS5Wuc?si=7t-ho_RZeshMCgZL 

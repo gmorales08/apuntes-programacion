@@ -1,0 +1,53 @@
+Para que clang-tidy realice los checks necesita un compile-commands.json
+
+GNU Make no tiene opcion de generarlos por defecto. Hay que usar herramientas 
+externas como bear. Con bear se ejecuta:
+bear -- make 
+y ya genera el compile_commands.json automaticamente
+
+En Cmake se genera con la linea:
+cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON /ruta/al/directorio/de/proyecto
+
+Desde terminal se ejecuta:
+$clang-tidy -p=ruta_a_compilecommands.json --extra-arg=-std=c++11 fichero1 fichero2
+
+
+Se puede definir un fichero .clang-tidy que contenga las reglas de clang-tidy
+que seran evaluadas.
+
+
+En checks, al poner un - delante de una regla se anula la evaluacion de esa 
+regla por ejemplo -* anula todas las reglas
+Con familiaDeReglas-* incluimos todas las reglas que empiecen por 
+familiaDeReglas
+
+WarningsAsErrors incluye las reglas que queremos que nos imprima como errores
+
+En HeaderFilterRegex se le puede indicar donde tiene que buscar los srcs. Por 
+ejemplo:
+HeaderFilterRegex: 'src/.*' 
+
+ExtraArgs: agrega argumentos adiciones. Actualmente (2025) hay un bug y no 
+funciona, por lo que se deben pasar los argumentos por cmd con --extra-arg=...
+
+Como clang-tidy lee el compile-commands.json, si aqui viene especificado un 
+-std=c++xx, entonces usara los checks en base a ese standard. Si no, habria que 
+pasarle un extra args para indicarle el std.
+
+Ejemplo de .clang-tidy:
+---
+Checks: "cppcoreguidelines-*,
+         clang-analyzer-*,
+         bugprone-*,
+         readability-*,
+         -readability-identifier-length,
+         misc-*
+         modernize-*,
+         performance-*,
+         hicpp-*
+"
+WarningsAsErrors: ''
+HeaderFilterRegex: ''
+
+
+

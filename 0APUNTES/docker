@@ -1,0 +1,128 @@
+Para poder ejecutar comandos Docker hay que pertenecer al grupo Docker:
+$sudo usermod -aG docker $USER
+
+$docker images / $docker image ls
+    muestra las imagenes descargadas
+
+$docker pull img:tag
+    descarga la imagen img. Tag es opcional e indica el tag que se quiere 
+    descargar. Por defecto es latest
+    
+    
+$docker container create --name nombre img
+    crea un contenedor en base a la imagen img y devuelve un id
+    se puede especificar el nombre que tendra el contenedor
+
+$docker start id
+    inicia el contenedor. Se puede indicar el id corto o el nombre.
+
+$docker ps
+    muestra los contenedores que se estan ejecutando.
+    con -a muestra todos los contenedores.
+    
+$docker stop id
+    detiene la ejecucion del contenedor.
+    
+$docker rm nombre
+    elimina el contenedor
+    
+    
+
+$docker create -pHOST:CONTENEDOR --name nombre img
+    mapea el puerto HOST para que apunte al puerto CONTENEDOR
+    
+    
+    
+$docker logs id
+    muestra los logs del contenedor. Con --follow se queda escuchando los logs
+    en la terminal.
+    
+    
+$docker run -d img 
+    busca la imagen y si no la encuentra, la descarga
+    crea el contenedor
+    inicia el contenedor
+    -d significa detached y es para que no se quede mostrando los logs
+
+
+    
+###### DOCKERFILE ######
+
+FROM img:tag # indica la imagen y el tag base
+
+RUN mkdir -p /home/app # indica la ruta que va a contener la aplicacion DENTRO
+                         del contenedor. No en la maquina fisica.
+                       # RUN ejecuta comandos dentro del contenedor 
+                         
+COPY origen destino    # COPY copia archivos desde la maquina fisica. 
+
+EXPOSE puerto          # Abre el puerto en el contenedor
+
+CMD ["comando", "arg1"] # CMD ejecuta comandos en el contenedor.
+
+$docker build -t nombre:etiqueta dir
+    crea la imagen en base a las instrucciones del Dockerfile
+    dir es donde se encuentra el Dockerfile (se puede omitir si esta en .)
+
+
+
+###### DOCKER NETWORK ######
+
+Las network de docker sirven para comunicar varios contenedores.
+
+$docker network ls
+    lista las network disponibles
+
+$docker network create nombre
+    crea una red nueva
+    
+$docker network rm nombre
+    elimina una red
+
+$docker create -pHOST:CONTENEDOR --name nombre --network net img
+    crea el contenedor metiendolo en la network net
+
+
+
+######  DOCKER COMPOSE ######
+El fichero docker-compose.yml permite automatizar tareas en la creacion
+de contenedores
+
+version: "3.9" # version de docker compose
+services: 
+    nombreContenedor:
+        build: . # ruta donde se encuentra el fichero Dockerfile
+        ports: 
+            - "puertoHost:puertoContenedor"
+        links:
+            - contenedorDependencia
+    contenedorDependencia:
+        image: img # imagen en la que se basa
+        ports:
+            - "puertoHost:puertoContenedor"
+        environment:
+            - ENVVAR1
+            - ENVVAR2
+        volumes: 
+            - nombreVolumen:/rutaMontaje
+
+volumes:
+    nombreVolumen:
+    
+    
+Al ejecutar docker compose, los contenedores que especifica se incluyen 
+automaticamente en una network sin necesidad de especificarlo.
+
+$docker compose up 
+    construye y levanta todos los contenedores
+
+$docker compose down
+    elimina los contenedores y la network asociada
+
+
+
+
+
+
+
+    

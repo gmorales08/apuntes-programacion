@@ -1,0 +1,7 @@
+Las clases que no gestionan recursos y utilizan clases de la libreria estandar,
+no deberian definir special member functions y dejar que el compilador defina el
+constructor por defecto, el copy constructor, y el copy operator. Esto es porque
+la STL sigue RAII y por tanto no hace falta que nosotros hagamos nada.
+
+Las clases que si gestionan recursos deberian seguir reglas como RAII, copy and
+swap para operator= y rule of three.
