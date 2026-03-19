@@ -1,0 +1,112 @@
+*** COMANDOS
+Listar todas las unidades cargadas. O filtrar por tipo:
+$ systemctl list-units
+$ systemctl list-units --type=service
+
+Gestionar una unit:
+$ systemctl start httpd.service
+$ systemctl stop httpd.service
+$ systemctl restart httpd.service
+$ systemctl status httpd.service
+$ systemctl enable httpd.service
+$ systemctl disable httpd.service
+$ systemctl enable/disable --now // enable/disable + start/stop
+
+
+*** EDITAR CONFIGURACION DE UN SERVICIO INSTALADO
+Para editar la configuracion de un servicio es recomendable crear un fichero
+override.conf en el directorio de configuracion servicio.service.d/
+Esto se puede hacer automaticamete con el comando:
+$ systemctl edit servicio
+
+*** SERVICE UNIT
+Ejemplo de service unit custom que puede ser ubicado en 
+/etc/systemd/system/ejemplo.service
+Los servicios para todo el sistema deberian ubicarse en: /etc/systemd/system/
+Los servicios de usuario en: ~/.config/systemd/user/
+
+
+[Unit]
+Description=Descripcion
+After=network.target // Se inicia despues de que la red este disponible
+Before=despues.target // Se inicia antes que depues.service
+
+Requires=s.service // Hard dependency. Si falla s, este servicio tambien
+Wants=s.service // Soft dependency. Inicia s pero no falla si no existe
+BindsTo=s.service // Como Requires, pero si s se detiene, este tambien.
+
+Conflicts=s.service // No se pueden ejecutar a la vez 
+ 
+[Service]
+Type=simple
+User=myapp
+Group=myapp
+
+WorkingDirectory=/opt/myapp
+ExecStart=/usr/bin/python3 /usr/local/bin/my_script.py
+
+Restart=always // Cada cuando se reinicia si falla el servicio. Opciones: 
+//on-failure, on-abnormal, on-abort, no
+RestartSec=5
+
+// Logs por journal. 
+// Redirigir stdout y stderr del programa a journal
+// Ver logs con: $ journalctl -u unidad -n 100 
+StandardOutput=journal 
+StandardError=journal
+SyslogIdentifier=myapp
+
+// Variables de entorno
+Environment=NODE_ENV=production
+Environment=PORT=3000
+EnvironmentFile=-/etc/myapp/local.env   # "-" means don't fail if missing
+
+// Resource limits
+LimitNOFILE=65536
+MemoryMax=512M
+CPUQuota=80%
+ 
+[Install]
+WantedBy=multi-user.target // Este servicio se iniciara cuando el target 
+// multi-user se alcance
+
+
+Despues de editar o crear un servicio se debe ejecutar:
+$ systemctl daemon-reload
+Luego tambien se puede iniciar y habilitar:
+$ systemctl start my_script.service
+$ systemctl enable my_script.service
+
+
+*** UNITS
+Una unit es un objeto que systemd sabe como manejar. Hay varios tipos:
+* Service unit: para manejar servicios y procesos. Tienen un extension .service.
+* Socket unit: para manejar sockets web o IPC. Tiene extension .socket.
+* Target unit: sirven para argupar otras units. Tienen extension .target. Se 
+usan para sincronizar el proceso de arranque. Por ejemplo graphical.target 
+representa el escritorio grafico, y cuando systemd alcanza este target, activa
+todas las unidades requeridas para la sesion grafica.
+* Timer unit: cada cierto tiempo activan eventos como lanzar otros service 
+* Mount y automount units
+* Path, Slice, Device
+
+
+*** TARGETS
+multi-user.target   # Full system, no GUI (runlevel 3)
+graphical.target    # Full system with GUI (runlevel 5)
+rescue.target       # Single-user mode (runlevel 1)
+emergency.target    # Minimal shell, no services
+reboot.target       # System reboot
+poweroff.target     # System shutdown
+
+
+*** DEPENDENCIAS
+Se pueden especificar dependencias con Requires, Wants, After y Before.
+
+
+*** LOGGING
+Systemd usa journald para logging. Se pueden ver los logs de un servicio con:
+$ journalctl -u servicio.service
+
+
+

@@ -1,0 +1,40 @@
+SCP: usa el protocolo antiguo RCP sobre un tunel SSH. Solo permite transferencia
+de archivos, pero es muy rapido. No hace comprobaciones y no puede reanudar 
+transferencias interrumpidas.
+
+SFTP: usa un protocolo propio moderno construido sobre SSH. No tiene que ver con
+FTP salvo el nombre. Permite gestion de archivos (listado, borrado, renombrado,
+movimiento entre archivos). Permite reanudar transferencias interrumpidas. 
+Muestra el progreso de las transferencias. Al tener mas comprobaciones de 
+conexion es mas lento que SCP.
+
+--- SCP ---
+Subir un directorio y su contenido
+$ scp -r <directory> <user>@<remote server>:<path to put the directory>
+
+Descargar un directorio remoto
+$ scp -r <user>@<server>:<directory with full path> <where to put it locally>
+
+Se puede usar compresion para transferir mas rapido
+$ scp -C <file name> <user>@<server>:<path to put file>
+
+-v para verbose
+$ scp -v <file name> <user>@<server>:<path to put file>
+
+-p para preservar atributos de ficheros
+$ scp -p <file name> <user>@<server>:<path to put file>
+
+
+Nota para Windows: si el remoto es windows, asume C:/Users/usuario 
+implicitamente. Las rutas se especifican a partir de C:/
+ej.: scp user@windows:Downloads/fichero
+
+
+--- SFTP ---
+Conectarse al remoto usando el protocolo:
+$ sftp usuario@host
+y luego get, list, etc.
+
+
+
+

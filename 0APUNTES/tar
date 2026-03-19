@@ -1,0 +1,25 @@
+El formato TAR permite juntar varios ficheros en uno solo, con cabeceras que
+identifican cada fichero. No comprime por si solo sino que genera un unico 
+fichero a partir de otros.
+La libreria GZIP permite comprimir un solo fichero en un comprimido .gz. Se usa
+con tar para comprimir un solo tar que contiene muchos ficheros.
+
+Comprimir
+tar -czvf archivo.tar.gz archivos
+
+Comprimir con -C cambia a esa ruta antes de comprimir y comprime todo su 
+contenido
+tar -czvf archivo.tar.gz -C ruta
+
+Descomprimir
+tar -xzvf archivo.tar.gz
+tar -xzvf archivo.tar.gz -C ubicacion
+
+Ver contenido
+tar -tvf archivo.tar.gz
+
+c/x - comprimir/descomprimir
+z - usar gzip (.gz)
+v - verbose, muestra los archivos e informacion
+f - indica el fichero
+t - muestra el contenido

@@ -1,0 +1,59 @@
+.gitattributes sirve para configurar opciones de git en un repositorio en 
+concreto. Es como un git config pero pensado para ser compartido entre los 
+colaboradores del repositorio.
+
+
+Cada linea en el fichero tiene la forma:
+
+pattern attr1 attr2 …
+
+Cada atributo puede estar set, unset, set to a value, o unspecified
+
+Atributos:
+
+- text:
+Si esta set establece el path como texto y habilita la normalizacion de su eol.
+Si esta set a auto se habilita la normalizacion de su eol. Si git decide que es 
+text, se normaliza con LF. Si git ve que se ha subido con CRLF lo deja como 
+esta.
+Si no esta set, se usa la variable local core.autocrlf
+Si esta unset se previene cualquier tipo de normalizacion:
+    *.jpg           -text
+
+- eol:
+Esta variable establece un eol para ser usado en el working directory. Habilita 
+la conversion de eol sin comprobar el contenido, como si estableciera el 
+atributo text a todos los ficheros. Su valor puede ser lf o crlf
+
+Para que todos los ficheros de texto normalizen su eol se recomienda poner:
+
+    *       text=auto
+Asi unix usara lf en el working directory, el repositorio de git usara lf, y los
+working directory de windows usaran lo que tengan configurado localmente (por 
+ejemplo core.autocrlf), pero usuarios unix y el repositorio no quedan afectados.
+
+- diff:
+Cuando esta set establece el path como text
+Cuando esta set a un valor, git utiliza el diff driver indicado para el path. 
+Por ejemplo: *.tex diff=tex usa el diff driver tex para ficheros latex. Se puede
+indicar alguno de los builtin diff drivers (vienen listados en man 5 
+gitattributes) o una ruta a uno custom.
+Para saber que diff driver se usa para un fichero actualmente:
+
+$ git check-attr diff -- archivo.c
+
+El driver lo que hace es indicar el contexto de un cambio en la linea @@...@@ 
+que se muestra antes del cambio. Por ejemplo en C muestra el nombre de la 
+funcion donde esta ese cambio. En mi instalacion git aplica los builtin drivers 
+sin necesidad de indicarlos explicitamente.
+
+
+-linguist-language:
+Linguist es un motor que usa GitHub para reconocer de que lenguaje es un 
+fichero basandose en heuristicas sencillas. Gitlab usa otro motor, por lo que 
+esta configuracion solo afecta a GitHub. Se puede especificar el tipo de 
+lenguaje asociado a un archivo, cuando este no se reconoce como nos gustaria.
+Por ejemplo:
+*.vh linguist-language=Verilog
+Asigna a los ficheros .vh el lenguaje verilog (normalmente asignaria System
+Verilog).

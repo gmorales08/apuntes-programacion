@@ -35,4 +35,6 @@ y la lvalue, pero no habria problema en hacerlo asi.
 Mas explicado en este video de cppcon: 
 https://youtu.be/7Qgd9B1KuMQ?list=PLHTh1InhhwT4CTnVjJqnAKeMfGzOWjsRa
 
+En el libro C++ primer lo explica en la seccion 13.6.2. Move Constructor and 
+Move Assignment, en el apartado Copy-and-Swap Assignment Operators and Move
 

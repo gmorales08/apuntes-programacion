@@ -1,0 +1,95 @@
+*** ANTES DE C++11
+
+Antes de C++11 se solia hacer con punteros o referencias, pero si se queria 
+thread safety se requeria de mutex explicitos como se explica aqui:
+https://refactoring.guru/design-patterns/singleton/cpp/example#example-1
+
+Una implementacion no thread-safe es:
+
+class Singleton
+{
+
+    /**
+     * The Singleton's constructor should always be private to prevent direct
+     * construction calls with the `new` operator.
+     */
+
+protected:
+    Singleton(){}
+
+    static Singleton* singleton_;
+
+public:
+
+    /**
+     * Singletons should not be cloneable.
+     */
+    Singleton(Singleton &other) = delete;
+    /**
+     * Singletons should not be assignable.
+     */
+    void operator=(const Singleton &) = delete;
+    /**
+     * This is the static method that controls the access to the singleton
+     * instance. On the first run, it creates a singleton object and places it
+     * into the static field. On subsequent runs, it returns the client existing
+     * object stored in the static field.
+     */
+    static Singleton *GetInstance(const std::string& value);
+};
+
+Singleton* Singleton::singleton_= nullptr;
+
+/**
+ * Static methods should be defined outside the class.
+ */
+Singleton *Singleton::GetInstance()
+{
+    /**
+     * This is a safer way to create an instance. instance = new Singleton is
+     * dangeruous in case two instance threads wants to access at the same time
+     */
+    if(singleton_==nullptr){
+        singleton_ = new Singleton();
+    }
+    return singleton_;
+}
+
+
+*** A PARTIR DE C++11
+
+Desde c++11 las variables static dentro de funciones son thread-safe 
+implicitamente, lo que las hace muy convenientes para implementar un singleton.
+El Meyers' Singleton hace uso de esta caracteristica del lenguaje:
+
+class MeyerSingleton {
+public:
+    // Provides global access to the singleton instance.
+    static MeyerSingleton& instance() {
+        // This static local variable is created on first use and is thread-safe
+        static MeyerSingleton instance;
+        
+        return instance;
+    }
+
+    // Delete copy constructor and assignment operator to prevent copies.
+    MeyerSingleton(const MeyerSingleton&) = delete;
+    MeyerSingleton& operator=(const MeyerSingleton&) = delete;
+
+private:
+    // Private constructor prevents direct instantiation.
+    MeyerSingleton() {}
+    
+    // Private destructor can be defined if special cleanup is needed.
+    ~MeyerSingleton() = default;
+};
+
+int main() {
+    // Accessing the singleton instance.
+    MeyerSingleton::instance();
+    
+    // Further calls return the same instance.
+    MeyerSingleton::instance();
+
+    return 0;
+}

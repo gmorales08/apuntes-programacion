@@ -1,0 +1,135 @@
+He implementado el siguiente ejemplo y lo he ido analizando en compiler explorer
+con -std=c++11:
+
+struct Clase {
+    static int estatica;
+
+    int funcion(int a) {
+        static int interna = 1;
+        return interna;
+    };
+};
+
+int funcion2(int a) {
+    return a * 2;
+}
+
+int Clase::estatica = funcion2(3);
+
+
+int main(int argc, char **argv) {
+    Clase c;
+
+    return Clase::estatica;
+}
+
+
+*** EN VARIABLES MIEMBRO DE UNA CLASE ***
+
+Esto nos permite acceder a variables sin necesidad de crear una instancia de la
+clase. Por ejemplo Clase::estatica.
+
+En C++11 estas variables no se pueden inicializar en la propia clase y se debe
+realizar en el .cpp (ver ejemplo de arriba). Desde C++17 se puede inicializar en
+la propia clase con inline static, que por debajo hace lo mismo que C++11 pero 
+se puede dejar la inicializacion en el header para mejor visualizacion.
+
+El compilador reserva espacio en el binario en la seccion estatica donde se 
+almacenara el valor de estas variables static. Cuando una funcion quiere acceder
+a esta variable static, accede a traves de un puntero a esta ubicacion del 
+binario, sin tener nada que ver con la clase. En clang por ejemplo generara:
+Clase::estatica:
+        .long   0 
+
+La inicializacion de estas variables depende del compilador. Por lo general, si 
+el dato es trivial, por ejemplo int Clase::estatica = 123; el compilador guarda
+el valor 123 en la seccion del binario en tiempo de compilacion.
+Pero si el valor no es trivial (por ejemplo se llama a una funcion no constexpr
+o inlineable con optimizaciones) como el ejemplo de arriba, entonces la 
+inicializacion se hace en tiempo de ejecucion durante la inicializacion del 
+runtime. Esto nuevamente depende del compilador pero por lo general suele ser:
+
+El compilador crea una funcion _GLOBAL__sub_I_nombreDeFichero.cpp que llamara a 
+otra funcion creada __cxx_global_var_init y esta ultima inicializara las 
+variables estaticas no triviales (llamando a las otras funciones, realizando 
+operaciones, etc.). La funcion _GLOBAL__sub_I se crea una vez por cada unidad de
+traduccion.
+
+El linker coloca punteros a estas funciones en una seccion del binario, 
+tipicamente .init_array o .ctors
+
+Durante la ejecucion del programa, antes de main, el codigo de inicializacion de
+la libc (__libc_start_main) llama a __libc_csu_init, que recorre .init_array
+llamando a todas las funciones que contiene.
+
+Los nombres y pasos pueden cambiar dependiendo del compilador, pero la idea es 
+que las variables static no triviales se inicializan en runtime antes del main. 
+
+Lo mismo sucede si tienen destructores no triviales, que se ejecutan al 
+finalizar el programa, despues de main() de la misma forma.
+
+Es importante saber que las variables static de clase no son thread safe por 
+defecto en C++11 y habria que usar mutex o similares.
+
+Para que el compilador avise de la existencia de constructores no triviales 
+que se ejecutaran antes de main() o destructores no triviales que se ejecutaran
+despues de main se pueden usar las opciones: 
+clang++ -Wglobal-constructors -Wexit-time-destructors
+Solo esta en clang (a 2025) y no en gcc. 
+
+STATIC INITIALIZATION ORDER FIASCO
+Con las variables de clase estaticas existe un problema cuando dos variables 
+estaticas dependientes entre si estan definidas en dos unidades de traduccion
+distintas. Por ejemplo tener un objeto estatico X y otro Y donde X dependa de Y
+o un metodo de Y para su construccion. El problema esta en que no se puede 
+asegurar que X se va a construir antes que Y, y hay un 50% de probabilidades de
+que el programa crashee antes de llegar a main(). Para evitarlo se recomienda el
+Construct on First Use Idiom que consiste en declarar las variables como static
+de funcion para forzar un lazy init despues de main en su primer uso (igual que 
+el singleton de Meyers). Ver mas en:
+https://isocpp.org/wiki/faq/ctors#static-init-order
+
+*** EN UNA VARIABLE DENTRO DE UNA FUNCION ***
+
+El comportamiento es parecido a las static de clase. En este caso, el acceso a 
+la variable solo se puede hacer desde dentro de la funcion, y la variable tiene
+lazy load, es decir, se inicializa solo si se usa, y solo la primera vez que se 
+usa. 
+En el ejemplo, dentro de funcion, interna se crea solo si se llama alguna vez a 
+funcion, y solo se crea la primera vez. El resto de llamadas a funcion, usan el 
+valor inicial, que se escribe en la primera llamada en el espacio reservado en 
+espacio de direcciones del ejecutable. Aqui, al igual que en las estaticas de 
+clase, si el valor es trivial (un valor directo que se pueda conocer en tiempo
+de compilacion como un const char*, un int, un std::array, etc.), se puede 
+inicializar en tiempo de compilacion, pero si no lo es (por ejemplo cualquier 
+clase que implique malloc(), llamadas a funciones, etc.), se inicializa en 
+tiempo de ejecucion. En cualquier caso, el espacio para el objeto queda 
+reservado en el espacio de direcciones del ejecutable y los accesos a la 
+variable se hacen apuntando a ese espacio.
+
+Importante: desde C++11, la variables static dentro de funciones son thread-safe
+por defecto. Es decir, el compilador agrega implicitamente instrucciones 
+adicionales que adquieren y comprueban un lock para la variable en todos sus
+accesos. Esto lo agrega el compilador solo si es necesario, es decir si hay 
+threads lo agrega siempre, pero tambien he comprobado que si la inicializacion 
+se hace en tiempo de ejecucion, tambien agrega estas instrucciones aunque sea
+un programa single thread. (Por ejemplo con un static std::vector). Esto supone 
+un overhead de instrucciones que generalmente es muy pequeño, pero combiene 
+saberlo.
+
+Para asegurar que se inician en tiempo de compilacion creo que es buena idea 
+intentar hacer las static constexpr o consteval siempre que se pueda.
+
+
+*** EN FUNCIONES DE CLASE ***
+Una funcion miembro static implica que no esta sujeta a ninguna instancia de la
+clase, y por tanto no recibe el puntero this como parametro implicito.
+
+Tampoco puede tener keywords como const porque no altera el contenido de ninguna
+instancia de la clase.
+
+
+*** ARTICULOS INTERESANTES ***
+http://neugierig.org/software/chromium/notes/2011/08/static-initializers.html
+https://gcc.gnu.org/onlinedocs/gccint/Initialization.html
+

@@ -1,0 +1,84 @@
+Las tools gcov y llvm-cov sirven para generar informacion de covertura de codigo
+que puede ser util para medir covertura de tests, o ver que lineas de codigo son
+las que mas se ejecutan. Gcov se usa con gcc y llvm-cov con clang.
+Lcov es una tool de linux que sirve para generar reportes visuales de diferentes
+programas de coverage, entre ellos gcov y llvm-cov.
+
+*** GCOV
+Durante la compilacion se generan ficheros .gcno que contienen informacion de 
+covertura de cada fichero. Tambien se agregan secciones al binario para que 
+durante la ejecucion se puedan generar los .gcda.
+Durante la ejecucion se generan ficheros .gcda que contienen las medidas de 
+cuantas veces se ejecuta cada linea.
+Con los .gcno y los .gcda se genera un fichero .gcov con la informacion global,
+que se puede convertir a un .info de lcov, con el que se puede generar 
+informacion visual (por ejemplo, html).
+
+Para generar los .gcno se debe compilar con -ftest-coverage y linkar con -lgcov.
+Si se va a compilar y linkar en un solo comando se puede usar la opcion 
+--coverage.
+Para generar las secciones del binario que generan los .gcda, se debe compilar
+con -fprofile-arcs
+
+! Para que gcov funcione mejor es recomendable compilar sin optimizaciones 
+porque las inlineaciones hacen que se cuenten las lineas donde se inlinean en 
+lugar de las lineas de la funcion original.
+
+Para usar gcov con lcov:
+
+Compilar y generar los .gcno:
+$ gcc -fprofile-arcs -ftest-coverage -otras_opciones main.c
+$ gcc -fprofile-arcs -ftest-coverage -o main main.o
+Ejecutar para testear y generar los .gcna:
+$ ./main
+Generar el .gcov
+$ gcov main.c foo.c etc.c
+Convertir de formato gcov a formato lcov
+$ lcov --capture --directory . --output-file coverage.info
+Generar informacion visual (por ejemplo en html, hay varias opciones):
+$ genhtml coverage.info --output-directory .
+Visualizar el html con el navegador que se prefiera
+
+
+*** LLVM-COV
+Funciona de manera similar a gcov. Hay algun parche para que funcione habiendo
+compilado con optimizaciones, pero mejor compilar sin optimizaciones por el 
+mismo motivo que en gcov.
+
+Llvm-cov genera toda la informacion en el binario (no genera un equivalente a 
+.gcno). En tiempo de ejecucion genera ficheros .profraw (equivalente a .gcna).
+Para juntar la informacion de los .profraw se genera un .profdata (equivalente a
+.gcov).
+
+Para generar los .profraw, se debe compilar con -fprofile-instr-generate 
+-fcoverage-mapping y linkar con -fprofile-instr-generate
+
+Dispone de opciones propias para generar informacion visual, y entre ellas puede
+generar en formato lcov.
+
+Para usar llvm-cov:
+
+Compilar para generar la informacion en el binario:
+$ clang++ -fprofile-instr-generate -fcoverage-mapping -otras_opciones main.cpp
+$ clang++ -fcoverage-mapping -o main main.o
+Ejecutar para testear y generar los .profraw
+$ LLVM_PROFILE_FILE="main.profraw" ./main
+Generar el .profdata
+$ llvm-profdata merge --output=main.profdata main.profraw foo.profraw
+Generar la informacion visual (los formatos son html, text, lcov y json):
+$ llvm-cov show ./main -inst-profile=main.profdata -format=html -output-dir=.
+Visualizar el html con el navegador que se prefiera
+
+
+
+
+
+
+
+
+
+
+
+
+
+

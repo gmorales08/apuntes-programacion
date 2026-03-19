@@ -1,0 +1,47 @@
+Pointer to implementation es una tecnica porla que se eliminan los detalles de
+implementacion de una clase desde su representacion de objeto, moviendolos a una
+clase separada a la que apunta con un puntero. 
+Esta tecnica se utiliza para constuir interfaces de librerias con un ABI estable
+y reducir las dependencias en tiempo de compilacion (ya que si la implementacion
+cambia, ya sea una variable miembro o la definicion de una funcion, se recompila
+solo la implementacion y no quien la use. Si la implementacion estuviera dentro 
+de la clase que la usa, deberia recompilarse entera). De esta forma una libreria 
+que implemente pimpl puede actualizar la implementacion y aun asi mantener
+compatibilidad de ABI con versiones anteriores. 
+Por ejemplo:
+
+// interface (widget.h)
+struct widget
+{
+private:
+    struct impl;      // forward declaration of the implementation class
+    std::unique_ptr<  // unique-ownership opaque pointer
+        impl>> pImpl; // to the forward-declared implementation class
+};
+ 
+// ---------------------------
+// implementation (widget.cpp)
+struct widget::impl
+{
+    // implementation details
+};
+
+
+Algunas de las desventajas de este diseño son:
+-Se agrega el coste de indireccion del puntero para acceder a las variables o 
+funciones de la implementacion:
+this -> pImpl -> variable de implementacion
+this -> pImpl -> funcion
+esto habria que valorarlo en hot spots.
+-El hecho de que la implementacion este a traves de un puntero hace dificil las
+optimizaciones de inlining.
+-Hay otras alternativas que pueden funcionar mejor en otras situaciones:
+  .Implementacion inline (sin puntero, directamente en la clase): no mantiene 
+  una ABI estable pero es mas rapido.
+  .Clase abstracta pura (OOP factory): una factoria crea un puntero a la clase
+  base que contiene la interfaz que implementa otra clase virtual que contiene
+  la implementacion. Esto tambien mantiene la ABI estable.
+  
+  
+Para leer mas sobre PImpl:
+https://en.cppreference.com/w/cpp/language/pimpl.html

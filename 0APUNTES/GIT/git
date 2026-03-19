@@ -34,6 +34,18 @@ $ git config --global core.autocrlf true
 Hay algunas opciones que git autoconfigura por lo que no es recomendable 
 modificarlas.
 
+--- UPSTREAM
+El upstream configurado en local es el que se usa para inferir la rama
+donde se quiere subir un commit cuando se hace git push, git pull, git fetch, 
+etc. (sin argumentos)
+Para ver el upstream de git local:
+$ git status -sb
+Para configurar un upstream que se use a partir de ahora:
+$ git comando -u origin rama
+La variable de configuracion push.default gestiona este comportamiento. Si esta 
+en simple se hace push por defecto a una branch con el mismo nombre que la local
+en origin (es la opcion por defecto).
+
 ============= FICHEROS ================
 .git/info/exclude
     los ficheros indicados aqui se ignoran localmente.
@@ -285,10 +297,26 @@ $ git show numeroDeCommit
 
 
 ========== GIT CHERRY PICK ==========
-$ git cherry pick hash1 hash2
+$ git cherry-pick hash1 hash2
+$ git cherry-pick hash
+$ git cherry-pick hash_inicio^..hash_fin
 Toma uno o varios commits, copia sus cambios y crea un nuevo commit en la rama
 actual con esos cambios. Se utiliza para traer a una rama ciertos cambios de 
-otra sin hacer merge entero. 
+otra sin hacer merge entero.
+Si se quiere evitar crear un commit nuevo con los cambios, se pasa el flag 
+--no-comit y luego se hace el commit manualmente.
+
+========== GIT REBASE ==========
+Git rebase toma el ultimo commit comun entre dos ramas y aplica todos los 
+commits desde entonces por encima del ultimo commit de una de las ramas
+
+Si hay  cambios locales, se guardan para luego: git add . && git stash
+Origen es la rama donde estan los cambios que queremos traer, y destino es donde
+los queremos aplicar
+$ git checkout destino
+$ git pull --rebase origin origen
+// git pull --rebase es igual a git fetch + git rebase
+Si habia cambios locales antes: git stash pop
 
 
 ========== GIT RESET ==========
@@ -329,10 +357,87 @@ $ git reflog
 y muestra los cambios de HEAD, incluidos los que no aparecen en git log
 
 
+========== SUBMODULOS ==========
+Agregar un submodulo:
+$ git submodule add ssh_submodulo_repo
+Al agregar el submodulo, git genera un fichero .gitmodules con la informacion 
+de los submodulos
+
+Para clonar un repositorio que contenga submodulos:
+$ git clone --recurse-submodules ssh_repo
+Que equivale a estos tres comandos:
+$ git clone ssh_repo
+$ git submodule init   # Detecta todos los submodulos
+$ git submodule update # Sincroniza los submodulos
+
+Para actualizar los submodulos de un repositorio:
+$ git submodule update --remote --recursive
+
+Para hacer pull de un repositorio y actualizar el estado de los submodulos:
+$ git pull --recurse-submodules
+
+
 ========== PROBLEMAS Y SOLUCIONES ==========
-Si da problemas con el ssl (por ejemplo desde Windows), se puede intentar 
+*** PROBLEMAS CON SSL
+Si da problemas con ssl (por ejemplo desde Windows), se puede intentar 
 desactivarlo:
 
 $ git config --global http.sslVerify false
+
+La variable de entorno GIT_SSL_NO_VERIFY puede sobreescribir esta opcion.
+
+Si el problema es con el backend de SSL, se puede comprobar cual se esta usando
+y cambiarlo (si se esta usando alguno):
+$ git config --global http.sslbackend
+Por ejemplo puede estar configurado como openssl, pero no tener las librerias, 
+entonces se puede intentar cambiar a gnutls u otro, o desactivar la opcion.
+
+*** DEJAR DE TRACKEAR UN FICHERO SUBIDO AL REPO
+Eliminar un fichero para dejar de trackearlo y eliminarlo tambien en origin:
+Primero eliminarlo de la cache de git y luego agregarlo a gitignore:
+$ git rm --cached ruta/al/fichero
+$ vim .gitignore
+
+*** PROBLEMA CON CRLF Y LF 
+Git puede guardar los ficheros tanto con CRLF como con LF. Al crear un proyecto
+se deberia elegir cual usar. Generalmente el LF porque CRLF es exclusivo de 
+Windows.
+
+Para gestionar que salto de linea se usa a nivel local, se usa git config 
+core.autocrlf. Esta opcion puede tener los valores false (no hace nada), true
+(al guardar en git se usa LF, y al leer de git se usa CRLF. Esta es la opcion
+que deberia tener windows), y input (al guardar en git se usa LF, y al leer de
+git se lee como esta, es decir en LF. Esta es la opcion que se deberia usar en
+Unix). Lo ideal es que los unix del equipo no configuren nada (o si acaso lo 
+configuren en input), y los windows usen true.
+$ git config --global core.autocrlf input
+A nivel local tambien es recomendable usar un .editorconfig porque algunos 
+linters o formatters pueden interferir. En .editorconfig poner:
+[*]
+end_of_line = lf
+  
+Aunque este bien configurado a nivel local, si algun miembro del equipo no lo 
+tiene configurado, puede subir CRLF al repo, y eso daria problemas. Para 
+configurarlo a nivel de proyecto se puede editar un .gitattributes poniendo:
+* text=auto eol=lf
+Esto aplica para todos los ficheros y detecta si son text o binary (text=auto),
+y a todos les pone un eol de tipo LF. Si se quiere agregar una excepcion, por 
+ejemplo un .bat de Windows:
+*.bat text eol=crlf
+
+Habiendo aplicado la configuracion correcta puede que el proyecto ya tuviera 
+ficheros CRLF que hay que normalizar. Para listar el tipo de formato de cada 
+fichero:
+$ git ls-files --eol
+asi se puede ver si queda algun CRLF. Con el siguiente comando deberian 
+normalizarse los ficheros que no lo esten:
+$ git add --renormalize .
+Luego hacer un status para ver si alguno ha cambiado. En caso de que algun 
+fichero siga sin normalizarse, se puede eliminar de la cache, y al agregarlo de
+nuevo ya deberia estar normalizado: 
+$ git rm --cached fichero
+$ git add fichero 
+
+
 
 
