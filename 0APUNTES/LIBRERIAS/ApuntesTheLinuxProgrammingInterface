@@ -1,0 +1,859 @@
+The Linux Programming Interface
+Michael Kerrisk
+ISBN-10: 1-59327-220-0
+ISBN-13: 978-1-59327-220-3
+
+Apuntes sobre los capitulos 41 y 42, referentes a librerias.
+
+************************************************
+*** Ch. 41: Fundamentals of shared libraries ***
+************************************************
+
+*** 41.1. Object Libraries
+
+En Linux, el linker se invoca indirectamente por el compilador, por lo que no 
+hay que invocarlo explicitamente.
+
+Generalmente es una buena idea incluir debug information en las librerias. 
+Antiguamente esto se evitaba por el coste adicional de disco y memoria, pero hoy
+no es tan importante.
+
+En algunas arquitecturas como x86_32 el parametro -fomit-frame-pointer no se 
+deberia indicar porque no permite el debug. En x86_64 esta opcion viene por 
+defecto porque no afecta al debugging.  Tampoco se deberia stripear el binario 
+para que conserve los simbolos.
+
+*** 41.2. Static libraries
+
+Las librerias estaticas tambien se conocen como archives y fue el primer tipo de
+libreria para sistemas UNIX.
+
+Una libreria estatica es un fichero que contiene un conjunto de ficheros objeto,
+junto con varios atributos para cada fichero como permisos, tiempo de 
+modificacion, etc. 
+
+Se crean y mantienen con el comando ar(1):
+
+$ ar options archive object-file ...
+
+En options se puede indicar el operation code, que puede ser:
+
+ -r(replace): para que los objetos introducidos reemplacen a los que ya 
+exisitian con el mismo nombre. Esta es la opcion para mantener librerias:
+
+$ cc -g -c mod1.c mod2.c mod3.c
+
+$ ar r libdemo.a mod1.o mod2.o mod3.o
+$ rm mod1.o mod2.o mod3.o
+
+ -t(table of contents): muestra el contenido de una libreria estatica. Con -v se
+muestran tambien los atributos:
+
+$ ar tv libdemo.a
+
+ -d(delete): elimina un objeto de la libreria:
+
+$ ar d libdemo.a mod3.o
+
+Para usar una libreria estatica se puede enlazar junto con los otros ficheros 
+objeto en la fase del linker:
+
+$ cc -g -c prog.c
+$ cc -g -o prog prog.o libdemo.a
+
+o se puede ubicar la libreria en un directorio para enlazarla con la opcion -l:
+
+$ cc -g -o prog prog.o -ldemo
+
+o ubicandola en un directorio no estandar:
+
+$ cc -g -o prog prog.o -Ldirectorio -ldemo
+
+Aunque contenga muchos ficheros objetos, el linker solo utiliza los necesarios 
+de la libreria.
+
+*** 41.3 Overview of Shared Libraries
+
+Las librerias compartidas presentan ventajas frente a las estaticas:
+
+-menor espacio en disco al no tener redundancia en cada programa que la use
+
+-una solo carga en memoria que comparten todos los programas
+
+-para actualizar la libreria solo se actualiza la instancia compartida, en 
+lugar de todos los binarios que la usen
+
+En la fase de linking las librerias dinamicas no se copian al ejecutable. Cuando 
+el primer programa en necesitar la libreria se inicia, la libreria se carga en 
+memoria.
+
+Aunque el codigo de la libreria compartida se comparta entre los programas que 
+la usen, sus variables no se comparten, y cada programa guarda una copia de las 
+variables globales y estaticas definidas en la libreria.
+
+Las desventajas de las librerias compartidas son: 
+
+-Son mas complejas que las estaticas, tanto en formato como a la hora de 
+construir programas con ellas.
+
+-Deben ser compiladas para usar position-independent code (Seccion 41.4.2) que 
+tiene un overhead porque usa un registro adicional.
+
+-La relocacion de simbolos debe ser ejecutada en tiempo de compilacion la 
+primera vez que se carga la libreria, lo que supone un overhead en tiempo de 
+carga del primer programa que la use.
+
+*** 41.4 Creating and using shared libraries - A firt pass
+
+El formato usado en el capitulo es ELF (Executable and Linking Format), usado 
+por Linux moderno y sistemas UNIX.
+
+--- 41.4.1 Creating a shared library
+
+$ gcc -g -c -fPIC -Wall mod1.c mod2.c mod3.c
+
+$ gcc -g -shared -o libfoo.so mod1.o mod2.o mod3.o
+
+-fPIC se explica en la siguiente seccion. -shared es el flag que indica que se 
+quiere crear un libreria compartida. La convencion de nombre es usar el prefjio 
+lib y el sufijo .so.
+
+La opciones especificadas son para el compilador gcc y podrian variar con otros 
+compiladores.
+
+A diferencia de las librerias estaticas, las dinamicas no pueden agregar o 
+eliminar objetos una vez construidas, al igual que un ejecutable.
+
+--- 41.4.2 Position-Independent code
+
+El flag -fPIC indica al compilador que debe generar position independent code. 
+Esto cambia la forma en la que genera el codigo para acceder a variables 
+globales, estaticas, y externas, acceder a string constants y obtener 
+direcciones de funciones. Estos cambios permiten al codigo ubicarse en cualquier
+posicion de la memoria virtual en tiempo de ejecucion.
+
+En Linux/x86_32 es posible crear librerias dinamicas sin PIC, pero se pierden 
+algunas ventajas. En otras arquitecturas es imposible crear librerias dinamicas
+sin PIC.
+
+Para saber si una libreria se ha compilado con PIC se puede examinar su tabla de
+simbolos para ver si tiene el simbolo _GLOBAL_OFFSET_TABLE_:
+
+$ nm mod1.o | grep _GLOBAL_OFFSET_TABLE_
+
+$ readelf -s mod1.o | grep _GLOBAL_OFFSET_TABLE_
+
+Para saber si algun modulo de la libreria no usa PIC se puede examinar la cadena
+TEXREL, que indica la presencia de un modulo cuya seccion .text contiene una 
+referencia que requiere relocacion en tiempo de ejecucion:
+
+$ objdump --all-headers libfoo.so | grep TEXTREL
+
+$ readelf -d libfoo.so | grep TEXTREL
+
+--- 41.4.3 Using a shared library
+
+Para usar una libreria compartida hacen falta dos pasos que no son necesarios 
+con las librerias estaticas:
+
+-Como el ejecutable no contiene la copia de la libreria que necesita, necesita 
+un mecanismo para encontrarla en tiempo de ejecucion. Esto se hace embebiendo el
+nombre de la libreria en el ejecutable en la fase de enlazado. En ELF se guarda
+en un tag DT_NEEDED. La lista de todas las librerias de las que depende el 
+programa se denomina dynamic dependency list.
+
+-En tiempo de ejecucion debe existir un mecanismo para resolver el nombre 
+embebido de la libreria. Esto lo realiza el dynamic linker o dynamic linking 
+loader. Este programa la libreria /lib/ld-linux.so.2 que es utilizada en todos 
+los ejecutables que utilizen librerias compartidas. El path del dynamic linker 
+puede variar asi como su nombre, en diferentes arquitecturas. El dynamic linker 
+utiliza una serie de reglas para resolver el nombre de la libreria y localizarla
+en directorios estandar como /lib o /usr/lib. Algunas arquitecturas permiten el
+uso de librerias de 32 y 64 bits y las diferencian en directorios como /lib y 
+/lib64
+
+La variable de entorno LD_LIBRARY_PATH permite especificar directorios no 
+estandar para que el dynamic linker busque librerias en ellos.
+
+El termino linking se refiere al uso del linker, ld, para combinar ficheros 
+objetos en un ejecutable. Esto tambien se conoce como static linking o link 
+editing, y el linker se conoce como link editor. Todos los programas pasan por 
+una static-linking phase, y los que usan librerias compartidas pasan ademas por
+un dynamic linking.
+
+--- 41.4.4. The Shared Library Soname
+
+Es posible crear un alias para una libreria para que pueda ser encontrada cuando
+se busque por el nombre embebido en el ejecutable. Esta especie de alias se 
+denomina soname y en ELF  es el tag DT_SONAME.
+
+Si una libreria tiene un soname, entonces durante la fase de static linking, el
+soname se embebe en el ejecutable en lugar del nombre real de la libreria. El
+proposito del soname es que el ejecutable pueda usar una version de la libreria
+que es diferente a la libreria contra la que esta linkando.
+
+El primer paso para usar un soname es especificarlo al crear la libreria: 
+
+$ gcc -g -c -fPIC -Wall mod1.c mod2.c mod3.c
+
+$ gcc -g -shared -Wl,-soname,libbar.so -o libfoo.so mod1.o mod2.o mod3.o
+
+Con -Wl,-soname,libbar.so se indica al linker que libbar.so es el soname de la 
+libreria libfoo.so
+
+Para determinar el soname de una libreria existente:
+
+$ objdump -p libfoo.so | grep SONAME
+
+o
+
+$ readelf -d libfoo.so | grep SONAME
+
+Una vez compilada la libreria con un soname, al linkar un binario que use la 
+libreria, se embebera el soname en lugar del nombre de la libreria. 
+
+Faltaria el paso de crear un enlace simbolico a la libreria real:
+
+$ ln -s libfoo.so libbar.so # libbar.so apunta a libfoo.so
+
+*** 41.5. Useful Tools for Working with Shared Libraries
+
+-ldd: ldd(1) (list dynamic dependencies) lista las librerias de las que depende 
+un binario mostrando tambien el path resuelto a su libreria real.
+
+-objdump y readelf: muestran informacion sobre la cabecera y secciones de un ELF
+
+-nm: muestra los simbolos que contiene un objeto. Con -A muestra el nombre de la
+libreria.
+
+*** 41.6. Shared Library Versions and Naming Conventions
+
+Tipicamente las versiones sucesivas de las librerias son compatibles entre 
+ellas, es decir, sus funciones mantienen la misma interfaz y sus resultados son
+equivalentes. Estas versiones diferentes pero compatibles se conocen como minor
+versions. Cuando se hace una version que tiene que romper esa compatibilidad se
+le denomina mayor version. Aunque se lance una mayor version, es necesario 
+mantener compatibilidad con los programas que todavia usen las versiones 
+anteriores. Para tratar con estos requerimientos de versionado, se usan 
+convenciones para los nombres reales y sonames de las librerias.
+
+El formato estandar de nombre de libreria es: 
+
+libname.so.major-id.minor-id
+
+donde major-id y minor-id son identificadores de sus versiones, normalmente un 
+numero que se va incrementando cada version, pero puede ser una letra u otro 
+identificador. El minor-id puede ser dos numeros separados por un punto, siendo
+el primero el minor version y el segundo el patch version.
+
+El soname de la libreria incluye la major version pero excluye la minor version.
+
+Normalmente el soname de una major version apunta a la libreria con el minor 
+version mas actualizado (ver ejemplo).
+
+Ejemplos: 
+
+libdemo.so.1.0.1
+libdemo.so.1.0.2
+libdemo.so.2.0.0
+libreadline.so.5.0
+
+libdemo.so.1     -> libdemo.so.1.0.2
+libdemo.so.2     -> libdemo.so.2.0.0
+libreadline.so.5 -> libreadline.so.5.0
+
+Las ventajas de esta convencion de nombres son que un ejecutable siempre va a 
+apuntar a la minor version mas actualizada, y que pueden coexistir diferentes 
+major versions de una libreria, al tener diferentes nombres.
+
+Ademas del real name y del soname, existe el linker name que es el utilizado 
+cuando se enlaza la libreria con el ejecutable. El linker name es el nombre de 
+la libreria sin los id de versiones (libname.so). Esto permite enlazar el 
+ejecutable sin saber que version esta instalada en el equipo. El linker 
+utilizara la version mas actualizada de esa libreria.
+
+Tipicamente el linker name se crea en el mismo directorio qu eel fichero al que 
+refiere. Puede ser enlazado al real name o al soname de la major version mas 
+reciente. Es preferible enlazar al soname para que los cambios en el soname se 
+apliquen automaticamente al linker name. Con el programa ldconfig (seccion 41.7)
+se puede mantener actualizados los linker names automaticamente. Si se quiere 
+usar una version antigua de una libreria, entonces se debe indicar al linker el
+soname o real name de la version en cuestion.
+
+Ejemplos de linker names: 
+
+libdemo.so     -> libdemo.so.2
+libreadline.so -> libreadline.so.5
+
+Resumen:
+
+-real name (libname.so.maj.min): contiene el codigo de la libreria
+
+-soname (libname.so.maj): una instancia por major version. Apunta a la minor 
+version mas actualizada. Es el nombre que se embebe en el ejecutable en tiempo 
+de linkado y que se usa en tiempo de ejecucion para encontrar el real name a 
+traves del enlace simbolico.
+
+-linker name (libname.so): enlace simbolico al ultimo real name, o mas 
+usualmente al ultimo soname.
+
+Observacion: el linker name se suele usar durante el desarrollo, para no tener 
+que poner una major version expliciftamente y usar la utlima que haya en el 
+sistema. Este symlink se suele incluir en las versions devel o dev de los 
+paquetes (las que incluyen las cabeceras).
+
+Los pasos para crear una libreria con las convenciones vistas son:
+
+$ gcc -g -c -fPIC -Wall mod1.c mod2.c mod3.c
+
+$ gcc -g -shared -Wl,-soname,libdemo.so.1 -o libdemo.so.1.0.1 \
+mod1.o mod2.o mod3.o
+
+$ ln -s libdemo.so.1.0.1 libdemo.so.1
+
+$ ln -s libdemo.so.1 libdemo.so
+
+Entonces ya se puede usar la libreria: 
+
+$ gcc -g -Wall -o prog prog.c -L. -ldemo
+$ LD_LIBRARY_PATH=. ./prog
+
+*** 41.7 Installing Shared Libraries
+
+Los directorios estandar donde se instalan librerias son: 
+
+-/usr/lib : directorio de librerias estandar
+
+-/lib: para librerias necesarias durante el arranque, porque /usr/lib puede no 
+estar montado todavia.
+
+-/usr/local/lib: para librerias personales o experimentales
+
+-En los directorios especificados en /etc/ld.so.conf
+
+Ldconfig: ldconfig(8) soluciona dos problemas potenciales de las librerias 
+compartidas: 
+
+-Las librerias comparitdas puede estar en una variedad de directorios. Si el 
+dynamic linker tiene que buscar en todos ellos, la carga seria muy lenta.
+
+-Si se intalan versiones nuevas o se eliminan versiones antiguas, el enlace 
+simbolico del soname se queda obsoleto.
+
+ldconfig soluciona estos problemas haciendo dos tareas: 
+
+-Busca en el set estandar de directorios y crea o actualiza una cache 
+/etc/ld.so.cache que contiene las minor versions mas actualizadas para cada 
+major version. El dynamic linker usa esta cache para buscar las librerias en run
+time. Para construir la cache, ldconfig busca en los directorios especificados
+en /etc/ld.so.conf y luego en /lib y /usr/lib. Para listar el contenido de la 
+cache se puede usar ldconfig -p
+
+-Examina las ultimas minor version de cada major version para encontrar el 
+soname embebido y crear o actualizar los enlaces simbolicos para cada soname.
+
+Para que ldconfig pueda realizar estas tareas, los nombres de las librerias 
+deben seguir las convenciones mencionadas anteriormente.
+
+Siempre que haya cambios en las librerias (instalacion, borrado, actualizacion)
+se deberia ejecutar ldconfig.
+
+Por ejemplo para instalar dos versiones de una libreria con ldconfig: 
+
+$ mv libdemo.so.1.0.1 libdemo.so.2.0.0 /usr/lib
+
+$ ldconfig -v | grep libdemo
+
+libdemo.so.1 -> libdemo.so.1.0.1 (changed)
+libdemo.so.2 -> libdemo.so.2.0.0 (changed)
+
+$ cd /usr/lib
+
+$ ls -l libdemo* | awk '{print $1, $$9, $10, $11}'
+    lrwxrwxrwx libdemo.so.1 -> libdemo.so.1.0.1
+    -rwxr-xr-x libdemo.so.1.0.1
+    lrwxrwxrwx libdemo.so.2 -> libdemo.so.2.0.0
+    -rwxr-xr-x libdemo.so.2.0.0
+
+$ ln -s libdemo.so.2 libdemo.so
+
+En el utlimo paso se crea el linker name manualmente porque ldconfig no lo hace.
+Aun asi, despues de crearlo, ldconfig lo mantiene actualizado, por lo que si se
+añade una version nueva de la libreria, ldconfig movera el linker name a esta.
+
+*** 41.8 Compatible Versus Incompatible Libraries
+
+Un cambio en una libreria es compatible con otra version existente si se cumplen
+todas las siguientes condiciones:
+
+-La semantica de cada funcion publica y variable de la libreria se mantienen 
+igual. Es decir, no se cambia la firma, el valor de retorno, las variables 
+globales que modifica, etc. El cambio debe ser un fix o una mejora de 
+rendimiento.
+
+-No se eliminan funciones o variables de la API publica de la libreria. Es 
+posible agregar nuevas funciones y variables a la API.
+
+-Los structs allocados y retornados por cada funcion permanecen sin cambios. Los
+structs exportados por la libreria permanecen sin cambios. Una tecnica que usan
+los diseñadores de librerias es crear structs con espacio extra “reservado para
+uso futuro” para asi poder agregar campos sin alterar el comportamiento de la 
+libreria..
+
+*** 41.9 Upgrading Shared Libraries
+
+Se pueden actualizar versiones de librerias mientras estas estan siendo usadas
+por otros programas. La cache y los enlaces simbolicos se actualizan y tienen 
+efecto para todos los programas que enlacen desde ese momento.
+
+*** 41.10 Specifying Library Search Directories in an Object File
+
+Hay varias formas para indicar al dynamic linker la ubicacion de las librerias 
+dinamicas:
+
+-con la variable de entorno LD_LIBRARY_PATH
+
+-ubicando la libreria en los directorios estandar /lib /usr/lib o los indicados
+en /etc/ld.so.conf
+
+-durante la static editing phase indicando los directorios con el flag -rpath:
+
+$ gcc -g -Wall -Wl,-rpath,/home/mtk/pdir -o prog prog.c libdemo.so
+
+Esta ultima opcion copia el path indicado en el run-time library path list del
+ejecutable. El dynamic linker busca en tiempo de ejecucion las librerias en los
+directorios indicados en este campo del binario.
+
+La variable de entorno LD_RUN_PATH se usa cuando la opcion -rflag no se ha 
+especificado y actua de la misma forma.
+
+En ELF antiguamente exisita una seccion DT_RPATH que fue deprecada en favor de 
+DT_RUNPATH. Se pueden encontrar binario con ambas secciones, y la de DT_RUNPATH
+tiene preferencia. Por defecto el linker crea la seccion DT_RPATH. Para usar la
+nueva seccion hay que indica el flag --enable-new-dtags 
+
+Using $ORIGIN in rpath: 
+
+si se quiere distribuir una aplicacion con sus propias librerias para que el 
+usuario al desepaquetar los binarios pueda ejecutar el programa, se tendria que
+forzar al usuario a actualizar el LD_LIBRARY_PATH o mover las librerias a 
+directorios estandar. Para evitar estas dos alternativas, el dynamic linker 
+puede entender una cadena especial $ORIGIN o ${ORIGIN} en la especificacion del
+rpath.
+
+Por ejemplo:
+
+$ gcc -Wl,-rpath,'$ORIGIN'/lib …
+Indica que el rpath es el directorio lib desde la ubicacion del binario.
+
+*** 41.11 Finding Shared Libraries at Run Time
+
+Para encontrar una libreria el dynamic linker usa las siguientes reglas: 
+
+1 Si el ejecutable tiene directorios en DT_RPATH y no contiene DT_RUNPATH, 
+entonces busca en esos directorios en orden.
+
+2 Si la variable de entorno LD_LIBRARY_PATH esta definida busca en sus 
+directorios en orden.
+
+3 Si el ejecutable contiene DT_RUNPATH se busca en sus directorios en orden.
+
+4 Se comprueba si el fichero /etc/ld.so.cache tiene la entrada para la libreria
+
+5 Se busca en orden en /lib y luego en /usr/lib
+
+*** 41.12 Run-Time Symbol Resolution
+
+Cuando un simbolo (funcion o variable) esta definida en un ejecutable y en una 
+libreria a la que enlaza ese ejecutable, la definicion del ejecutable 
+sobreescribe la de la libreria: 
+
+// prog
+xyz() {
+    printf(”main-xyz\n”);
+}
+
+main() {
+    func();
+}
+
+// libfoo.so
+xyz() {
+    printf(”foo-xyz\n”);
+}
+
+func() {
+    xyz();
+}
+
+Cuando se ejecute prog habiendo enlazado con libfoo.so se imprimira: main-xyz
+
+Si un mismo simbolo se define en varias librerias, la referencia a ese simbolo 
+es la primera que se encuentra
+
+Esta es una decision de diseño historica que se hizo cuando las librerias 
+dinamicas sustituian las estaticas. Actualmente supone un problema porque no se 
+puede asegurar que las librerias ofrecen un sistema autocontenido dado que otras 
+librerias pueden afectar a sus simbolos. Para evitar este problema se puede usar 
+el flag del linker -Bsymbolic que indica que las referencias a simbolos globales 
+se enlazaran (siempre que existan) a las definiciones dentro de la propia 
+libreria. De esta forma en el ejemplo anterior se llamaria a xyz() de la 
+libreria desde la funcion func() de la libreria. Aunque se use este flag, si se 
+llamase a xyz() dentro de main, se seguiria refieriendo al xyz() de main.
+
+*** 41.13 Using a Static Library Instead of a Shared Library
+
+Hay situaciones en las que usar librerias estaticas es preferible a las 
+dinamicas. Por ejemplo si no se quiere instalar una libreria en el sistema, o si
+el entorno no lo permite (p.e. chroot).
+
+Cuando existe una libreria dinamica y otra estatica con el mismo nombre, el 
+linker prefiere la dinamica. Por ejemplo al usar –Lsomedir –ldemo cuando existe
+libdemo.so y libdemo.a, se enlazara la dinamica. Para forzar a compilar la 
+estatica, se puede pasar el flag -static, indicar el nombre completo con el .a 
+al enlazar o usar la opcion –Wl,–Bstatic (–Wl,–Bdynamic para forzar dinamicas).
+
+****************************************************
+*** Ch. 42 Advanced features of shared libraries ***
+****************************************************
+
+*** 42.1 Dynamically Loaded Libraries
+
+Es posible cargar librerias dinamicas de forma lazy en lugar de en la carga del
+ejecutable. Esto se puede hacer con la API dlopen. Las librerias cargadas de
+esta forma se denominan dynamically loaded library. La API de dlopen consiste en
+las siguientes funciones: 
+
+-dlopen(): abre una libreria compartida, devolviendo un handle que se usara en 
+las siguientes llamadas.
+
+-dlsym(): busca la libreria que contiene un simbolo (funcion o variable) y 
+devuelve su direccion.
+
+-dlclose(): cierra una libreria abierta con dlopen()
+
+-dlerror(): devuelve un string de error y se usa despues de un return fallido de
+una de las funciones anteriores.
+
+La implementacion de glibc tambien incluye algunas funciones relacionadas. Para
+construir programas usando la API de dlopen en Linux se debe especificar la 
+opcion -ldl para linkar con la libreria libdl.
+
+--- 42.1.1 Opening a Shared Library: dlopen()
+
+dlopen() abre la libreria compartida y la carga en el espacio de direcciones 
+virtuales del proceso que ha llamado a dlopen(). Despues incrementa en uno el 
+contador de referencias de la libreria.
+
+Si el nombre de la libreria contiene un /  dlopen busca la ruta absoluta o 
+relativa, y en caso contrario busca con las reglas descritas en 41.11.
+
+En caso de exito, la funcion devuelve un puntero a un handle que puede ser 
+utilizado en funciones posteriores de la API. En caso de error devuelve NULL.
+
+Si la libreria compartida tiene dependencias con otras librerias, dlopen tambien
+las carga.
+
+Si se llama varias veces a dlopen() para la misma libreria, esta solo se carga 
+la primera vez, y devuelve el mismo handle cada vez que se vuelve a llamar. La 
+API mantiene una cuenta de cuantos handle hay abiertos, que se van decrementando
+con cada dlclose() hasta llegar a 0, entonces la libreria se descarga de 
+memoria.
+
+Se pueden indicar flags a dlopen: 
+
+-RTLD_LAZY: los simbolos de funcion sin definir se deben resolver solo si el 
+codigo que los usa se ejecuta. Los simbolos de variables siempre se resuelven 
+inmediatamente. Este comportamiento es el mismo que el dynamic linker tiene 
+cuando carga librerias dinamicas de la dynamic dependency list de un ejecutable.
+
+-RTLD_NOW: todos los simbolos de la libreria se resuelven en la llamada a 
+dlopen(). Esto es mas lento, pero los errores de simbolos sin definir se 
+detectan al abrir la libreria en lugar de mas tarde.
+
+Existen otros flags en la especificacion SUSv3:
+
+-RTLD_GLOBAL: los simbolos en la libreria y su arbol de dependencias estan 
+disponibles para resolver referencias en otras librerias cargadas por este 
+proceso y para lookups con dlsym().
+
+-RTLD_LOCAL: es lo contrario a RTLD_GLOBAL y el comportamiento por defecto. Los
+simbolos en la libreria y su arbol de dependencias no estan disponibles para 
+resolverse en las librerias cargadas despues.
+
+Linux ademas ofrece otras flags:
+
+-RTLD_NODELETE
+
+-RTLD_NOLOAD
+
+-RTLD_DEEPBIND
+
+Si se llama a dlopen con el parametro libfilename a NULL, este devuelve un 
+handle al programa main. Al buscar simbolos con dlsym() con este handle, se 
+buscaran en las librerias cargadas al comienzo de la ejecucion y las cargadas 
+con RTLD_GLOBAL.
+
+--- 42.1.2 Diagnosing Errors: dlerror()
+
+Si una llamada a dlpoen() devuelve un error, se puede usar dlerror() para 
+obtener un puntero al mensaje de error.
+
+--- 42.1.3 Obtaining the Address of a Symbol: dlsym()
+
+void *dlsym(void *handle, char *symbol);
+
+Con dlsym se busca el simbolo en el handle y se devuelve un puntero a su 
+direccion de memoria.
+
+Para buscar simbolos versionados (42.3.2) se puede usar la funcion dlvsym.
+
+Ejemplo para buscar una variable: 
+
+int *ip;
+ip = (int *) dlsym(symbol, "myvar");
+if (ip != NULL)
+    printf("Value is %d\n", *ip);
+
+Ejemplo para buscar una funcion (C99 prohibe la asignacion de void* a function 
+pointer, por eso se hace el cast redundante): 
+
+int (*funcp)(int);
+
+*(void **) (&funcp) = dlsym(handle, symbol);
+
+res = (*funcp)(somearg);
+
+Aun asi el cast anterior de dlsym genera un warning en los compiladore ANSI C. 
+Para evitarlo se podria hacer: 
+
+funcp = (int (*) (int)) dlsym(handle, symbol);
+
+pero en la especificacion de SUSv3 se recomienda la sintaxis de **(void ***)
+
+En vez de especificar un handle en la llamada a dlsym() se pueden especificar 
+los siguientes pseudohandles:
+
+-RTLD_DEFAULT: busca el simbolo empezando por el main program y luego en orden 
+por la lista de libreiras compartidas cargadas, incluyendo las cargadas con 
+dlopen() con RTLD_GLOBAL. Esto corresponde al comportamiento por defecto del 
+dynamic linker.
+
+-RTLD_NEXT: busca el simbolo en las librerias compartidas cargadas despues de la
+que invoca a dlsym(). Esto es util cuando se crea una funcion wrapper con el 
+mismo nombre que una funcion definida en otro sitio. Por ejemplo para 
+implementar una version de malloc que llame al malloc real, se puede obtener 
+primero la direccion del malloc real con func = dlsym(RTLD_NEXT, “malloc”)
+
+--- 42.1.4 Closing a Shared Library: dlclose()
+
+int dlclose(void *handle);
+
+dlclose() decrementa el contador de referencias abiertas de la libreria y si 
+llega a 0, y no hay simbolos de la libreria que sean requeridos por otras 
+librerias, la libreria se descarga. Este proceso se ejecuta recursivamente para
+las librerias en la lista de dependencias de la libreria. Tambien se ejecuta 
+implicitamente al terminar el proceso.
+
+--- 42.1.5 Obtaining Information About Loaded Symbols: dladdr()
+
+int dladdr(const void *addr, Dl_info *info);
+
+Devuelve informacion sobre una direccion de memoria, tipicamente obtenida con 
+dlsym().
+
+--- 42.1.6 Accessing Symbols in the Main Program
+
+Cuando se compilan librerias, sus simbolos se exportan por defecto a la tabla de
+simbolos dinamicos del binario. En los ejecutables normales no se exporta ningun
+simbolo a la tabla de simbolos dinamicos. En ocasiones se puede necesitar que un
+ejecutable exporte sus simbolos publicamente a la tabla de simbolos dinamicos, 
+por ejemplo cuando una libreria cargada y usada dentro del propio ejecutable 
+llame a una funcion que se encuentra dentro del ejecutable. Para poder encontrar
+esa funcion en tiempo de ejecucion, el linker necesita buscarla en la tabla de 
+simbolos dinamicos del ejecutable. Para exportar los simbolos a la tabla de 
+simbolos dinamicos: 
+
+$ gcc -Wl,--export-dynamic main.c
+
+o
+
+$ gcc -export-dynamic main.c
+
+Nota: para ver los simbolos dinamicos se puede usar nm -D a.out
+
+*** 42.2 Controlling Symbol Visibility
+
+Una libreria bien diseñada solo deberia hacer publicos los simbolos que formen 
+parte de la especificacion de su ABI. Las razones son: 
+
+-El diseñador de la libreria puede exportar accidentalmente interfaces que no 
+deberia, y estas pueden ser usadas por los usuarios de la libreria. Si el 
+diseñador cambia o elimina estas interfaces en el futuro se rompe la 
+compatibilidad.
+
+-Durante la resolucion de simbolos, los simbolos exportados por una libreria 
+dinamica pueden interponerse con definiciones provistas por otras librerias 
+dinamicas (Seccion 41.12)
+
+-Exportar simbolos innecesarios incrementa el tamaño de la tabla de simbolos 
+dinamicos que debe ser cargada en tiempo de ejecucion.
+
+Para controlar la exportacion de simbolos se pueden usar las siguientes 
+tecnicas: 
+
+-En C, se puede usar la keyword static para hacer un simbolo privado en un 
+modulo de codigo fuente, haciendo que no se pueda enlazar con otros objetos.
+
+-gcc provee un atributo de compilador:
+
+void __attribute__ ((visibility(”hidden”))) func(void) {...}
+
+que hace el simbolo accesible a toda la libreria (a diferencia de static que lo
+limita al fichero), pero previene que se exporte el simbolo.
+
+Tanto la keyword static de C como el atributo visibility(”hidden”) de gcc tienen
+el efecto adicional de prevenir la interposicion de simbolos en tiempo de 
+ejecucion (Seccion 41.12). Asegurando que los simbolos con estos atributos sean
+usados en el codigo en lugar de sobreesciribirlos si otro simbolo externo tiene
+el mismo nombre.
+
+-Se puede usar version scripts (Seccion 42.3) para controlar la visibilidad de 
+los simbolos y seleccionar la version de un simbolo a la que apunta una 
+referencia.
+
+-Cuando se carga una libreria con dlopen() se puede usar RTLD_GLOBAL (42.1.1). 
+
+-Cuando se compila un ejecutable se puede usar --export-dynamic para exportar su
+simbolos dinamicamente (42.1.6).
+
+*** 42.3 Linker Version Scripts
+
+Un version script es un fichero de texto que contiene instrucciones para el 
+linker. Para usarlo se necesita usar la flag --version-script: 
+
+$ gcc -Wl,--version-script,myscriptfile.map ...
+
+Suele utilizar la extension .map aunque no es universal.
+
+--- 42.3.1 Controlling Symbol Visibility with Version Scripts
+
+Un uso de estos scripts es controlar la visibilidad de los simbolos que se 
+podria hacer global accidentalmente. Por ejemplo, si tenemos una libreria con 
+las funciones vis_f1, vis_f2 y vis_comm, y queremos que solo sean publicas 
+vis_f1 y vis_2, se puede usar el siguiente scrip: 
+
+$ cat vis.map
+VER_1 {
+    global:
+        vis_f1;
+        vis_f2;
+    local:
+        *;
+};
+
+VER_1 es un version tag que indica la version de la libreria. En este caso es 
+redundante porque solo se esta especificando la visibilidad de los simbolos, 
+pero versiones antiguas de ld lo necesitan. Si en una version de ld moderno no 
+se especifica la version tag, se considera una version anonima.
+
+--- 42.3.2 Symbol Versioning
+
+El versionado de simbolos permite a una libreria dinamica tener multiples 
+versiones de la misma funcion. Un ejecutable usara la version que esta 
+disponible en el momento del enlace estatico contra la libreria. Por esta 
+caracteristica, es posible hacer una version incompatible de una funcion sin 
+necesidad de cambiar la major version. En un caso extremo, esta capacidad podria
+sustituir al sistema de versiones major y minor (esto se hace por ejemplo en 
+glibc, que mantiene la major version 2.0 desde hace mucho tiempo). 
+
+Si por ejemplo tenemos la version VER_1 de una libreria que define globalmente 
+el simbolo xyz(), con el map asi:
+
+VER_1 { 
+    global: xyz;
+    local: *; # Hide all other symbols
+};
+
+y el codigo asi: 
+
+void xyz(void) { printf("v1 xyz\n"); }
+
+y luego queremos agregar una version diferente de xyz, pero manteniendo la 
+compatibilidad con los programas que ya enlazaron contra la version VER_1. Para
+ello podemos usar las directivas de ensamblador symver:
+
+// Codigo C
+
+__asm__(".symver xyz_old,xyz@VER_1");
+__asm__(".symver xyz_new,xyz@@VER_2");
+
+void xyz_old(void) { printf("v1 xyz\n"); }
+void xyz_new(void) { printf("v2 xyz\n"); }
+void pqr(void) { printf("v2 pqr\n"); }
+
+La directiva symver indica que funcion se debe enlazar contra que simbolo y tag.
+En xyz_new se indica el tag con dos @ porque es la que se usara por defecto 
+(solo debe haber un tag con dos @), cuando se enlace contra la libreria 
+estaticamente. El version script quedaria asi:
+
+VER_1 {
+    global: xyz;
+    local: *;
+};
+
+VER_2 {
+    global: pqr;
+} VER_1;
+
+El } VER_1; despues de la definicion de VER_2 indica que VER_2 depende de VER_1.
+Esto significa que VER_2 hereda las especificaciones global y local de VER_1. 
+Los nombres de los tags no tienen ningun efecto mas que informativo.
+
+Las version tags se graban en el ejecutable en tiempo de enlazado estatico. Para
+verlas, se puede usar objdump -t o readelf -s
+
+*** 42.4 Initialization and Finalization Functions
+
+Se pueden definir funciones que se ejecuten automaticamente cuando la libreria 
+se carga y se descarga, independientemente de si lo hace automaticamente o con 
+dlopen(). Para ello se usan los atributos de gcc constructor y destructor: 
+
+void __attribute__ ((constructor)) some_name_load(void)
+{
+/* Initialization code */
+}
+
+void __attribute__ ((destructor)) some_name_unload(void)
+{
+/* Finalization code */
+}
+
+Tambien es posible usar estos atributos para crear un constructor y destructor 
+del programa main.
+
+Una tecnica antigua para este mismo proposito es crear las funciones void 
+_init(void) y void _fini(void), e indicar el flag de gcc --nostartfiles para 
+prevenir que incluya la version por defecto de estas funciones. El uso de _init
+y _fini esta deprecado en favor del atributo constructor y destructor, que 
+ademas permiten definir multiples funciones con estos propositos.
+
+*** 42.5 Preloading Shared Libraries
+
+En ocasiones puede ser util para testing pedir al linker dinamico que carge 
+ciertos simbolos con prioridad, permitiendo asi usar estos simbolos sin que sean
+sobreescritos por otras librerias. Esto se hace con la variable de entorno 
+LD_PRELOAD
+
+*** 42.6 Monitoring the Dynamic Linker: LD_DEBUG
+
+Con la variable de entorno LD_DEBUG se puede monitorizar el funcionamiento del 
+linker dinamico. Se puede asignar diferentes opciones (libs, symbols, all, etc.)
+para que lo muestre por cout (o por otro fichero, indicado con LD_DEBUG_OUTPUT).
+Por ejemplo: 
+
+$ LD_DEBUG=libs date
+
+Muestra la busqueda de librerias realizada durante la ejecucion del comando 
+date.
+
