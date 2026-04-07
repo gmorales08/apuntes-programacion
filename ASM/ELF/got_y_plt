@@ -1,0 +1,126 @@
+Existen tres secciones en un binario ELF que son relevantes para el proceso de 
+resolucion de dependencias de simbolos de librerias externas: got, got.plt y 
+plt.
+
+Programa de ejemplo: 
+
+#include <stdlib.h>
+
+int main() {
+    exit(0);
+    
+    return 0;
+}
+
+
+*** Seccion PLT (Procedure Linkage Table): 
+cuando un programa necesita acceder a simbolos externos, el compilador coloca un
+stub en esta seccion, al que llama desde el codigo que necesita acceder a ese 
+simbolo. En el programa de ejemplo, en la linea que llamaria a exit(0) (ubicado
+en glibc) se coloca una llamada a exit@plt que apunta a la seccion plt.
+La seccion plt tiene este aspecto: 
+
+Disassembly of section .plt:
+
+0000000000401020 <exit@plt-0x10>: // Comienzo de la seccion plt
+  401020:      push   0x2fca(%rip)   # 403ff0 <_GLOBAL_OFFSET_TABLE_+0x8>
+  401026:      jmp    *0x2fcc(%rip)  # 403ff8 <_GLOBAL_OFFSET_TABLE_+0x10>
+  40102c:      nopl   0x0(%rax)
+
+0000000000401030 <exit@plt>: // Entrada de la funcion exit en la PLT
+  401030:      jmp    *0x2fca(%rip)  # 404000 <exit@GLIBC_2.2.5>
+  401036:      push   $0x0
+  40103b:      jmp    401020 <_init+0x20>
+
+// Fin de la PLT
+
+Siempre que se quiera llamar a exit, se llamara primero a exit@plt, y esta
+ejecuta la linea: 
+401030:      jmp    *0x2fca(%rip)  # 404000 <exit@GLIBC_2.2.5>
+Esta linea siempre va a ser un salto a la GOT.PLT
+
+
+
+*** Seccion GOT.PLT (Global Offset Table):
+Esta seccion es una seccion de datos (no tiene instrucciones) de lectura y 
+escritura, que contiene las direcciones de memoria absolutas de los simbolos que
+se resuelven dinamicamente desde el PLT (en tiempo de ejecucion, de manera 
+lazy).
+
+En el ejemplo, antes de ejecutar el binario, esta seccion esta asi: 
+
+0x00403fe8 083e4000 00000000 00000000 00000000
+0x00403ff8 00000000 00000000 36104000 00000000 
+
+La direccion a la que salta exit@plt (0x404000) ahora contiene el valor 
+0x401036. Este valor no es el valor real de la funcion exit en glibc, sino que 
+es la direccion que apunta al propio binario en la seccion plt, justo debajo de 
+la llamada al GOT.PLT desde exit@plt:
+401036:      push   $0x0
+40103b:      jmp    401020 <_init+0x20>
+
+El push guarda un cero en el stack, que identifica el indice del simbolo a 
+resolver en la seccion .rela.plt
+El jmp salta al comienzo de la seccion .plt, que tiene estas instrucciones: 
+0000000000401020 <exit@plt-0x10>: // Comienzo de la seccion plt
+  401020:      push   0x2fca(%rip)   # 403ff0 <_GLOBAL_OFFSET_TABLE_+0x8>
+  401026:      jmp    *0x2fcc(%rip)  # 403ff8 <_GLOBAL_OFFSET_TABLE_+0x10>
+  40102c:      nopl   0x0(%rax)
+La primera instruccion guarda el contenido de la direccion GOT[1] que contiene
+una estructura de datos llamada link_map, que contiene informacion de las 
+librerias del proceso.
+La segundo instruccion llama a GOT[2], que contiene la direccion de memoria de 
+la funcion _dl_runtime_resolve de ld.so. Esta funcion se encargara de leer el 0
+y el link_map del stack y resolver la direccion real de exit en glibc. Despues 
+de resolverla, guarda esta direccion en la seccion .got.plt, en la direccion  
+0x404000. 
+Despues de esto, se vuelve a entrar en exit@plt, y esta vez, al hacer el salto a
+la GOT.PLT, se encontrara la direccion correcta de la funcion.
+
+
+
+*** Seccion GOT:
+La seccion .got es identica a .got.plt, pero en ella se guardan los simbolos que
+se resuelven estaticamente (durante en enlazado estatico), en lugar de durante
+el enlazado dinamico.
+
+
+*** Resumen:
+Al compilar, los simbolos sin resolver apuntan a la tabla PLT. La tabla PLT 
+tiene punteros a la tabla GOT.PLT, que al compilar vuelven a apuntar la tabla 
+PLT a la funcion de ld.so
+Al ejecutar, estos stubs llaman a la funcion de ld.so, que resuelve las 
+direcciones de los simbolos y las graba en la seccion GOT.PLT, de tal manera que
+cuando se vuelvan a llamar desde el PLT, se acceda directamente a ellos.
+
+
+*** Prueba: 
+Nota: los cambios en la seccion .got.plt se realizan en el mapa de memoria del 
+proceso, por lo que no se pueden ver desde el binario estaticamente, se debe
+usar un debugger con acceso a memoria como gdb.
+
+Compilar el programa de ejemplo con simbolos de debug y ejecutar en gdb: 
+
+gdb ./a.out
+(gdb) info file
+// Buscar la direccion de got.plt (en mis pruebas en 0x404000)
+(gdb) start
+(gdb) x/3gx 0x404000
+// Esto muestra las tres primeras entradas del got.plt. Se puede ver que apunta
+// de vuelta al plt
+(gdb) b exit
+(gdb) continue
+// Ahora ha llamado ya a exit
+(gdb) x/3gx 0x404000
+// Al volver a examinar el got.plt se puede ver que la direccion de memoria se
+// ha actualizado y ahora contiene un valor alto, externo al binario
+
+
+
+
+
+
+
+
+
+
