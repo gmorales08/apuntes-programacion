@@ -1,0 +1,85 @@
+ps es un comando que lee informacion de /proc para mostrarla por terminal. Se
+encuentra en el paquete procps o procps-ng
+
+Para ordenar por consumo de memoria: 
+$ ps -eo pid,user,%mem,rss,comm --sort=-rss | less
+
+*** OPCIONES UTILES
+$ ps aux
+a : muestra los procesos de todos los usuarios
+u : muestra informacion orientada al usuario (CPU, MEM, etc.)
+x : muestra los procesos sin terminal asociada (demonios)
+Util para ver cuantos recursos consume cada proceso
+Se pueden ordenar con 
+$ ps aux --sort=-%cpu
+o
+$ ps aux --sort=-%mem
+
+$ ps -ef
+-e : muestra todos los procesos
+-f : agrega columnas de informacion
+Util para ver el PPID y el STIME (start time)
+
+*** COLUMNAS 
+UID    : quien lanzo el proceso
+PID    : PID del proceso
+PPID   : PID del padre
+C      : % de CPU usada durante la vida del proceso
+STIME  : hora de lanzamiento del proceso
+TTY    : si esta atado a una terminal. ? indica que es un demonio
+TIME   : tiempo total de CPU durante la vida del proceso
+CMD    : comando de ejecucion del proceso. Los que vienen entre corchetes son
+procesos del kernel.
+
+%CPU : tiempo de CPU dividido por el tiempo de ejecucion del proceso
+%MEM : porcentaje del RSS respecto a la memoria fisica total
+VSZ  : memoria virtual del proceso
+RSS  : memoria fisica sin swappear que ha usado un proceso en KB.q
+STAT o S : estado del proceso:
+    D - uninterrupible sleep (usually IO)
+    I - idle kernel thread
+    R - running or runnable (on run queue)
+    S - interruptible sleep (waiting for an event to complete)
+    T - stopped by job control signal
+    t - stopped by debugger during the tracing
+    W - paging (not valid since the 2.6.xx kernel)
+    X - dead (should never be seen)
+    Z - defunct ("zombie") process, terminated but not reaped by its parent
+    
+    Para BSD se usan estados adicionales:
+    < - high-priority
+    N - low-priority
+    L - has pages locked  into memory
+    s - is a session leader
+    l - is multi-threaded
+    + - is in the foreground process group
+
+Para elegir que columnas mostrar se puede usar -o: 
+$ ps -eo pid,user,%cpu,command
+
+*** PERSONALITY
+ps es un comando que se hereda de BSD, y cada sistema muestra la informacion en
+un formato diferente. Esto se puede cambiar con la variable de entorno
+PS_PERSONALITY. Por ejemplo PS_PERSONALITY=bsd o PS_PERSONALITY=sysv
+
+Normalmente en sistemas modernos ps viene configurado con la personality 
+adecuada.
+
+Los argumentos que empiezan con "-" (ps -ef) son de Linux, mientras que los que
+no empiezan por "-" (ps aux) son de BSD. Normalmente se pueden mezclar en el
+mismo binario.
+
+
+*** THREADS
+Los threads de cada proceso se pueden listar con la opcion -L
+
+*** ARBOL DE PROCESOS
+Para ver el arbol de procesos
+$ pstree
+-c para mostrar los threads y -p para mostrar el PID
+$ pstree -cp
+
+
+
+
+

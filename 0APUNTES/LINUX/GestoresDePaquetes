@@ -1,0 +1,4 @@
+********** DNF **********
+
+Ver el paquete al que pertenece un binario:
+$ dnf provides $(which binario)

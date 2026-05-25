@@ -1,0 +1,3512 @@
+ANOTACION RESUMEN:
+V: que potencia tiene cada carga en un punto
+I: cuantas cargas por segundo
+P: energia consumida
+
+2.2. Electric Current
+La corriente electrica es el total de carga que pasa por un punto A por unidad 
+de tiempo. (dibujo 2.1)
+
+La unidad de la corriente son coulombs por segundo, pero esta unidad tambien es 
+conocida como ampere (A). 1 A = 1 C/s
+
+En conductores como el cobre la corriente electrica esta formada por electrones
+libres moviendose a traves de una matriz de iones de cobre. El cobre tiene un 
+electron libre por atomo de cobre. La carga de un solo electron es: (2.2.a)
+
+Esto es igual, pero con signo contrario, a la carga de un solo ion de cobre. La 
+carga del proton es: (2.2.b)
+
+El conductor es neutral porque tiene el mismo numero de protones que de 
+electrones.
+
+Usando la formula de la corriente electrica, se observa que si la una corriente
+de 1 A fluye a traves de un cable de cobre, el numero de electrones fluyendo en 
+cualquier seccion del cable en 1 s es igual a: (formula)
+
+El resultado indica que hay un numero negativo de electrones fluyendo. Esto 
+podria tener dos explicaciones:
+ - Los electrones se deben mover en la direccion opuesta a la corriente.
+ - Las cargas positivas deben moverse por el cable en vez de los electrones
+La segunda opcion es incorrecta porque se ha demostrado que los electrones son 
+libres de moverse, y las cargas positivas estan fijas en la matriz del 
+conductor. Lo que determina que la primera opción es la correcta.
+
+Benjamin Franklin tuvo la convencion de asignar carga positiva a "las cosas
+misteriosas" (en su momento) que se movian. Mas tarde Joseph Thomson realizo 
+experimentos donde aislaba las "cosas misteriosas", y para nombrarlas utilizo 
+las leyes que habia en ese momento, formulandolas como corrientes positivas.
+Pero estas cosas que Thomson encontro, y que llamo electrones, se movian en la 
+direccion contraria a la corriente convencional I usada en las ecuaciones.
+
+Thomson cambio la nocion de que las cargas positivas era lo que se movia en los
+conductores, contrariamente a la nocion de Franklin. De todas formas, electrones
+negativos moviendose hacia una direccion es equivalente a cargas positivas 
+moviendose en la direccion contraria, asi que las formulas antiguas se siguen 
+utilizando.
+
+Todas las formulas usadas en electronica pretenden que la corriente I esta hecha
+de cargas positivas, como planteo Franklin, para asi poder usar las formulas 
+antiguas. Pero es conveniente saber que lo que se mueve realmente son los 
+electrones en la direccion contraria, como planteo Thomson.
+
+Ejemplo 1 ¿Cuantos electrones pasan por un determinado punto en 3 s si un 
+conductor esta conduciendo una corriente de 2 A? (figure 2.3)
+
+2.2.1 Currents in Perspective
+
+Algunos ejemplos de corriente son: una bombilla 1 A, un microondas toma 8-13 A,
+un ordenador portatil 2-3 A, un ventilador electrico 1 A, una televisión 1-3 A,
+una tostadora 7-10 A, una luz fluorescente 1-2A, una radio 1-4 A, un LED 20mA,
+un smartphone accediendo a la web 200mA, un microchip de bajo consumo unos pocos 
+microA, un rayo 1000 A.
+
+
+2.3. Voltage
+
+Para tener corriente electrica fluyendo de un punto a otro, debe existir un 
+voltaje entre los dos puntos.
+
+Un voltaje situado a traves de un conductor genera una fuerza electromotriz 
+(EMF), que es responsable de dar un empujon a todos los electrones libres a lo 
+largo del conductor.
+
+El voltaje tambien es referenciado como diferencia de potencial o simplemente 
+potencial.
+
+En un circuito con un switch, cuando el switch se baja, la corriente fluye y el 
+voltaje se encarga de conducir a todos los electrones libres a lo largo del 
+conductor en la direccion que apunta de negativo a positivo.
+Es importante notar que la bateria necesita del resto del circuito, asi como el
+circuito necesita de la bateria. Sin ese enlace entre los terminales, las 
+reacciones quimicas internas de la bateria no pueden producirse. Estas 
+reacciones quimicas incluyen la transferencia de electrones, que por diseño 
+intencional, solo se produce cuando los dos terminales de la bateria estan 
+conectados.
+
+Un dispositivo que mantiene voltaje constante entre sus terminales es llamado
+direct current voltaje source (dc voltaje source). Una bateria es un ejemplo de 
+ello. El simbolo de la bateria es (dibujar).
+
+2.3.1 The Mechanisms of Voltage
+
+Para tener una idea de como una bateria genera un campo EMF a traves de un 
+circuito, podemos imaginar que las reacciones quimicas en su interior 
+producen electrones libres que rapidamente se acumulan en el area del 
+terminal negativo (material del anodo), causando una concentracion de 
+electrones. Esta concentracion esta llena de fuerza repelente (electrones
+repeliendose) que puede ser visto como una especie de presion electrica.
+
+Con una carga (p.e: una lampara, conductores, switch) situada entre los
+terminales de la bateria, los electrones del terminal negativo intentan 
+aliviar esa presion dispersandose por el circuito. Estos electrones 
+incrementan la concentracion de electrones libres dentro del extremo del 
+conductor conectado al terminal negativo. Incluso un pequeño porcentaje de
+diferencia en la concentracion de electrones libres en una region 
+incrementa las fuerzas repulsivas entre los electrones libres. La fuerza 
+repulsiva se expresa como un pulso instantaneo (cercano a la velocidad de 
+la luz) que viaja a traves del circuito. Aquellos electrones libres 
+cercanos a los electrones bombeados son rapidamente repelidos en la 
+direccion contraria; los siguientes vecinos son empujados, y asi 
+sucesivamente, causando una reaccion en cadena o pulso.
+(figura 2.6)
+
+Los electrones mas adentrados en el circuito no sienten el mismo nivel de 
+fuerza repulsiva porque puede que haya material en el camino que absorva
+parte de esa fuerza (via colisiones electron-electron, interacciones entre
+electrones libres y electrones de la matriz, etc.). Ademas, los circuitos
+pueden tener un gran numero de componentes con multiples caminos donde en
+algunos el empuje llega a ser menor. Estas zonas se denominan como regiones
+de baja presion electrica. Los electrones en estas zonas tienen menos 
+potencial para trabajar a diferencia de los mas cercanos a la fuente de 
+empuje de electrones.
+
+El voltaje representa la diferencia de energia potencial. Implicitamente 
+la definicion de voltaje siempre se mide entre dos puntos. Esto infiere que
+hay una escala absoluta en donde medir puntos individuales de voltaje. En 
+electronica se puede crear esa escala seleccionando un punto, normalmente 
+el punto donde hay menos presion electrica, y definiendolo como el punto 
+cero, o referencia 0V. En muchos circuitos DC, se suele escoger el terminal
+negativo como la referencia 0V y se hace saber insertndo el simbolo de 
+tierra (dibujar). 
+
+El voltaje se suele representar como diferencia de potencial, voltaje entre
+dos puntos o simplemente con el simbolo V. Todos representan la diferencia
+de potencial electrico entre dos puntos.
+/\V = Vab = V
+
+Ejemplo: se puede calcular la diferencia de energia potencial entre un 
+electron emanando del terminal negativo de una bateria de 1.5V y otro 
+entrando por el terminal positivo.
+(formula)
+Notese que este resultado nos indica la diferencia de potencial entre los 
+dos electrones, no el potencial electrico real del electron saliente (U1) o el 
+electron entrante (U0). De todas formas, si asumimos que el electron 
+entrante tiene 0 energia potencial, se puede deducir que el electron 
+saliente tiene una energia potencial relativa de
+(formula)
+
+Nota: Un aumento en la energía potencial positiva puede asociarse con cargas 
+similares acercándose entre sí. Una disminución de la energía puede asociarse 
+con cargas similares alejándose entre sí.
+
+Sobre los electrones que estan en otras partes del circuito como el 
+filamento de la lampara, en el cable positivo, en el cable negativo, etc.
+se puede asumir que un electron a mitad de circuito tiene la mitad de 
+potencial electrico que uno al comienzo, debido a la perdida de energia por los 
+mecanismos de colision, lo que implica un fuerza repulsiva mas debil.
+
+En relacion a la energia potencial de los electrones libres de dentro de 
+los conductores que entran y salen de la bateria, asumimos que todos esos
+electrones tienen la misma energia potencial. Esto asume que no hay 
+diferencia de voltaje entre puntos en el mismo conductor. Por ejemplo si 
+se mide con un voltimetro entre dos puntos de un solo conductor, mostrara
+0V. Para propositos practicos, asumimos que esto es cierto, aunque en 
+realidad no lo sea, porque existe una pequeña perdida de voltaje a lo 
+largo del conductor, y si utilizamos un voltimetro de gran precision se 
+puede observar una diferencia de voltaje de 0.00001V o asi. Esto es 
+atribuido a la resistencia interna de los conductores.
+(figure 2.8)
+
+2.3.2. Definition of Volt and Generalized Power Law
+
+Usando la relacion entre voltaje y diferencia de energia potencial V = U/q
+, definimos volt como:
+(formula) U es energia potencial
+Dos puntos con un voltaje de 1V entre ellos tienen presion suficiente para 
+realizar 1J de trabajo mientras mueven 1C de carga entre los puntos.
+
+Otra definicion es en terminos de potencia: cuanta energia por segundo es
+necesaria para alimentar un circuito. Asumiendo que un solo electron 
+pierde todo su energia potencial en atravesar el circuito desde el terminal
+negativo hasta el positivo, decimos que toda esa energia se ha tenido que 
+convertir en trabajo, util o malgastado (calor). Asumiendo que el voltaje
+es constante tenemos:
+(formula)
+Como la corriente I = dq/dt, tenemos que P = VI
+Esta es conocida como la generalized power law. Esta ley provee un 
+resultado general independiente del material y la naturaleza del 
+movimiento de carga. La unidad de este poder electrico es watts (W) con 
+1W = 1J/s = 1VA
+En terminos de poder el voltio es definido como 1 volt = 1 watt / 1 amp
+La ley generalizada de la potencia puede ser usada para determinar la 
+perdida de poder de cualquier circuito, solo con tener el voltaje aplicado
+y la corriente consumida, ambas facilmente medibles con un multimetro.
+Aun asi, no te dice especificamente donde se utiliza esa potencia.
+(Fig. 2.9)
+algun ejemplo.
+
+2.3.3 Combining Batteries
+Se pueden colocar dos baterias en serie para obtener el doble de voltaje en el 
+circuito.
+(dibujos)
+En la mayoria de circuitos se suele establecer el 0V gorund reference en el 
+terminal negativo de la fuente de voltaje (imagen a). Tambien tenemos el 
+concepto de un point voltage, que es la medida de voltaje entre la ground 
+reference y un punto especifico de interes en el circuito.
+Es posible crear una fuente de alimentacion dividida reposicionando la 0V ground
+reference y situandola entre las baterias (imagen b). Esto crea conexiones de 
++1.5V y -1.5V relativas a la 0V reference. Muchos circuitos requieren voltaje
+positivo y negativo, por ejemplo un circuito de audio.
+
+
+2.5 Resistance, Resistivity, Conductivity
+Los mecanismos que impiden que los electrones avancen en el conductor, como las
+colisiones o desviaciones, se asocian con la resistencia electrica.
+En 1826 Georg Simon Ohm publico resultados de experimentos donde observaba los
+efectos de diferentes materiales en el flujo de la corriente. Definio la 
+resistencia como el ratio del voltaje aplicado dividido entre la corriente 
+resultante. (2.4)
+Esta es conocida como la ley de Ohm y se mide en Ohms.
+(formula)
+El simbolo (sim) se usa para designar un resistor.
+
+Ahora bien, la ley de Ohm no es realmente una ley, sino más bien una afirmación 
+empírica sobre el comportamiento de los materiales. De hecho, existen algunos 
+materiales para los cuales la ley de Ohm no se cumple.
+(fig 2.18)
+
+La ley de Ohm solo puede ser aplicada a materiales ohmicos - materiales cuya 
+resistencia permanece constante sobre un rango de voltajes. Los materiales no 
+ohmicos no siguen este patron (p.e: un diodo, que ofrece diferente resitencia
+para voltaje negativo y positivo).
+
+Normalmente la ley Ohm se escribe como:
+V = I x R
+Pero esta forma esta intentando definir el voltaje en terminos de la resistencia
+y la coorriennte. Es importante notar que la resistencia de un material ohmico
+es independiente del voltaje en la ley de Ohm. Esto no quiere decir que no se 
+pueda usar esta forma para predecir el voltaje que debe existir a traves de una
+resistencia dado un valor de corriente medido.
+
+2.5.1. How the Shape of a Conductor Affects Resistance
+La resitencia de un cable conductor depende de su forma. Duplicar la longitud de
+un cable duplica la resistencia. Por el contrario, duplicar el área transversal
+A reduce la resistencia a la mitad.
+Un cable mas ancho permite que haya menos colisiones al haber mas espacio para
+distribuir la corriente. 
+La concentracion del flujo de electrones libres se conoce como densidad de 
+corriente J e indica el ratio de flujos de corriente por unidad de area. Para un
+cable: J = I/A. A mayor anchura del cable, hay menos densidad de corriente y por
+tanto mas drift velocity, que indica la velocidad a la que se mueven los 
+electrones libres.
+
+2.5.2. Resistivity and Conductivity
+
+La resistividad es una propiedad independiente de la longitud del cable y esta
+relacionada con el tipo de material del cable. Se define como: 
+(2.5.)
+Donde A es la anchura del cable, L la longitud y R la resitencia del material.
+Las unidades de la resistividad son ohm-meters (simb)
+
+La conductividad es el inverso de la resistividad e indica que tan bueno es un
+material conduciendo corriente electrica. 
+(2.6)
+Las unidades de la conductividad son los siemens (dibujar)
+
+En terminos de resistividad y conductividad, las ley de Ohm se puede reescribir:
+(2.7)
+
+Tabla de elementos
+
+Una caracteristica importante de la resistividad (o conductividad) es que es 
+dependiente de la temperatura. A mayor temperatura, mayor resistividad, debido 
+a las vibraciones de los atomos causadas por la energia termica.
+
+2.6 Insulators, Conductors, and Semiconductors
+(?)
+
+2.7 Heat and Power
+La ley generalizada de la potencia P = VI nos indica cuanta potencia es
+introducida en un circuito, pero no como se utiliza.
+(figura 2.22)
+Si estamos interesados en saber cuanta potencia se pierde en forma de calor 
+(energia transmitida en las vibraciones de la matriz, radiacion emisiva, etc.)
+no podemos saberlo salvo que miremos dentro de la caja negra, porque puede 
+haber varios componentes que utilicen la potencia de diferente forma. La 
+potencia solo es convertida completamente cuando la caja negra es un resistor
+perfecto (100% de naturaleza ohmica). Entonces se puede sustituir la ley de Ohm
+en la equacion genaralizada de la potencia:
+(2.10)
+En esta forma, la potencia perdida debido al calor se suele denominar Ohmic 
+heating, Joule heating o I^2R loss.
+EJEMPLO DE PERDIDA DE PODER EN CIRCUITOS
+(figura 2.23)
+
+
+2.8.1 Importance of Heat Production
+En la mayoria de ocasiones el calor representa un perdida de energia que debe
+ser minimizada siempre que sea posible. Un problema mayor es cuando los 
+componentes son dañados a causa del calor, causando efectos indeseados en el 
+comportamiento del circuito. Para evitar estos problemas es importante usar
+componentes que puedan manejar potencias dos o tres veces mayores de la que se
+espera que disipen.
+La disipacion de calor en circuitos de potencia medio-alta. Existen tecnicas
+pasivas como disipadores, layout de los componentes y ventilacion, tecnicas
+activas como ventiladores y refigeracion liquida.
+
+2.9. Wire Gauges
+Cuanto mayor es la corriente que pasa por un cable, mayor es el calor que 
+produce. Para evitar que el cable se funda, se debe escoger un diametro 
+apropiado. El tamaño del diametro se mide en gauge number, siendo el 
+estandar comun el American Wire Gauge (AWG), donde un gauge number menor 
+se corresponde con un mayor diametro de cable.
+
+2.10 Grounds
+Anteriormente se ha visto que la referencia 0V o ground reference se puede
+situar en diferentes puntos de un circuito para medir el voltaje de manera
+relativa a este punto.
+(figura 2.28)
+En el primer y segundo circuito la referencia a tierra esta situada en el
+terminal negativo y se denomina return. Si una carga, como una lampara o 
+un resitor es situado entre los terminales, la corriente de carga volvera 
+a este punto. En el caso del tercer circuito, la referencia esta situada 
+entre las baterias y se denomina common return.
+
+El simbolo de tierra (dibujar) se suele utilizar como la 0V reference, pero 
+realmente deberia representar un verdadero earth ground, es decir, una 
+conexion con la tierra a traves de un material conductivo enterrado en la 
+tierra. Por ciertas razones el doble significado de este simbolo ha 
+sobrevivido, aunque suele ser motivo de confusion.
+
+2.10.1. Earth Ground
+La definicion correcta de Earth Ground es una conexion terminada en una vara
+introducida en la tierra a una profundidad de 8 pies (2.44m) o mas. Esta vara 
+esta cableada directamente con la ground bar del cuadro de distribucion 
+principal y es enviada a las diferentes salidas AC en el hogar a traves de un 
+cable de cobre pelado o con recubrimiento verde, el cual se encuentra dentro del
+mismo cable principal que los cables hot (fase) y neutral (neutro). LO que se 
+suele considerar como el Earth Ground es la vara enterrada en la tierra.
+(figura 2.29)
+Es importante la conexion fisica con la tierra porque la tierra provee de un 
+cuerpo electricamente neutro, con el mismo numero de cargas positivas que 
+negativas. Como la carga neutra de la tierra es practicamente infinita, los 
+intentos de cargar su potencial, via generadores electricos, baterias, etc no 
+tienen un efecto imperceptible.
+
+Para fines practicos, se dice que la tierra tiene cero potencial (relativo a 
+otras cosas) y por eso se utiliza para referenciar a otras señales.
+La conexion fisica real con la tierra en un dispositivo suele realizarse a 
+traves del cable de tierra del cable de alimentacion del dispositivo, el cual se
+enlaza con la red de tierra del sistema electrico principal cuando el 
+dispositivo se enchufa. El cable de tierra del cable de alimentaciòn suele estar
+conectado internamente al chasis del dispositivo y a la porcion de retorno de
+ un canal que proviene de la circuiteria interna.
+
+Por ejemplo en un conector BNC, el cuerpo exterior del conector esta cableado a
+la porcion de retorno (o fuente) del canal, mientras que el cable conductor 
+central (aislado del cuerpo exterior) esta cableado a la porcion de fuente (o 
+retorno) del canal. La parte importante es que la conexion de retorno está 
+tambien cableada internamente al cable de tierra principal. Esto hace que el 
+retorno tenga como referencia la toma de tierra. 
+
+En el caso de una fuente de alimentacion dc, se presenta un terminal de tierra
+separado en la forma de un terminal "banana jack". Para poder conectar a tierra
+la fuente, se debe conectar un jumper entre el terminal negativo y terminal de 
+tierra. Si no se usa un jumper, se dice que la alimentacion esta "flotante" 
+(floating) porque no tiene una via de escape a tierra.
+(figura 2.30)
+La conexion de la tierra al chasis se realiza con equipos con chasis metalico,
+como lavadoras, frigorificos, etc. para que, en caso de que haya un fallo 
+interno y el chasis quede energizado, la corriente se desvie a tierra, al tener
+conexión fisica con el chasis y oponer muy poca resistencia, la electricidad 
+escogera este camino, evitando que si alguien toca el equipo conduzca la 
+corriente.
+Esta conexion a tierra tambien se realiza para ayudar a eliminar descargas
+electrostaticas(ESD) cuando un cuerpo cargado estaticamente entra en contacto
+con un equipo sensible.  
+Otro trabajo del sistema de tierra consiste en proporcionar un camino a tierra
+de baja impedancia para cualquier corriente RF extraviada causada por equipos
+RF como equipamiento electrico, ondas de radio, etc. Las RF extraviadas pueden
+ hacer que los equipos funcionen incorrectamente y contribuyen a los problemas 
+ de interferencia por radiofrecuencia (RFI). Este camino de baja impedancia se
+ denomina RF ground y suele ser proporcionado por el mismo sistema que el dc
+ ground.
+
+Common Grounding Error
+El simbolo de tierra suele utilizarse de manera incorrecta para indicar el 
+camino de retorno de la corriente. Esto es incorrecto porque, como puede verse
+en los conectores dc, existen tres cables: positivo, negativo y tierra. Si se 
+conecta un circuito entre el positivo y la tierra no fluctuara la corriente, 
+porque no existe el camino de retorno (figura a). El circuito debe conectarse
+entre el positivo y el negativo, y la tierra puede no conectarse, creando un 
+floating load (figura b), o conectarse con un jumper al negativo, creando 
+un grounded load (figura c). 
+Muchos circuitos dc no necesitan estar grounded porque generalmente no ayuda ni
+empeora el rendimiento.
+(figura2.31).
+
+Los circuitos que requieren voltaje positivo y negativo, necesitan una fuente 
+que provea cada polaridad. La fuente para el voltaje positivo tendra el 
+terminal negativo como retorno, y la fuente negativa tendra el terminal positivo
+para el retorno. Estos dos terminales estan conectados, formando un retorno 
+comun o "floating return". Este retorno puede estar conectado al terminal de 
+tierra de una fuente, si algun circuito lo requiere, aunque no suele ser lo 
+habitual.
+(figura 2.32)
+
+2.10.2 Different Types of Ground Symbols
+Para evitar interpretaciones incorrectas se suelen utilizar los siguientes 
+simbolos
+(figura 2.34)
+
+Common (Floating) Return: 
+(dibujar columnas)
+    
+Chassis Return: el chasis metalico actua como retorno y puede o no flotar en 
+relacion a la tierra.
+(dibujar columnas)
+
+Earth Return: es posible usar el cable de tierra principal como retorno, pero 
+esto normalmente se evita porque puede conducir a otros problemas (circuito a). 
+En vez de 
+eso, lo que usualmente se intenta es que la zona de la fuente que tiene menos 
+potencial se entierra por el cable principal de tierra (circuito b). El retorno 
+real es todavia accesible por el cable directo o por el chasis. 
+(dibujar columnas. diferenciar circuito a y b)
+
+2.10.3 Loose Ends on Grounding
+Hay algunos cabos sueltos que deben ser atados:
+
+Shock Hazard:
+Cuando se requieren altos voltajes y se usa un chasis metalico como retorno se 
+produce un riesgo de shock. Para evitarlo, se debe cablear el chasis a tierra
+para que conduzca la corriente en caso de fallo, al tener menor resistencia 
+que la mayoria de conductores que puedan entrar en contacto con el chasis 
+energizado.
+(figura 2.35 a y b)
+
+Grounding and Noise:
+Una de las causas mas comunes del ruido electico es la falta de buenas practicas
+de "grounding". Si hay varios puntos usados para conexiones a tierra, las 
+diferencias de potencial entre estos puntos causadas por la impedancia inherente
+en la linea de tierra puede causar problematicos "ground loops" que producen 
+errores en la lectura de voltajes.
+(figura 2.35 c.)
+En la figura se ven dos chassis grounds. Vg representa el voltaje entre la 
+signal ground y la load ground. Si se realiza una medida de voltaje entre la 
+load ground y la señal entrante Vs, se medira un voltaje erroneo (Vs + Vg). La 
+manera de solucionar esto es utilizando un unico punto de tierra:
+(figura 2.35 d). 
+Aunque esta solucion parezca ideal en papel, no es practica de 
+implementar, porque incluso los circuitos mas pequeños tienen 10 o mas tierras,
+y conectarlas todas a un unico punto puede ser dificil. La alternativa es usar
+un ground bus. Un ground bus o bus bar es una barra de cobre de baja resistencia
+que conduce las corrientes de retorno. Es mas practica porque aborda todo el 
+circuito y es facilmente ampliable.
+(figura 2.35 e)
+
+Analog and Digital Grounds:
+Los dispositivos que utilizan circuiteria analogica y digital deberian tener la
+tierra analogica y la tierra digital separadas y eventualmente unidas en un 
+punto. Esto es para prevenir que se genere ruido dentro de los circuitos debido 
+a las corrientes a tierra. Los circuitos digitales son conocidos por generar 
+picos de corriente cuando las señales cambian de estado. Los circuitos 
+analogicos pueden generar picos de corriente cuando las corrientes de carga
+cambian o durante el "slewing". En cualquier caso, las corrientes variables se 
+aplican a través de la impedancia de retorno a tierra, lo que provoca 
+variaciones de voltaje (según la ley de Ohm) en el plano de tierra local con 
+respecto a la tierra de referencia del sistema, que suele estar ubicada cerca de 
+la fuente de alimentación. La impedancia del retorno a tierra consiste en 
+elementos resistivos, capacitivos e inductivos, donde los resistivos e 
+inductivos son predominantes. Si una corriente constante es aplicada en el 
+retorno a tierra, la resistencia es primaria, y existira una diferencia de 
+voltaje dc. Si la corriente es alterna, la resistencia, inductancia y 
+capacitancia juegan todas un rol y existira un voltaje ac de alta frecuencia.
+En cualquier caso, estas variaciones de voltaje se introducen en el circuito y
+son consideradas ruido. Existen muchos trucos para reducir el ruido como 
+utilizar capacitores para balancear la inductancia, pero el mejor truco es 
+mantener la tierra digital y analogica separadas y luego unirlas en un solo 
+punto.
+
+2.11 Electric Circuits
+Un circuito electrico es un conjunto de componentes electricos organizados y una
+fuente de voltaje donde fluye una corriente. Los circuitos pueden estar en 
+serie, paralelo o una mezcla de ambas.
+Figura 2.37
+
+2.12 Ohm’s Law and Resistors
+Los resistores son dispositivos utilizados en circuitos para limitar el flujo de
+corriente o establecer un nivel de voltaje. Se suelen representar con los 
+siguientes simbolos y modelos:
+(figura 2.38)
+Si un voltaje dc es aplicado a traves de un resistor, la cantidad de corriente 
+que fluira se puede obtener usando la ley de Ohm. Para encontrar la potencia 
+disipada en forma de calor, se puede usar la ley generalizada de la potencia
+(con la sustitucion de la ley de Ohm):
+(formulas 2.15 2.16)
+
+2.12.1 Resistor Power Ratings
+Todos los resitores tienen un maximo de potencia que pueden disipar, y si esta 
+se sobrepasa pueden ser dañados, afectando al funcionamiento del circuito. Es 
+recomendable utilizar resistores que puedan disipar dos veces o mas la potencia
+esperada.
+
+2.12.2 Resistors in Parallel
+Normalmente los resistores no suelen utilizar solos. Se suelen poner varios en
+serie o paralelo. Cuando hay varios resistores en paralelo, el voltaje en cada
+uno es el mismo, pero la intensidad varia. Ademas, la resitencia total sera 
+menor que el valor de la resitencia con menor valor. La formula para obtener la
+resistencia total en paralelo es:
+(formula 2.17)
+Si solo hay dos resistencias en paralelo, la formula se reduce a:
+(formula 2.18)
+Se puede derivar la formula de resistores en paralelo y obtener que la suma de 
+las corrientes de cada rama es igual a la corriente total: (formula). Esta es
+conocida como la ley de corriente de Kirchhoff. Y entonces, aplicando la ley de 
+Ohm tenemos: (formula). Como todos los voltajes en los resistores son iguales a
+Vtotal al compartir el mismo voltaje a lo largo de ellos, tenemos que: (formu).
+Factorizando Vtotal tenemos: (form). Llamamos al termino entre parentesis Rtotal
+
+Para expresar que dos resistores estan en pararelo se suelen utilizar dos barras
+verticales: R1 || R2. En terminos de orden aritemetico, || se trata similar a 
+la multiplicacion o division. Por ejemplo en (formula), se calcula R2 y Rload 
+primero en paralelo, y luego se suma R1.
+
+Con la ley de Kirchhoff y la de Ohm se pueden resolver ecuaciones de divisor de
+corriente, utiles cuando se conoce la corriente de entrada, pero no el volataje
+de entrada.
+(dibujo de resistors in parallel)
+(dibujo de divisor de corriente)
+(Ejemplo 2)
+
+2.12.3 Resistors in Series 
+Cuando un circuito tien un numero de resitores conectados en serie, la 
+resistencia total es la suma de las resistencias individuales. La corriente en 
+cada resistor es la misma y el voltaje se divide. La formula para obtener la 
+resistencia total es:
+(formula)
+Se puede derivar esta formula observando que la suma de las caidas de voltaje a
+lo largo de los resistores en serie es igual al voltaje aplicado a todo el 
+conjunto: (formula). Esta es conocida como la ley de voltaje de Kirchhoff. 
+Aplicando la ley de Ohm y notando que la misma corriente fluye a traves de cada 
+resistor, tenemos: (formula), y cancelando la I tenemos la formula de la 
+resistencia total: (form)
+(dibujo de divisor de voltaje)
+Ecuaciones de divisor de voltaje:
+(ecuaciones)
+Ejemplo: la entrada de un circuito integrado requiere 5V constantes, pero la 
+fuente es de 9V. Usa las ecuaciones de division de voltaje para crear un divisor
+que saque 5V. Asume que el IC tiene una resistencia de entrada de 10M(ohms) que 
+practicamente no consume corriente del divisor. 
+Como asumimos que el IC no consume corriente, aplicamos el divisor de voltaje
+directamente:
+(formula)
+Debemos elegir los resistores del divisor de voltaje, haciendo que no cosuman 
+mucha corriente, causando perdida de potencia. Para hacerlo simple, elegimos que
+R2 valga 10k(ohms) y asi R1 vale:
+(formula)
+
+Ejemplo: 
+Tienes una fuente de 10V, pero un dispositivo que tiene que ir conectado a la 
+fuente esta clasificado como 3V y consume 9.1mA. Crea un divisor de voltaje para 
+el dipositivo.
+En este caso, la carga consume corriente y puede ser considerada un resistor en 
+paralelo con R2. Por lo tanto, usar el divisor de voltaje sin tomar la carga en 
+consideracion no va a funcionar. Se debe aplicar la conocida como regla del 10
+por ciento.
+Regla del 10 por ciento: es un metodo estandar para seleccionar R1 y R2 que 
+tiene en cuenta la carga y minimiza la perdida de potencia innecesaria en el 
+divisor. Lo primero que hay que hacer es seleccionar R2 de tal forma que I2 sea
+el 10% de la corriente de carga deseada. Esta resistencia y corriente se 
+denominan las bleeder resistance y bleeder current. En el ejemplo tenemos:
+(Ibleed...)
+Usando la ley de Ohm se calcula la bleeder resistance:
+(Rbleed...)
+Escogemos un resistor cercano: 3300(ohms).
+Ahora necesitamos seleccionar R1 para que mantenga la salida a 3V. Para ello 
+calculamos la corriente en el resistor con la ley de Ohm:
+(form)
+En terminos de consumo de potencia:
+(forms)
+Resistores de 1/4W pueden satisfacerlo.
+
+2.12.4 Reducing a Complex Resistor Network
+Cuando existen varias resistencias en serie o paralelo se pueden reducir 
+calculando el valor equivalente.
+Ejemplo: Encontrar la resistencia equivalente de la red conectada a la bateria 
+usando la reduccion de circuitos:
+(ejemplos 1 y 2)
+
+2.12.5 Multiple Voltage Dividers
+Ejemplo: se desea crear un divisor de voltaje que suministre potencia a tres 
+cargas: carga 1 (75V, 30mA), carga 2 (50V, 10mA) y carga 3 (25V, 10mA). Usa la 
+regla del 10% para construir el divisor.
+(dibujo)
+Un punto importante al determinar el resistor cuando se aplica la regla de 10%
+es que, para calcular la bleeder current, se debe tomar el 10% de la corriente
+total. Los pasos son los siguientes:
+Encontrar la bleeder current, que es un 10% de la corriente total:
+(f)
+Para encontrar el bleeder resistor, se usa la ley de Ohm:
+(f)
+La corriente en R3 es igual que la corriente en R4 mas la corriente en la carga 
+3:
+(f)
+Para encontrar R3, se usa la ley de Ohm:
+(f)
+La corriente en R2 es:
+(f)
+(r2 f)
+La corriente en R1 es:
+(f)
+(r1 f)
+Para determinar el power rating se utiliza P=IV
+(figura 2.49)
+(ejemplo 2)
+
+Aunque los divisores de voltaje son faciles de aplicar, no estan regulados de 
+ninguna forma. Si la resistencia de una carga cambia o hay variacion de voltaje
+en la fuente, todas las cargas experimentaran un cambio en el voltaje. Por lo 
+tanto, los divisores de voltaje no deberian aplicarse en circuitos donde el 
+divisor vaya a agobiarse por cambios en la carga. Para aplicaciones que 
+requieran voltaje estable y consuman una corriente considerable, es mejor 
+utilizar un dispositivo activo, como un voltage regulator IC. 
+
+2.13 Voltage and Current Sources
+Una fuente de voltaje ideal es un dispositivo que mantiene un voltaje fijo entre
+sus terminales, independientemente de si hay una carga conectada y esta varia su
+resistencia. Esto significa que la fuente provee la corriente necesaria en 
+funcion de la resistencia (en I=V/R, varia la R y la V es fija). Esto 
+significaria que si la resistencia es 0, la corriente es infinita, pero esto es
+imposible en el mundo real. Para evitar este dilema, se define una fuente real 
+de voltaje como una fuente que puede proveer un valor maximo finito de 
+corriente. Una fuente real de voltaje es como una fuente ideal de voltaje con 
+una resistencia interna rs.
+(figura 2.51)
+Cuando una fuente de voltaje real esta en un circuito abierto (sin carga 
+conectada entre los terminales) el voltaje terminal equivale al voltaje ideal, 
+porque no hay caida de voltaje en rs ya que la corriente no puede pasar en un 
+circuito incompleto. Cuando la Rload se conecta, esta en serie con rs y el 
+voltaje fluye.
+(figura 2.52)
+Cuando Rload es muy grande en comparacion con rs, el efecto de rs es 
+imperceptible, pero si Rload es muy pequeña, hay que tener en consideracion a 
+rs.
+
+Otro simbolo usado en electronica es la fuente de corriente, vista en las 
+figuras anteriores. Una fuente de corriente ideal mantiene la corriente 
+constante Is independientemente de los cambios en la resistencia de la carga. 
+Las fuentes de corriente reales tienen una resistencia rs en paralelo. Esta 
+resistencia es muy grande y tiende a reducir la corriente It en funcion de la 
+resistencia de la carga. Cuando no hay ninguna carga conectada, It vale 0, y 
+cuando se conecta una carga, si esta tiene una resistencia muy pequeña en 
+comparacion con rs apenas se nota, pero cuando la resistencia de carga es muy
+grande, hay que tener en consideracion a rs.
+
+Una fuente puede ser representada como fuente de voltaje o de corriente, y se 
+puede obtener la equivalencia con la ley de Ohm:
+(figura 2.53)
+
+Una fuente de corriente practica es normalmente un circuito activo hecho con 
+transistores. Vin conduce la corriente a traves de R1 a la base del segundo 
+transistor, asique la corriente fluye en el colector y sale por el emisor. Esta
+corriente debe fluir por R2. Si la corriente es muy alta, el primer transistor
+se activa y absorbe corriente de la base del segundo transistor y asi la 
+corriente de su colector nunca excedera el valor mostrado. Esta es una excelente
+forma de hacer una fuente de corriente o limitar la corriente disponible a un 
+valor maximo dado.
+(figura 2.54c) 
+
+2.14 Measuring Voltage, Current, and Resistance
+Los voltímetros, amperímetros y ohmímetros idealmente no deberian introducir 
+cambios en el circuito que miden. Un voltimetro ideal tiene una resistencia de 
+entrada infinita y no consume corriente. Un voltimetro real tiene una 
+resistencia de entrada de muchos cientos de M(ohms). Un amperimetro ideal tiene 
+cero resistencia de entrada y no produce caida de voltaje. Un amperimetro real 
+tiene una resistencia de fracciones de ohmio. Un ohmimetro ideal tiene cero 
+resistencia de entrada. Un ohmimetro real tiene una resistencia de fracciones de 
+ohmio. En cualquier caso, la resistencia interna pasa a formar parte del 
+circuito cuando se realizan las mediciones y esto produce un porcentaje de 
+error.
+(figura 2.56)
+
+2.15 Combining Batteries
+Para incrementar el voltaje suministrado, las baterias se pueden colocar en 
+serie, sumando sus valores de voltaje. Para crear una fuente con capacidad de 
+corriente añadida (incrementando el tiempo de operacion), las baterias se pueden
+colocar en paralelo. Cuando las baterias se colocan en paralelo es importante 
+que todas tengan el mismo voltaje y quimica para evitar problemas. La potencia 
+suministrada a la carga se obtiene con la ley 
+de Ohm de la potencia: P = V^2/R. Notese que el simbolo de tierra es unicamente
+una referencia de 0V y no una conexion con la tierra fisica, raramente dada en 
+un circuito operado por baterias.
+(fig 2.58)
+
+2.16 Open and Short Circuits
+Los problemas mas comunes (faults) en los circuitos son los open circuits y los 
+short circuits. Un short circuit en todo o parte de un circuito causa un flujo 
+de corriente excesivo. Esto puede fundir un fusible o quemar un componente, lo 
+que resultara en un open circuit. Un open circuit representa una apertura en el
+circuito, impidiendo que la corriente fluya. Los cortocircuitos pueden ser 
+causados multiples motivos: cables cruzandose, fallo de aislamiento o 
+salpicaduras de soldadura que unen conductores separados. Un circuito abierto
+puede resultar por la separacion de un cable o un componente del circuito o por
+un componete que se ha quemado, causando una gran resistencia.
+Un fusible se utiliza para que se funda cuando la corriente exceda un valor 
+determinado. Se representa con el simbolo: (simbolo).
+(figura 2.59)
+Se puede notar un cortocircuito por el sobrecalentamiento o el olor a quemado. 
+Para prevenir los cortocircuitos se pueden usar fusibles, transient voltage 
+supressors y circuit breakers. Estos dispositivos cuando sienten mucha corriente
+generan una condicion de circuito abierto para limitar el daño por exceso de 
+corriente.
+
+Ejemplo: en el siguiente circuito en serie, determina cuanta corriente fluye por
+el bajo las diferentes condiciones. Asume que la resistencia interna del 
+circuito en el cortocircuito completo es de 3 (ohms).
+(figura 2.60)
+
+Ejemplo: en el siguiente circuito en paralelo, determina cuanta corriente fluye
+por el bajo las diferentes condiciones. Asume que la resistencia interna de la 
+bateria es 0.2(ohms) por debajo de 3A y 2(ohms) durante el cortocircuito.
+(figura 2.61)
+En el circuito abierto, por la parte abierta no fluye la corriente y no se 
+considera al calcular la resistencia equivalente. En el caso del cortocircuito,
+toda la corriente pasa por la zona del cortocircuito ya que su resistencia es
+extremadamente baja. Por eso las otras dos resistencias no se tienen en 
+consideracion.
+
+2.17 Kirchhoff’s Laws
+Las leyes de Kirchhoff proveen el metodo mas general para analizar circuitos. 
+Estas leyes funcionan con elementos lineales (resistores, capacitores e 
+inductores) y no lineales (diodos, transistores, etc.) no importa como de 
+complejo sea el circuito.
+
+Ley de Kirchhoff del voltaje (o Loop Rule): la suma algebraica de los voltajes 
+alrededor de cualquier bucle en un circuito es cero:
+(2.20)
+Para ver como funciona la ley de Kirchhoff consideramos el siguiente circuito:
+(2.63)
+Podemos empezar desde cualquier punto del circuito en cualquier direccion, y al 
+ir añadiendo elementos
+a la "ongoing loop equation" vemos que al terminar el bucle tendremos un valor
+de 0. Para determinar el signo de la diferencia de voltaje, se utilizan las 
+reglas indicadas al lado del circuito.
+
+Ley de Kirchhoff de la corriente (o Junction Rule): la suma de las corrientes 
+que entran en un nodo equivale a la suma de las corrientes que abandonan el 
+nodo.
+Esta ley es una declaracion de la conservacion de la carga a traves de un 
+circuito: en ningun momento las cargas se crean o destruyen.
+El siguiente ejemplo muestras las leyes de Kirchhoff del voltaje y la corriente
+en accion. 
+Ejemplo: aplicando las leyes de Kirchhoff en el circuito, encuentra las 
+corrientes desconocidas I1-6 asumiendo que R1-6 y V0 se conocen. Despues de 
+eso, la caida de voltaje en los resistores se puede obtener usando la ley de 
+Ohm.
+(fig 2.65)
+Solucion: para solucionar este problema se aplica la ley de voltaje a bucles 
+cerrados y la ley de corriente a nodos hasta que tengamos suficientes ecuaciones
+para despejar las incognitas.
+(fig 2.66)
+Las incognitas se pueden resolver por el metodo de sustitucion, con matrices o
+usando la regla de Cramer.
+(resolver ??)
+(fig. 2.69) (solucion)
+
+2.18 Superposition Theorem
+Teorema de superposicion: la corriente en una rama de un circuito lineal es 
+igual a la suma de las corrientes producidas por cada fuente estableciendo 
+las otras fuentes a 0.
+El teorema de superposicion es util siempre que un circuito lineal contiene mas
+de una fuente.
+La demostración del teorema de superposición se basa directamente en el hecho 
+de  que las leyes de Kirchhoff, aplicadas a circuitos lineales, siempre 
+resultan en 
+un conjunto de ecuaciones lineales, las cuales pueden reducirse a una sola 
+ecuación lineal con una única incógnita. Esto significa que una corriente 
+desconocida en una rama puede expresarse como una superposición lineal de cada 
+una de las fuentes con un coeficiente apropiado.
+Es importante tener en cuenta que la superposición no debe aplicarse a 
+circuitos no lineales.
+Es importante aclarar lo que significa establecer las otras fuentes a cero 
+cuando se utiliza el teorema. Una fuente puede ser de voltaje o corriente. Si es
+de voltaje, establecerla a cero significa que los puntos donde estan conectados 
+sus
+terminales mantienen el mismo potencial. La manera de hacer esto es 
+sustituyendo la fuente por un conductor (cortocircuitarla). Si la fuente es de
+corriente, establecerla a cero significa removerla y dejar los terminales 
+abiertos, creando un circuito abierto. Un cortocircuito causa voltaje 0 y un 
+circuito abierto, corrient 0.
+Ejemplo: 
+(fig 2.70)
+Primero se quita la fuente de corriente (circuito b). La nueva corriente en 
+R2 es:
+(form)
+Esta corriente se llama corriente parcial en la rama 2 debido a la fuente 1. 
+Despues se quita la fuente de voltaje (circuito c). La corriente en el nuevo 
+circuito es:
+(form)
+Aplicando el teorema de superposicion, añadidmos la corriente parcial a la 
+corriente total:
+(form)
+La corriente en R1 podria haber sido obtenido de manera similar, con el 
+siguiente resultado: 
+(form)
+El teorema de superposicion es el mecanismo subyacente que hace posibles dos
+importante teoremas: el de Thevenin y el de Norton. Estos dos teoremas son mas
+practicos de usar.
+
+2.19 Thevenin’s and Norton’s Theorems
+2.19.1 Thevenin’s Theorem
+Thevenin establecio un teorema por el cual, si en un circuito complejo solo nos 
+interesa medir la diferencia de potencial entre dos puntos, se pueden extraer
+estos dos puntos del circuito y considerar el resto del circuito como una caja
+negra. Aplicando los trucos de Thevenin se puede descubrir que esa caja negra
+puede ser representada por una fuente de voltaje en serie con un resistor. La
+fuente de voltaje se denomina Voltage de Thevenin (VTHEV) y el resistor, 
+resistencia de Thevenin (RTHEV), y juntos forman el circuito equivalente de 
+Thevenin. Con este simple circuito se puede calcular el flujo de corriente en 
+la carga situada entre los terminales usando la ley de Ohm: (form)
+
+Notese que los terminales de la caja negra pueden no estar presentes en el 
+circuito. Por ejemplo si se quiere obtener el voltaje en un resistor que ya esta
+dentro de un circuito complejo, se puede quitar ese resistor, para crear los dos
+terminales y entonces calcular el circuito equivalente de Thevenin. Depues se 
+coloca el resistor entre los terminales y se calcula su voltaje con la ley de 
+Ohm.
+
+(VTHEV) es simplemente el voltaje entre los terminales de la caja, que pueden 
+ser facilmente medidos o calculados. (RTHEV) es la resistencia entre los 
+terminales de la caja negra cuando todas las fuentes dc son reemplazadas por 
+cortos, y tambien puede ser medida o calculada.
+
+El truco que utilizo Thevenin para simplificar el teorema de superposicion, es 
+remover todas las fuentes de una vez y calcular la resistencia de Thevenin, en
+vez removerlas una a una como en el teorema de superposicion. 
+
+Ejemplo: 
+(fig 2.72)
+Para obtener el (VTHEV) entre A y B se calcula con la formula de divisor de 
+voltaje. Para obtener la (RTHEV) se reemplaza la fuente por un corto y se 
+calcula la reesitencia entre A y B (R1 y R2 en paralelo).
+Con (RTHEV) y (VTHEV) se puede calcular la caida de voltaje y corriente en R3:
+(forms).
+
+2.19.2 Norton’s Theorem
+El teorema de Norton funciona como el de Thevenin: reemplaza un circuito 
+complejo por uno mas sencillo equivalente, pero en vez de tener una fuente de
+voltaje y una resitencia en serie, tiene una fuente de corriente en paralelo
+con una resistencia, que es la misma que la resistencia de Thevenin. Lo que 
+hay que hacer es encontrar el valor de la fuente de corriente, conocida como
+corriente de Norton (INORTON), que se obtiene cortocircuitando los terminales
+A y B y obteniendo la corriente que pasa por ellos. El mecanismo subyacente
+ tambien es el teorema de superposicion.
+(figura 2.73)
+
+Un circuito equivalente de Norton puede ser transformado en un circuito 
+equivalente de Thevenin y viceversa.  
+
+(figura 2.74)
+
+Ejemplo: en el siguiente ejemplo el teorema de Thevenin se puede aplicar varias 
+veces 
+para simplificar un circuito complejo que tiene mas de una fuente. En ensencia,
+se crean subcircuitos de Thevenin y luego se combinan, lo que suele ser mas 
+facil que intentar obtener el equivalente de Thevenin del circuito completo.
+(figura 2.75)
+
+Ejemplo: para incrementar la capacidad de corriente, se colocan las baterias en 
+paralelo. Si la resistencia interna es de 0.2(ohms) por cada bateria de 1.5V,
+encontrar el circuito equivalente de Thevenin:
+(figura 2.76)
+
+2.20 AC Circuits
+Las fuentes vistas hasta ahora hacen que la corriente fluya en 
+un unico sentido, resultando en un corriente directa (dc). Otro tipo de fuente 
+es la que causa un cambio de direccion periodico en la corriente, resultando en
+una corriente alternante (ac). En los circuitos ac ademas de que la corriente
+cambia de sentido, el voltaje tambien se invierte periodicamente.
+(figura 2.77 ?)
+
+El balanceo positivo y negativo de el voltaje y la corriente implica que la 
+fuerza electromotriz de la fuente esta cambiando de direccion, causando que la 
+polaridad de la fuente de voltaje se invierta y forzando a la corriente a 
+cambiar de direccion. El voltaje entre los terminales de la fuente en un 
+instante dado es el voltaje medido respecto a la linea de la onda sinusoidal, 
+que es la referencia de 0V.
+
+2.20.1 Generating AC
+La forma más común de generar ondas sinusoidales es mediante inducción 
+electromagnética, por medio de un generador de corriente alterna (o alternador).
+Un simple generador ac consiste en un bucle de cable que es rotado mecanicamente
+alrededor de un eje mientras esta posicionado entre los polos norte y sur de un 
+iman.
+Cuando el bucle rota en el campo magnetico, el flujo magnetico a traves de el 
+cambia y las cargas son forzadas a moverse dentro del alambre, obteniendo un 
+incremento de 
+voltaje inducido. El voltaje inducido resultante es sinusoidal, con una 
+frecuencia angular (simbolo) (radianes por segundo).
+(fig 2.78)
+
+Hay varias razones por las que las ondas sinusoidales son importantes en 
+electronica. La primera razon es por la facilidad de convertir movimiento 
+mecanico circular en corriente inducida via un generador ac. Otra razón muy 
+importante para usar formas de onda sinusoidales es que, si se deriva o integra 
+una sinusoide, el resultado sigue siendo una sinusoide. Al aplicar un voltaje 
+sinusoidal a capacitores e inductores, se genera una corriente sinusoidal. Uno 
+de los beneficios mas importantes de ac es que puede incrementar o disminuir el
+voltaje (a expensas de la corriente) usando un transformador. En dc, incrementar
+o disminuir el voltaje  es mas complicado, normalmente produciendo perdida de 
+potencia resistiva. Por otro lado, los transformadores son muy eficientes y 
+consumen poca potencia.
+
+2.20.3 Pulsating DC
+Si la corriente y el voltaje nunca cambian de direccion en un circuito, tenemos
+corriente dc, incluso si el nivel de dc cambia constantemente. Por ejemplo en la
+siguiente figura, la corriente siempre es positiva respecto a 0, aunque varie
+periodicamente en aplitud. Sea cual sea la forma de las variaciones, la 
+corriente es referida como "pulsating dc". Si la corriente periodicamente 
+alcanza 0, es referida como "intermittent dc".
+(figura 2.80)
+Desde otra perspectiva, se puede mirar las corrientes dc pulsante e intermitente
+como una combinacion entre ac y dc. Hay circuitos que combinan corrientes y 
+voltajes ac y dc.
+
+2.20.4 Combining Sinusoidal Sources
+Ademas de combinar voltajes y corrientes ac y dc, se pueden combinar voltajes ac
+y corrientes separadas. Estas combinaciones resultan en formas de onda 
+complejas. 
+(fig 2.81)
+
+2.20.5 AC Waveforms
+La corriente alterna puede tomar muchas formas utiles ademas de la sinusoidal.
+Las siguientes formas son comunes en electronica: en la cuadrada se pueden 
+leer los estados true(on) y false(off). La triangular y la de diente de sierra
+son especialmente utiles en circuitos con temporizacion.
+(figura 2.82)
+Una fuente de voltaje sinusoidal ideal mantendra el voltaje entre sus 
+terminales independientemente de la carga. Una fuente de corriente sinusoidal
+ideal mantendra una corriente constante independientemente de la resitencia de 
+carga. Se pueden crear fuente ideales para otras formas de onda.
+(figura 2.83)
+
+2.20.6 Describing an AC Waveform  
+Una descripcion completa de un corriente o voltaje ac implica hacer referencia 
+a tres propiedades: amplitud (o magnitud), frecuencia y fase.
+
+Amplitud
+La magnitud del voltaje (o corriente) varia con el seno del angulo hecho por el 
+moviento circular respecto al punto cero. El seno de 90º es 1, que es el punto
+de maxima corriente (o voltaje); el seno de 270º es -1, que es el punto de 
+maxima corriente inversa (o voltaje); el seno de 45º es 0.707 y el valor de la 
+corriente (o voltaje) en el punto de 45º de rotacion es 0.707 veces la corriente
+maxima (o voltaje).
+
+2.20.7 Frequency and Period
+Un forma de onda sinusoidal generada por un generador rotando continuamente 
+generara una corriente alterna(o voltaje) que pasara a traves de muchos ciclos 
+a traves del tiempo. Puedes elegir un punto arbritario de un ciclo y usarlo como
+marcador. El numero de veces por segundo que la corriente (o voltaje) alcanza
+ese punto por segundo se llama frecuencia de la ac. La unidad de medida de la 
+frecuencia son los ciclos por segundo o hertz, abreviado como Hz (de Heinrich 
+Hertz).
+La longitud de cualquier ciclo en unidades de tiempo es el periodo del ciclo, 
+medido entre dos puntos equivalentes de ciclos sucesivos. El periodo es el 
+inverso de la frecuencia.
+Ejemplo: periodo de una corriente ac de 60 Hz:
+(form)
+Ejemplo: frecuencia de un periodo de 2 ns:
+(form)
+
+2.20.8 Phase
+Cuando dibujamos el seno de una onda de voltaje o corriente, el eje horizontal 
+representa el tiempo. Los eventos a la derecha del grafo suceden mas tarde, 
+mientras que los eventos a la izquierda suceden antes. A pesar de que el tiempo
+se puede medir en segundos, es mas conveniente tratar cada ciclo de la forma de
+onda como una unidad completa de tiempo, divisible entre 360º. Un punto de 
+comienzo convencional para contar en grados es 0º, el punto cero donde el 
+voltaje o la corriente comienzan un ciclo positivo.
+(figura 2.85a).
+Midiendo el ciclo ac de esta forma, es posible hacer calculos y obtener medidas
+de manera independiente de la frecuencia. El pico positivo del voltaje o la 
+corriente ocurre a los 90º durante un ciclo. En otras palabras, 90º representa 
+la fase del pico ac relativo al punto de 0º inicial.
+
+La relacion entre fases es usada para comparar dos formas de onda ac de 
+corriente o voltaje en la misma frecuencia:
+(fig 2.85b)
+Como la forma de onda B cruza el punto 0 despues que A, existe una diferencia de 
+fase. En este caso B retrasa (lags) a A por 45º. Tambien se puede decir que A 
+adelanta (leads) a B por 45º. Si A y B ocurren en el mismo circuito, se suman 
+formando una onda sinusoidal compuesta en un angulo de fase intermedio relativo
+a las formas de onda individuales. Interesantemente, añadir cualquier numero a 
+ondas seno de la misma frecuencia, siempre produce un onda seno de la misma 
+frecuencia, aunque la magnitud y la fase sean unicas.
+En la siguiente figura tenemos un caso especial donde B retrasa a A por 90º. El 
+ciclo de B comienza exactamente un cuarto de ciclo despues que A. Cuando una de 
+las formas de onda pasa por cero, la otra alcanza su valor máximo.
+(fig 2.85.c)
+Otro caso especial ocurre en la siguiente figura, donde las formas de onda A y B
+estan desfasadas 180º. Aqui no importa que forma de onda se considere adelantada
+o atrasada. La forma de onda B siempre es positiva cuando la forma de onda A es
+negativa, y viceversa. Si combinas esta dos formas de ondas de voltaje o 
+corrriente iguales en el mismo circuito, se cancelan completamente entre si.
+
+2.21 AC and Resistors, RMS Voltage, and Current
+Voltajes alternos aplicados a un resistor resultaran en corriente alterna a 
+traves del resistor, que esta en fase con el voltaje. Dado el voltaje ac y la 
+resistencia, se puede aplicar la ley de Ohm para obtener la corriente ac. Por 
+ejemplo, una forma de onda sinusoidal generada por un generador de funcion puede
+ser descrita matematicamente por:
+(2.24)
+donde Vp es el pico de amplitud de la forma de onda del voltaje, f es la 
+frecuencia y t es el tiempo. Usando la ley de Ohm y la ley de la potencia se 
+obtiene:
+(2.25)
+Al dibujar V(t) y I(t) juntas se observa que la corriente y el voltaje estan en
+fase entre ellas. Si el voltaje incrementa en una direccion, la corriente 
+tambien se incrementa en la misma direccion. De este modo, cuando una fuente ac
+es conectada a una resistencia de carga pura, la corriente y el voltaje estan en
+fase. Si la carga no es puramente resistiva (tiene capacitancia o inductancia),
+sucedera otra cosa. 
+(fig 2.86)
+Para encontrar la potencia disipada por el resistor bajo las condiciones 
+sinusoidales, se puede poner la expresion del voltaje sinusoidal en la ley de 
+Ohm de la potencia para obtener la expresion de potencia instantanea:
+(2.26)
+
+Estas formas de obtener valores instanteneos de voltaje, corriente y potencia no
+son tan utiles en realidad, porque lo que suele interesar es obtener algun tipo
+de valor promedio que evite tener que tratar con funciones sinusoidales. El 
+valor promedio que se suele usar es el RMS o root mean square, que se obtiene 
+elevando al cuadrado los valores instantenos del voltaje o la corriente ac, 
+calculando la media y finalmente tomando la raiz cuadrada de este resultado, lo 
+que nos da el valor efectivo del voltaje o la corriente ac. Estos valores RMS
+son esencialmente los equivalentes en ac de los voltajes y corrientes en dc. Los
+valores RMS de voltaje y corriente ac se basan en igualar los valores de 
+potencica en ac y dc necesarios para calentar un elemento resistivo exatamente
+en el mismo grado. La potencia pico en ac requerida para esta condicion es el 
+doble de la potencia dc necesaria. Por lo tanto, la potencia promedio en ac
+equivalente a dc es la mitad de la potencia pico en ac.
+(2.27)
+Matematicamente se puede determinar los valores de voltaje y corriente RMS para
+ondas sinusoidales  (forms)
+(2.28)
+(2.29)
+Notese que el voltaje y corriente RMS dependen solo del valor pico y son 
+independientes del tiempo o la frecuencia. Estas son las relaciones:
+(forms)
+La ley de Ohm y la ley de Ohm de la potencia se pueden seguir usando con los 
+valores RMS:
+(2.30)
+(2.31)
+Nuevamente, estas ecuaciones aplican solo en circutos que sean puramente 
+resistivos.
+
+La siguiente figura muestra la relacion entre los valores RMS, pico, pico-pico y
+promedio de media onda:
+(figura 2.87)
+(conversiones entre diferentes factores)
+
+MEASURING RMS VOLTAGES AND CURRENTS
+Hay muchos multimetros digitales que no miden el valor RMS directamente. 
+Normalmente el medidor solo medira el valor pico y calculara el valor RMS 
+equivalente, asumiendo que la forma de onda medida es sinusoidal. Los medidores
+analogicos normalmente miden el valor promedio de media onda, pero indican el 
+RMS equivalente. Por otro lado, los medidores RMS reales son especialmente 
+utiles para voltajes y corrientes no sinusoidales. Aunque son muy caros, merece 
+la pena su uso. 
+En otras formas de onda simetricas y regulares tambien se puede obtener el RMS
+conociendo los valore de pico, media o picopico. Una cosa importante a tener en 
+cuenta al usar la tabla es que necesitas saber exactamente en qué base se 
+realiza 
+la medición de tu multímetro. Por ejemplo, si tu multímetro mide el valor pico y 
+luego calcula y muestra el valor RMS equivalente para una onda senoidal, tendrás 
+que usar la tabla de manera diferente en comparación con la situación en la que 
+el multímetro realmente mide el valor medio de media onda y calcula el valor RMS 
+de la onda senoidal a partir de ese dato. Por lo tanto, ten cuidado, 
+especialmente si no estás seguro de cómo funciona exactamente tu multímetro.
+(figura 2.89)
+
+2.22 Mains Power
+En los U.S. la linea de voltaje esta envuelta por un aislante y se denomina NMB 
+cable. Contiene tres conectores:
+    - Hot wire: cable con cubierta negra que provee la fuente de corriente a
+    120V AC.
+    - Neutral wire: cable con cubierta blanca que cierra el circuito, 
+    proporcionando el camino de 
+    retorno a la corriente provista por el hot wire.
+    - Ground wire: cable de cobre sin cubierta que esta conectado a tierra.
+El neutral wire y el hot wire forman un circuito entre ellos. El ground wire
+esta conectado a la conexion a tierra del panel principal.
+
+En España el hot wire se denomina cable de fase y es de color marron, negro o
+gris. El neutral wire se denomina cable neutro y es siempre azul. El ground wire
+se denomina cable de tierra y normalmente es de color verde-amarillo.
+
+2.23 Capacitors
+
+Un capacitor consiste en dos laminas paralelas opuestamente cargadas separadas 
+por un aislante. Al aplicar voltaje en las laminas conectandolas a una bateria, 
+los electrones son bombeados desde el terminal negativo de la bateria a la 
+lamina inferior, mientras que los electrones que habia en la lamina superior son 
+drenados por el terminal positivo. La lamina superior se vuelve deficiente de 
+electrones, mientras que la lamina inferior se vuelve abundante de electrones. 
+Esto crea un campo electrico entre las laminas y un voltaje equivalente al de la 
+bateria. Este voltaje se mantiene al desconectar el capacitor del circuito y se 
+va descargando lentamente, como una bateria. El hecho de que se descargue se 
+debe a que el aislante no es perfecto, y la velocidad a la que lo hace depende 
+de la “leakage current”. 
+
+Si se conectara el terminal negativo a tierra, los electrones no irian a 
+tierra, porque la carga positiva de la otra lamina tiene un campo de atraccion 
+que impide que los electrones se vayan.
+
+(fig 2.91)
+
+La relación entre la carga en una de las placas de un condensador y el voltaje 
+que existe entre las placas se llama capacitancia (simbolizada como C).
+
+(2.32)
+
+C siempre es positiva y se mide en faradios (abreviado F). Un faradio equivale a 
+un coulomb por volt
+
+1F = 1C / 1V
+
+Los capacitores son dispositivos diseñados para mantener carga en forma de campo 
+electrico. A continuacion se muestran los diferentes simbolos utilizados para 
+representarlos:
+
+(fig 2.93 symbols)
+
+**2.23.1 Determining Capacitance**
+
+La capacitancia de un capacitor esta determinada por el area de la lamina A, la 
+separacion entre las laminas d, y el material del aislante. Si un voltaje V se 
+aplica entre las laminas, se genera un campo electrico E = V/d. Por la ley de 
+Gauss cada lamina debe contener un carga igual y positiva dada por: 
+
+(2.33)
+
+donde (e) es la permisividad del dielectrico. El vacio tiene una permisisvidad 
+dada por:
+
+(2.34)
+
+La capacitancia se obtiene con:
+
+(2.35)
+
+La permisividad relativa de un material en comparacion con la permisividad del 
+vacio se conoce como constante dielectrica, que es dada por:
+
+(form)
+
+Sustituyendo en la ecuacion anterior, se obtiene la capacitancia en terminos de 
+la constante dielectrica.
+
+(2.36)
+
+donde C esta en faradios, A en metros cuadrados y d en metros.
+
+La constante dielectrica varia desde 1.00059 del aire (1 atm) hasta 10^5 para 
+algunos tipos de ceramica. 
+
+Los capacitores suelen tener mas de dos laminas, donde las laminas alternas 
+estan conectadas para formar dos conjuntos. Esto hace posible obtener mucha 
+capacitancia en un espacio pequeño. Para un capacitor con multiples laminas, la 
+capacitancia se obtiene de la siguiente forma: 
+(form 2.37)
+
+(fig 2.95)
+
+**2.23.2 Commercial Capacitors**
+
+Los capacitores comerciales se construyen de laminas con un dielectrico solido o 
+liquido entre medias. Los dielectricos solidos mas utilizados son mica, papel, 
+polipropileno y ceramicas especiales.
+
+Los capacitores electroliticos usan laminas de aluminio con un compuesto quimico 
+semiliquido conductor entre ellas. El dielectrico real es una fina capa de 
+material aislante que forma en un conjunto de las placas a traves de accion 
+electroquimica cuando el voltaje dc es aplicado en el capacitor. La capacitancia 
+obtenida en un area dada en un capacitor electrolitico es muy grande comparada 
+con capacitores que usan otros dielectricos, porque la capa de dielectrico es 
+muy fina. Estos capacitores, debido a la accion electroquimica, requieren que un 
+terminal sea ubicado en un potencial menor que el otro. Por eso, salvo alguna 
+excepcion, los capacitores electroliticos no deberian usarse en circuitos ac.
+
+**2.23.3 Voltage Rating and Dielectric Breakdown**
+
+Si un voltaje suficientemente alto es aplicado entre las laminas del conductor, 
+el campo electico puede generar la suficiente fuerza en los electrones en el 
+dielectrico como para  separarlos, resultando en una ruptura dielectrica. Cuando 
+esto sucede, se crea un camino de baja resistencia entre las laminas del 
+capacitor.
+
+El voltaje de ruptura de un dielectrico depende de la composicion quimica y 
+grosor del dielectrico. Una ruptura dielectrica puede producir daños reparable 
+en capacitores con dielectricos gaseosos, pero permanente en dielectricos 
+solidos.
+
+Los fabricantes proveen lo que se llama dielectric withstanding voltage (dwv), 
+expresado en voltaje por milesima de pulgada a un temperatura dada. Tambien 
+suele dar el dc working voltage (dcwv) que tiene en cuenta otros factores como 
+la temperatura y el margen de seguridad, y da una idea del margen de seguridad 
+de voltaje dc que puede ser aplicado antes de la ruptura dielectrica. Este valor 
+es mas util en la practica.
+
+**2.23.4 Maxwell’s Displacement Current**
+
+La forma en la que se carga y descarga un capacitor puede llevar a pensar que 
+los electrones saltan el hueco entre las laminas, pero esto no sucede, al menos 
+en un  capacitor ideal. Como se ha 
+calculado antes usando la ley de Gauss, la carga en una lamina de un capacitor
+relleno de aire puede expresarse en terminos del campo electrico, el area y la
+permisividad del vacio.
+
+Hace un tiempo el fisico escoces James Clerk Maxwell noto que incluso si no hay
+corriente real pasando de una lamina del capacitor a otra, existe un flujo 
+electrico cambiante a traves del hueco entre las laminas que se incrementa o 
+decrementa con la magnitud y la direccion del campo electrico. Maxwell creyo que 
+el flujo electrico permeaba el espacio vacio entre las laminas del capacitor e 
+inducia la corriente al otro lado. Formulo la siguiente ecuacion conocida como 
+la corriente de desplazamiento para explicar como la corriente parecia que se 
+movia de un extremo del capacitor a otro:
+(2.39)
+Como nota adicional, tambien existe un campo magnetico que se genera debido a la
+corriente de desplazamiento entre las laminas.
+Las ecuaciones de Maxwell y la fisica moderna proveen mucho detalle que no suele
+ser necesario en electronica. En su lugar se suele utilizar el charge-based 
+model. 
+
+2.23.5 Charge-Based Model of Current Through a Capacitor
+Para explicar el flujo de corriente en un capacitor no hace falta entender la 
+fisica que ocurre dentro, pues en su lugar se trata como una caja negra con dos
+cargas y se combina la definicion de la capacitancia y la definicion del voltaje
+para realizar los calculos con diferenciales:
+(2.40) 
+(2.41)
+Estas ecuaciones son representativas de lo que se define como capacitor ideal.
+Para un capacitor real se suele utilizar un modelo mas aproximado:
+(fig 2.93)
+Para los calculos en la vida real se suele sustituir el capacitor por un 
+circuito con resistencia, lo que elimina la posibilidad de corrientes infinitas.
+Esta resistencia es mucho mas grande que la interna del capacitor, por lo que 
+esta ultima suele ser ignorada.
+Ejemplo 1: Un capacitor de 10(micro-F) se conecta a una fuente de corriente 
+constante de 50 mA. Determina el voltaje a traves del capacitor despues de 
+10(micro s), 10 ms y 1s.
+Respuesta: como IC es constante, puede ser movida delante de la integral:
+(respuesta)
+
+2.23.7 Energy in a Capacitor
+La energia disipada en un capacitor en forma de calor es muy pequeña debido a la
+baja resistencia. La energia solo puede ser almacenada en el campo electrico y 
+se obtiene sustituyendo la ecuacion de corriente del capacitor en la ley 
+generalizada de la potencia e insertando el resultado en la definicion de 
+pontencia:
+(2.42)
+Ejemplo: cuanta energia se almacena en un capacitor de 1000(micro)F con un 
+voltaje aplicado de 5V?
+(respuesta)
+
+2.23.8 RC Time Constant
+Cuando un capacitor se conecta directamente a un circuito cerrado, se descarga
+inmediamente, y cuando se conecta a una fuente de voltaje, la carga es 
+practicamente instantanea. Cuando se utiliza una resistencia, la carga y 
+descarga se producen de forma exponencial:
+(fig 2.101)
+Ecuaciones para un circuito de carga RC:
+(2.43) 
+Teoricamente el proceso de carga nunca termina, pero llega a un valor inmedible.
+Una convencion usada es que t = RC, lo que hace ue V(t) = 0.632 Vs. El termino 
+RC se denomina time constant del circuito, y es el tiempo en segundos requerido
+para cargar un capacitor al 63.2%. La letra tau (tau) se suele usar para 
+representar RC. Despues de dos constantes de tiempo (tau) el capacitor carga 
+otro 63.2% de la diferencia de voltaje entre la fuente y el capacitor para tener
+un total de 86.5% de carga. Despues de cinco constantes de tiempo el capacitor 
+se considera cargado al haber alcanzado el 99.24%
+
+Ecuaciones para un circuito de descarga RC:
+(2.44)
+(fig 2.103)
+La expresion de la descarga de un capacitor es la inversa de la carga: despues
+de una constante de tiempo se queda en un 63.2% de carga, despues de dos 
+constantes de tiempo se queda en un 37.8% de carga, etc. 
+
+2.23.9 Stray Capacitance 
+La capacitancia no existe solo en los capacitores, existe entre cualquier par de 
+superficies con diferencia de pontencial electrico que este lo suficientemente
+cerca como para generar un campo electrico. Este efecto suele estar presente en
+los circuitos aunque no de manera intencionada, y se suele denominar stray
+capacitance. Esta capacitancia debe ser evitada por los diseñadores de circuitos
+
+2.23.10 Capacitors in Parallel
+Cuando los capacitores se colocan en paralelo, las capacitancias se suman:
+(2.45)
+El voltaje en todos los capacitores es el mismo, por lo que se puede sustituir
+las corrientes de desplazamiento para cada capacitor en la expresion de 
+corriente de Kirchhoff:
+(form)
+Intuitivamente se puede pensar que los capacitores en paralelo son como un unico
+capacitor con una superficie de lamina mas grande. Es importante saber que el 
+limite de voltaje que puede ser aplicado es el del capacitor con menor voltage
+rating. 
+
+2.23.11 Capacitors in Series
+Cuando varios capacitores de colocan en serie, la capacitancia total es menor 
+que la del capacitor mas pequeño:
+(2.46)
+Los capacitores pueden ser ubicados en serie para permitir al grupo aguantar un 
+voltaje mayor que cualquier capacitor del grupo pudiera soportar. El intercambio
+es el decremento de la capacitancia total, aunque esto puede ser tambien lo que
+se busque, si no tienes capacitores de una capacitancia dada.
+Notese que el voltaje entre los capacitores en serie no se divide 
+equitativamente, sino como una fraccion del total (ej.: el voltaje en Cx es 
+(Ctotal/C2)Vin. Por esto hay que tener cuidado de no sobrepasar el voltaje 
+limite de ningun capacitor del grupo.
+(repasar lo siguiente)
+Si se va a usar capacitores en serie para aguantar grandes voltajes es buena 
+idea conectar un equalizing resistor junto con cada capacitor.
+Con capacitores reales, la leakage resistnace del capacitor puede tener mas 
+efecto en la division de voltaje de lo que tiene la capacitancia. Un capacitor 
+con una gran resistencia paralela tendra el voltaje mas alto a traves de el. 
+Agregar equalizing resistors reduce este efecto.   
+(ejemplos ?)
+
+2.23.12 Alternating Current in a Capacitor
+En circuitos dc los capacitores bloquean el flujo de corriente (excepto cuando 
+estan cargandose o descargandose). En circuitos ac los capacitores pueden 
+permitir o limitar el flujo de corriente dependiendo de la frecuencia.
+Cuando una señal ac es aplicada en un capacitor, el voltaje crece hasta que el 
+capacitor esta cargado, y despues disminuye. La corriente comienza en su valor
+mas alto cuando el capacitor comienza a cargarse y llega a cero cuando el 
+voltaje llega al maximo, por eso esta adelantada 90º. En el momento en el 
+que el capacitor comienza a descargarse, el voltaje decrementa y la corriente 
+aumenta de forma inversa. 
+(dibujo de la diferencia de fase 2.106) 
+
+2.23.13 Capacitive Reactance
+La cantidad de carga en un capacitor en ac es similiar a la resistencia. Aunque
+no se produzca calor, se denomina reactancia capacitiva y se mide en ohms:
+(2.47)
+Usualmente se usa omega (omega) en vez de 2(pi)f, y se denomina frecuencia 
+angular.
+Cuando la frecuencia tiende a infinito, Xc tiende a 0, y el capacitor actua como
+un corto. Cuando la frecuencia tiende a 0, Xc tiende a infinito y el capacitor
+actua como un circuito abierto.
+Es importante notar que aunque la unidad de la reactancia es el ohm, no hay 
+disipacion de potencia. La energia almacenada en el capacitor en una porcion de 
+ciclo es devuelta al circuito en la siguiente porcion.
+
+2.23.14 Capacitive Divider
+Los divisores capacitivos se pueden usar con señales ac o dc dado que los 
+capacitores alcanzan su steady state rapidamente. La formula es:
+(2.108 con dibujo)
+Notese que el voltaje de salida es independiente de la frecuencia de entrada. 
+Aun asi, si la reactancia de los capacitores no es grande para la frecuencia de
+interes, la corriente de salida sera muy baja.
+
+2.23.15 Quality Factor
+Los componentes que almacenan energia pueden ser comparados en terminos de 
+quality factor Q, tambien conocido como merit. Indica la capacidad de almacenar 
+energia sumado a las perdidas que pueda tener. Se expresa como:
+(2.48)
+
+2.24 Inductors
+Los capacitores almacenan energia en forma de campo electrico. Otra forma de 
+almacenar energia es en forma de campo magnetico. Incrementando o decrementando
+el flujo de corriente en un cable cambia la fuerza del campo magnetico generado.
+Durante estos cambios en la fuerza del campo magnetico, se encuentra el fenomeno
+conocido como inductancia, que hace referencia a como el campo magnetico influye
+en el flujo de electrones libres dentro del circuito. Cualquier dispositivo que
+tenga inductancia se conoce como inductor.
+
+2.24.1 Electromagnetism
+La forma mas sencilla de generar un campo magnetico es pasar corriente por un 
+conductor. Cuando a esta corriente se le agrega una diferencia de potencial que 
+hace que los electrones tengan una misma direccion, el campo magnetico toma una
+direccion perpendicular a la direccion de la corriente descrita por la regla de 
+la mano derecha.
+(fig 2.111b)
+Enrollar un cable en una serie de bucles forma un solenoide, donde cada bucle 
+contribuye a hacer un campo interno mas fuerte.
+(fig 2.111e)
+Introducir un material ferremagnetico dentro del solenoide produce un campo 
+magnetico mucho mas fuerte. La razón de este aumento en la intensidad del campo 
+tiene que ver con el hecho de que el campo del solenoide hace que una gran parte 
+de los dipolos magnéticos atómicos del núcleo roten en la dirección del campo. 
+De esta manera, el campo magnético total se convierte en la suma del campo 
+magnético del solenoide y el campo magnético inducido temporalmente en el 
+núcleo. Dependiendo del material y la construcción, un núcleo puede aumentar la 
+intensidad total del campo hasta en un factor de 1000.
+(fig 2.111f) 
+
+2.24.2 Magnetic Fields and Their Influence
+Los campos magneticos, a diferencia de los electricos, actuan sobre cargas
+que se esten moviendo en un direccion perpendicular a la direccion eel campo 
+aplicado. Un campo magnetico no tiene influencia sobre una carga estacionaria a
+no ser que el propio campo se este moviendo.
+A continuacion se muestra la direccion de la fuerza sobre una carga moviendose. 
+Cuando es positiva, se usa la regla de la mano derecha, y cuando es un electron,
+la regla de la mano izquierda. Si la carga se mueve en paralelo al campo 
+aplicado, no experimenta fuerza por el campo magnetico.
+(fig 2.113 a b c)
+En terminos de un grupo de cargas moviendose a traves de un cable, el campo 
+magnetico de un cable ejercera un fuerza sobre otro cable y viceversa:
+(fig 2.114)
+Viendo el comportamiento de dos imanes quietos atrayendose podemos cuestionarnos
+si no era un requisito que la carga o el campo tuvieran que estar en movimiento
+para que la fuerza se observara. En este caso el movimiento es microcospico y es
+el de los electrones que se encuentran rotando sobre los atomos del iman. Estas
+orbitas suelen estar fijas en una direccion general y se denominan dominios.
+
+Los campos magneticos pueden forzar a los electrones dento de los conductores a 
+moverse en una direccion, induciendo el flujo de corriente. La fuerza inducida 
+es una fuerza electromotriz (EMF) que depende del tiempo y la geometria. Según 
+la ley de Faraday, la EMF inducida en un circuito es directamente proporcional a
+la tasa de cambio del flujo magnético a través del circuito:
+(2.49)
+donde (omegaM) es el flujo magnetico en un bucle cerrado del circuito, que es
+igual al campo magnetico B apuntado por la direccion del area de superficie. De 
+acuerdo a esta ley, el campo EMF puede ser inducido a u circuito de varias 
+formas: 1. La magnitud de B puede varias con el tiempo. 2 el area del cricuito
+puede cambiar con el tiempo. 3 el angulo entre B y la normal de A puede cambiar
+con el tiempo. 4 Puede ocurrir cualquier combinacion de las anteriores.
+
+Un simple generador ac muestra la ley de Farday en accion. Un bucle de cable en
+en un campo magnetico constante genera una EMF que puede ser usada para 
+alimentar un circuito. Cuando el bucle gira, el flujo magnetico dentro de el 
+cambia con el tiempo, induciendo una EMF y una corriente en el circuito externo.
+Los terminales del bucle estan conectados a anillos colectores que rotan junto 
+al bucle, mientras que el circuito externo esta conectado al generador por 
+cepillos estacionarios en contacto con los anillos colectores.
+(fig 2.117)
+Un simple generador dc es esencialmente lo mismo salvo que los contactos con el
+bucle rotatorio estan hechos usando un anillo colector o conmutador. El 
+resultado es un corriente dc pulsante.
+(buscar dibujo ?)
+Un motor es esencialmente un generador operando a la inversa. En vez de generar 
+corriente girando un bucle, la corriente se le suministra por una bateria y la 
+fuerza de torsion actua en el bucle conducido por la corriente y hace que gire.
+
+Los siguientes circuitos muestran como es posible inducir corriente con una 
+bobina secundaria cambiando repentinamente el flujo de corriente en una bobina
+principal. Esto es esencialmente como funcionan los transformadores, aunque 
+estos suelen tener un nucleo ferromagnetico para incrementar el acoplamiento
+magnetico.
+(fig 2.118)
+
+2.24.3 Self-Inductance
+La auto induccion tipicamente involucra un bucle de cable que se auto inflinje
+una EMF inducida que es generada por la corriente cambiante que pasa a traves de
+el. De acuerdo la ley de Faraday de la induccion, el unico momento en que este
+bucle se puede autoinflingir es cuando el campo magnetico crece o disminuye en
+fuerza (como resultado de un corriente cambiante).
+Si se considera un circuito con un switch, un resistor y una fuente de voltaje,
+se puede predecir que al cerrar el switch la corriente va a fluir directamente 
+desde zero a V/R, de acuerdo a la ley de Ohm. Pero de acuerdo a la ley de 
+Faraday de la induccion electromagnetica esto no es completamente cierto. En su
+lugar, cuando se cierra el switch la corriente se incrementa rapidamente. Segun 
+va creciendo la corriente con el tiempo, el flujo magnetico en el bucle crece 
+rapidamente. Este incremento induce una EMF en el circuito que se opone al flujo
+de corriente, aumentando un retraso exponencial en el incremento de corriente. 
+Esta EMF se denomina EMF autoinducida.
+(fig 2.119 leer descripcion)
+En un circuito como este el voltaje inducido es despreciable. Es con 
+dispositivos como los inductores con los que se aprovecha esta propiedad.
+
+2.24.4 Inductors
+Los inductores son dispositivos que aprovechan los efectos de la induccion 
+electromagnetica. Una caracteristica comun es que tienen forma de bucle. Los 
+simbolos esquematicos son:
+(2.121)
+Los inductores con nucleo magnetico son capaces de generar una densidad de 
+campo magnetico mucho mayor que los inductores con nucleo de aire como resultado
+de la magnetizacion interna que ocurre dentro del material del nucleo debido a 
+al campo magnetico del cable que lo rodea. El material magnetico del nucleo 
+suele ser hierro, polvo de hierro o un material de oxido metalico (tambien 
+llamado ferrita).
+Los inductores con núcleo de aire varían desde un solo bucle de alambre 
+(utilizado en frecuencias ultraaltas), pasando por espirales en recubrimientos 
+de cobre de una placa de circuito impreso (utilizados en frecuencias muy altas), 
+hasta grandes bobinas de alambre aislado enrolladas sobre un soporte no 
+magnético. Para aplicaciones de radio, los inductores a menudo tienen núcleos de 
+aire para evitar pérdidas causadas por la histéresis magnética y las corrientes 
+parásitas (eddy currents) que ocurren en los inductores con núcleo magnético.
+Los inductores ajustables pueden fabricarse alterando la longitud de la bobina
+o, mas comunmente, insertando un nucleo magnetico en el centro de la bobina para 
+que al ajustar su posicion, cambie la permeabilidad relativa. A veces el nucleo
+ajustable esta hecho de un material conductor para que genere corrientes 
+parasitas y reduzca el campo magnetico.
+Un nucleo de ferrita (ferrite bead) tambien conocido como ferrite choke, es un 
+dispositivo parecido a un inductor de nucleo de ferrita invertido. A diferencia 
+de un inductor con nucleo, el nucleo de ferrita no requiere bobinas de cable. En
+su lugar se hace pasar un cable a traves del nucleo hueco, aumentando la 
+inductancia del cable. De todas formas, a diferencia de las bobinas que pueden
+alcanzar distintos niveles de inductancia dependiendo del numero de bucles, los
+nucleos de ferrita tienen un rango limitado donde pueden influenciar 
+inductancia, tipicamente limitado a radiofrecuencia. Los nucleos de ferrita 
+usualmente se colocan sobre cables que son notables emisores de RF. Los nucleos
+de ferrita absorben la RF del cable y convierten en calor en su interior. La 
+radiacion RF puede interferir con TV, radio o equipamiento de audio. Los nucleos
+de ferrita tambien pueden ser ubicados en cables que entran en equipos de 
+recepcion para prevenir que RF externo entre y contamine las señales en el tramo
+del cable.
+
+Inductor Basics
+Un inductor actua como una resistencia sensible a la corriente variable en el 
+tiempo. Solo resiste durante cambios en la corriente, y en cualquier otro caso 
+deja pasar la corriente como si fuera un cable. Cuando el voltaje aplicado se 
+incrementa, actua como un resistor dependiente del tiempo cuya resistencia es 
+mas grande durante momentos de incremento rapido de corriente. Por otro lado, 
+cuando el voltaje aplicado disminuye, el inductor actua como una fuente de 
+voltaje dependiente del tiempo, intentando mantener un flujo de corriente. La 
+capacidad maxima de suministro de corriente ocurre durante los periodos de 
+rapida disminucion de corriente.
+Cuando se aplica un voltaje creciente a un inductor, lo que provoca un aumento
+en el flujo de corriente, el inductor se opone a este incremento generando una 
+fuerza inversa sobre los electrones libres. Esto ocurre debido al aumento del 
+flujo magnetico que corta las espiras del solenoide. A esta EMF inducida se le 
+denomina back EMF. Como resultado el inductor ofrece una fuerte oposicion a un
+aumento repentino en el flujo de corriente, pero rapidamente deja de oponerse 
+cuando la corriente se estabiliza en un valor constante. 
+Cuando se aplica un voltaje decreciente a un inductor, lo que provoca una 
+disminucion en el flujo de corriente, el inductor se opone a esta reduccion
+generando una fuerza en la misma direccion del movimiento de los electrones. 
+Esto ocurre debido a la disminucion del flujo magnetico que corta las espiras
+del solenoide. Esta EMF inducida se denomina forward EMF. Como resultado, el 
+inductor actua como una fuente de voltaje durante la disminucion repentina del 
+flujo de corriente, pero este efecto desaparece rapidamente cuando la corriente
+se estabiliza a un valor constante.
+
+Ejemplo (en water analogy 2.126 nombrar con letras):
+¿Que sucedera cuando los switches se cierren en los siguientes circuitos? ¿Que 
+sucedera cuando se abran mas tarde? ¿Como influye la inductancia y capacitancia
+en su comportamiento?
+a. Cuando el switch se cierra en el circuito del inductor, la lampara se 
+iluminara rapidamente, pero luego 
+se atenuara. Esto se debe a que cuando el switch esta cerrado, el inductor tiene
+mucha impedancia pero la va perdiendoo hasta que la corriente se estabiliza (el
+campo magnetico deja de expandirse). Una vez constante, el campo magnetico actua
+como un corto y toda la corriente llega a la lampara.
+b. Cuando el switch se cierra en el circuito del capacitor, ocurre el efecto 
+contario: la lampara se iluminara lentamente hasta alcanzar su iluminacion 
+maxima. Esto se debe a que cuando el switch se cierra, el capacitor tiene 
+inicialmente poca impedancia al flujo de corriente hasta que se carga, donde su
+alcanza su impedancia maxima, recordando a un circuito abierto. Aqui toda la 
+corriente se deriva a la lampara. Una capacitancia mas grande incrementa el 
+tiempo que toma a la lampara alcanzar su brillo maximo.
+c. Cuando el switch se cierra en el circuito del resistor el flujo de electrones
+en el circuito es practicamente instantaneo. La lampara recibira 12V constantes
+y su iluminacion no cambiara con el tiempo.
+
+2.24.6 Inductor Equations
+La amplitud del voltaje inducido, ya sea inverso o directo, es proporcional a la 
+tasa de cambio de la corriente o a la tasa de cambio del flujo magnetico. 
+Cuantitativametne se puede expresar esta relacion con la siguiente ecuacion:
+(2.50)
+Si integramos y resolvemos para Il tenemos:
+(2.51)
+L es una constante que se denomina inductancia y depende de la forma de la 
+bobina, numero de bucles y material del nucleo. Una bobina tendra mas L si tiene 
+mas bucles o si su nucleo es magnetico. La unidad basica de la inductancia es el
+Henry abreviado H. Un henry equivale a un voltaje inducido de 1V cuando la 
+corriente esta variando a un ratio de 1A/s:
+(definicion de henry)
+Fabricar inductores es comun en electronica, a diferencia de los capacitores que 
+lo suelen fabricar principalmente los fabricantes.
+Valores tipicos para inductores comerciales van desde fraciones de nanohenrio
+hasta 50H. 
+La inductancia en un inductor esta definida por:
+(2.54)
+donde (micro) es la permeabilidad del material del nucleo, N es el numero de 
+bucles, A es el area de la seccion transversal de la bobina y l la longitud de 
+la bobina. Si se quiere duplicar la inductancia de una bobina, tipicamente se 
+hace que el numero de bucles sea (raiz de 2) el original.
+
+2.24.7 Energy Within an Inductor
+Un inductor ideal no disipa energia. En su lugar la almacena en el campo 
+magnetico y la devuelve al circuito cuando el campo colapsa. Esta energia 
+almacenada se obtiene usando la ley generalizada de la potencia P = IV, junto
+con la definicion de potencia P = dW/dt y la ecuacion de inductor V = L dI/dt:
+(2.55)
+
+2.24.8 Inductor Cores
+Los inductores pueden estar atados a un nucleo magnetico para aumentar su flujo
+magnetico. Para aumentar aun mas la inductancia, los nucleos magneticos suelen 
+tomar forma toroidal.
+La razon por la que un nucleo magnetico es tan influente tiene que ver con la 
+magnetizacion que ocurre dentro: cuando la corriente se envia a traves de la 
+bobina de cable un campo relativamente debil se forma en su centro. Este campo
+magnetico causa que los dipolos magneticos se reordenen con el material del 
+nucleo en una direccion comun. Cuanta mas corriente pase, mas dipolos se 
+realinearan. El propio nucleo esta generando ahora un campo magnetico como 
+resultado, que se suma al campo magnetico del cable para producir un campo 
+magnetico total.
+El ratio de la densidad de flujo magnetico producida por un material dado 
+comparada con la densidad de flujo producida por el aire es lo conocido como 
+permeabilidad relativa del material: (microR = micro/micro0). Ejemplos:
+(algunos ejemplos de la tabla 2.8)
+
+Problems with Magnetic Cores
+Cuando un material de nucleo es conductor, se produce un fenomeno conocido como 
+corrientes parasitas (eddy currents) que se incrementa cuando el campo magnetico
+aplicado esta cambiando. Por ejemplo en un inductor con nucleo de hierro, cuando
+la corriente pasa por la bobina exterior, el campo magnetico cambiante induce 
+una corriente circular dentro del nucleo. Esta corriente produce una perdida de
+potencia en forma de calor, que es mayor en materiales con poca resistividad.
+(131a)
+Para limitar estas corrientes, el nucleo conductor puede ser laminado junto con 
+laminas aislantes de barniz o goma laca. Los materiales de ferrita tienen mucha
+resistividad intriseca comparada con el acero, y por eso son utilizados en 
+aplicaciones de alta frecuencia. Los nucleos de hierro en polvo tambien ayudan 
+a evitar corrientes parasitas debido a su menor tamaño. Otro problema con el 
+hierro es que su permeabilidad no es constante sino que varia con la fuerza del
+flujo magnetico y la temperatura. De hecho, en un campo magnetico muy elevado
+el nucleo se saturara y la permeabilidad realtiva caera a un valor cercano a 1.
+Ademas de eso, el campo magnético en el hierro depende del historial pasado de 
+la corriente en el devanado. Esta propiedad de remanencia es esencial en un imán
+permanente, pero en un inductor da lugar a pérdidas adicionales, llamadas 
+pérdidas por histéresis. La histeresis se produce cuando se aplica un campo 
+magnetico a un material ferromagnetico y los dominios magneticos dentro del 
+material comienzan a alinearse con el campo. Sin embargo cuando se reduce el 
+campo, los dominios no regresan completamente a su estado inicial, lo que deja
+una magnetizacion residual. 
+Para evitar las perdidas de histeresis, es importante no saturar el inductor, 
+aplicandole corriente baja, usando un nucleo mas grande o con menor 
+permeabilidad, etc. Es posible que debido a las eddy current y las perdidas por
+histeresis que un inductor actue mas como un resistor.
+Comparacion de los nucleos de un inductor:
+Aire: permeabilidad relativa igual a 1. La inductancia es independiente de la 
+corriente porque el aire no satura. Limitado a valores de baja inductancia pero 
+puede operar a muy altas frecuencias.
+Hierro: permeabilidad 1000 veces mayor que el aire, pero la inductancia depende
+del flujo de corriente porque se satura. Principalmente usado en equipamiento de 
+alimentacion. Muy propenso a eddy currents (perdida de potencia) que se pueden
+reducir laminando el nucleo. Limitado a aplicaciones de alimentacion y 
+frecuencias de audio sobre 15.000 Hz
+Hierro en polvo: el hierro en polvo mezclado con material aislante reduce las 
+eddy currents. La permeabilidad es baja respecto a un nucleo de hierro. Los 
+inductores ajustables con nucleo de hierro en polvo son utiles en RF, incluso 
+hasta el rango de VHF. Los nucleos toroidales se consideran autoapantallados.
+Ferrita: compuestos de ferritas de niquel-zinc para rangos de permeabilidad mas
+bajos y de ferritas de manganeso-zinc para permeabilidades mas altas, estos 
+nucleos abarcan un rango de permeabilidad desde 20 hasta mas de 10.000. Se 
+utilizan en RF chokes y transformadores de banda ancha. Las ferritas se emplean
+con frecuencia ya que son inmunes a las eddy currents. 
+
+2.24.9 Understanding the Inductor Equations
+(ecuacion)
+En la ecuacion anterior, el termino (dIl/dt) indica el cambio en la corriente en 
+el tiempo. Si no hay cambio en la corriente, no existe caida de voltaje en el 
+inductor.
+Ejemplo: supon que la corriente que pasa por un inductor de 1H decrece de 0.60A
+hasta 0.20A durante 1 segundo. Encuentra el voltaje promedio en el inductor 
+durante ese periodo. Observa como se compara con el voltaje inducido promedio si 
+el periodo es de 100 ms, 10 ms y 1 ms.
+Respuesta: (respuesta ejemplo 11)
+En el ejemplo anterior observamos que cuando el voltaje inducido crece 
+considerablemente cuando el cambio en el flujo de corriente es mas abrupto. 
+Cuando el cambio es instantaneo, se predice un voltaje infinito, aunque esto no
+es cierto en un inductor no ideal ya que siempre va a haber resitencia y 
+capacitancia internas que suavizan el cambio instantaneo.
+(2.135d)
+En circuitos simples ignorar la resistencia interna puede causar problemas 
+conceptuales, pero en circuitos mas complejos (RL, RLC), la resistencia 
+presente en el circuito evita problemas matematicos. Para mayor precision, los 
+inductores suelen modelarse como un inductor ideal en serie con la resistencia
+interna Rdc. En aplicaciones de alta frecuencia, tambien se considera la 
+capacitancia entre espiras y las perdidas en el nucleo magnetico.   
+
+2.24.10 Energizing RL Circuit
+Cuando un resistor es colocado en serie con un inductor, controla el ratio al 
+que la energia es bombeada en el campo magnetico o inductor:
+(2.136)
+(ver que ecuaciones son importantes)
+El tiempo en segundos requerido para que la corriente alcance el 63.2% del valor
+maximo se llama time constant y es igual a L/R. Despues de cada intervalor de 
+tiempo igual a esta time constant, el circuito conduce un 63.2% adicional de la
+corriente restante. Al igual que en los capacitores, despues de 5 time constants
+se considera que la corriente alcanza el valor maximo.
+(2.137) 
+Incrementar la inductancia incrementa el tiempo requerido para alcanzar la 
+corriente maxima. 
+
+2.24.11 Deenergizing RL Circuit
+En un circuito RL con un switch, en el momento en que se abre el switch el campo
+magnetico colapsa rapidamente induciendo un voltaje que es normalmente mucho 
+mayor que el voltaje aplicado, dado que el voltaje inducido es proporcional al
+ratio de cambio del campo. El resultado comun de abir el switch en este circuito
+es que salte una chispa o se forme un arco en los contactos del switch cuando
+este se abre. Esta chispa puede ser evitada conectando un capacitor y 
+resistencia en serie entre los contactos. Esta combinacion RC se denomina 
+snubber network. Los transistores conectados a grandes cargas inductivas 
+requieren proteccion y normalmetne se suele utilizar un diodo en sentido 
+contrario a la corriente de la bobina.
+Si la descarga es eliminada derivandola a tierra, la corriente decaera siguiendo
+las siguientes formas de onda: 
+(2.138b)
+(ecuaciones ?)
+El circuito de desenergizacion RL tarda 5 time constants en desenergizarse por 
+completo.
+La inductancia, intencionadamente o no, puede tener influencia sobre las 
+señales, distorsionandolas segun se incrementa la inductancia. Con una fuente 
+de onda cuadrada de 0-5V a 1kHz constante, y una resistencia fija de 10(ohms),
+incrementamos la inductancia y observamos los cambios. Notese que el periodo es 
+de 1ms.
+(graficos a b c y d de 2.140)
+
+2.24.12 Voltage Spikes Due to Switching
+Los picos de voltaje inductivos son comunes en circuitos donde las cargas 
+inductivas se apagan o encienden con switches. Estos picos pueden causar daños 
+en el circuito. La siguiente figura muestra un diodo (un dispositivo que actua 
+como puerta de un solo sentido para el flujo de corriente) situado junto a la 
+bobina para proveer un camino de liberacion de presion en caso de que se 
+interrumpa el suministro de voltaje.
+(2.141 izquierda)
+
+2.24.13 Straight-Wire Inductance
+Cualquier conductor con un flujo de corriente tiene un campo magnetico asociado
+y por tanto una inductancia. La inductancia de un cable recto no magnetico en el
+espacio es:
+(2.56)
+donde L es la inductancia en (microH), a el radio del cable en pulgadas, b la 
+longitud del cable en pulgadas y ln el logaritmo natural.
+Ejemplo: encontrar la inductancia de un cable #18 (diametro = 0.0403in) que mide
+4 pulgadas de largo.
+Respuesta: (respuesta)
+
+Los skin effects cambian levemente en VHF (30-300 MHz) y superior. Segun la 
+frecuencia se acerca a infinito, la constante 0.75 se acerca a 1. La inductancia
+en un cable recto es pequeña y tipicamente se refiere como una inductancia 
+parasita. Se puede aplicar el concepto de reactancia a los inductores: en el 
+ejemplo anterior, a 10 MHz la inductancia de 0.106 (microH) provee 6.6(ohms) de
+reactancia, pero a 300MHz son 200 (ohms). Por eso cuando se diseña un circuito 
+para VHF y superior es importante mantener los terminales de los componentes lo
+mas cortos posibles.
+
+2.24.14 Mutual Inductance and Magnetic Coupling
+Cuando dos bobinas se ubican cerca con sus ejes alineados, la corriente aplicada
+en la primera crea un campo magnetico que se propaga a la segunda. Como 
+resultado el voltaje es inducido en la segunda bobina siempre que la fuerza del
+campo de la primera cambie. Se dice que estas bobinas estan acopladas 
+inductivamente. Cuanto mas cerca esten, mas grande la inductancia mutua. Si las
+espiras estan separadas o desalineadas del eje, la inductancia es muy baja.
+El ratio de inductancia mutua respecto al maximo posible se llama coeficiente de
+acoplamiento. En nucleos de aire puede llegar a 0.6 o 0.7 si una bobina esta 
+unida a la otra, pero mucho menos si estan separados. Es posible alcanzar el 
+coeficiente 1 si las bobinas estan atadas a un nucleo magnetico (como en los 
+transformadores). 
+
+2.24.15 Unwanted Coupling: Spikes, Lightning, and Other Pulses
+Aunque se diseñe el circuito con la suficiente seperacion o apantallamiento 
+entre cables, siempre es susceptible a interferencias externas al circuito que 
+pueden causar picos de voltaje no deseados tanto en ac como en dc. Estas 
+interferencias pueden provenir de rayos cercanos o lejanos, motores electricos,
+etc.
+
+2.24.16 Inductors in Series and Parallel
+Cuando los inductores se colocan en serie, la inductancia total es la suma de 
+las inductancias individuales. 
+(2.57)
+Se puede derivar la formula de los inductores en serie aplicando la ley de 
+Kirchhoff del voltaje y tomando la caida del voltaje en los inductores:
+(formula)
+Si los inductores estan colocados en paralelo la inductancia es:
+(2.58)
+Se puede derivar la formula aplicando la ley de Kirchhoff de la corriente 
+haciendo uso de que el voltaje es el mismo en todos los inductores:
+(formula)
+
+2.24.17 Alternating Current and Inductors
+Cuando se aplica voltaje alterno a un inductor, la corriente que fluye en el 
+inductor esta desfasada 90º respecto al voltaje. Esto es lo opuesto a los 
+capacitores en ac. La causa de esto es por el voltaje inverso generado por la 
+inductancia. La amplitud del voltaje inverso es proporcional al ratio al que 
+cambia la corriente. 
+(fig 2.146 con intervalos)
+En el intervalo DE el voltaje aplicado cambia de direccino y por tanto tambien 
+lo hace el voltaje inducido devolviendo la corriente al circuito segun colapsa
+el campo magnetico.
+
+2.24.18 Inductive Reactance
+La amplitud de la corriente alterna en un inductor es inversamente proporcional 
+a la frecuencia aplicada. Dado que el voltaje inverso es directamente 
+proporcional a la inductancia para una determinada tasa de cambio de corriente, 
+la corriente es inversamente proporcional a la inductancia para un voltaje y 
+frecuencia aplicados específicos. El efecto combinado de la inductancia y la 
+frecuencia se denomina reactancia inductiva y se mide en ohms. La formula es: 
+(2.59)
+La reactancia inductiva en forma angular (donde (omega) = (2pif)) es igual a:
+(formula)
+Como el fenomeno fisico que hace la resistencia (voltaje inverso inducido contra
+el voltaje) es diferente a un resistor (calor), se le da el nombre de reactancia
+inductiva. Cuando (omega) tiende a infinito, Xl tiende a infinito, y cuando 
+(omega) tiende a cero, Xl tiende a cero. En un inductor ideal la respuesta es 
+linear: aumentar la frecuencia aumenta la reactancia en proporcion, pero en un 
+inductor real existe resistencia parasita y capacitancia interna que hace que se
+comporte diferente: 
+(fig 2.147)
+La reactancia inductiva tiene una inversa llamada susceptancia inductiva dada 
+por la siguiente expresion: 
+(2.60)
+La susceptancia inductiva utiliza la unidad de siemens, abreviado S (S = 1/(ohm)
+Simplemente indica como de bien un inductor transmite la corriente en 
+contraposicion de como de mal lo hace, como implica la reactancia.
+
+2.24.19 Nonideal Inductor Model
+Un inductor real puede ser modelado por cuatro elementos pasivos ideales: un 
+inductor en serie (L), un resistor en serie Rdc, un capacitor paralelo Cp y un 
+resistor parelelo Rp. Rdc representa la resistencia dc o la caida de resistencia 
+medida cuando la corriente dc pasa por el inductor. Este valor lo suelen 
+proporcionar los fabricantes. Rp representa las perdidas del nucleo magnetico y
+se derivda de la frecuencia de auto-resonancia f0 (el punto en el que la 
+reactancia del inductor es cero). Puede ser calculada por el factor de calidad 
+Q. El resistor parelelo limita la autoresonancia simulada de llegar a infinito.
+Cp representa la capacitancia distribuida que existe entre las espiras. Esta 
+capacitancia distribuida resuena con la inductancia. Por debajo de la frecuencia
+de resonancia, la reactancia es inductiva y aumenta a medida que la frecuencia
+aumenta. Por encima de la resonancia, la reactancia es capacitiva y disminuye 
+con la frecuencia.
+(2.148)
+Los inductores estan sujetos a varios tipos de perdidas de energia: resistencia
+del cable, perdidas en el nucleo y skin effect. El cable del inductor debe 
+tener un tamaño adecuado ya que la corriente tiende a fluir por la superficie 
+del cable a medida que la frecuencia aumenta (skin effect). Si el nucleo del 
+inductor esta hecho de un material conductro, introducira perdidas adicionales 
+de energia.
+
+2.24.20 Quality Factor
+El factor de calidad Q en los capacitores suele ser elevado, siendo de 1200 o 
+superior en capacitores ceramicos de calidad. Los capacitores ceramicos trimmer
+pequeños pueden tener valores Q pequeños que no deben ser ignorados en ciertas
+aplicaciones. 
+El factor de calidad Q en los inductores es dado por (form) y raramente alcanza
+el valor de un capacitor en un circuito donde ambos trabajen juntos.
+
+Inductive Divider
+Los divisores inductivos pueden ser usado con señales ac de entrada. Un voltaje
+dc de entrada se dividira de acuerdo a las resistencia relativas de los dos 
+inductores usando el divisor de voltaje resistivo:
+(2.149)
+Notese que el voltaje de salida es independiente de la frecuencia de entrada. 
+Aun asi, si la reactancia de los inductores no es los suficientemente elevada a
+la frecuencia de operacion, caera mucha mas corriente en L2.
+
+2.24.21 Inductor Applications
+La principal funcion de los inductores es almacenar energia en forma de campo 
+magnetico. Son utilizados extensivamente en circuitos analogicos y procesamiento
+de señales, incluyendo recepcion de radio y radiodifusion. En conjunto con 
+capacitores y otros componentes pueden formar filtros electricos usados para 
+señales a frecuencia especificas. Se suelen usar inductores para aumentar o 
+disminuir voltaje ac. 
+
+2.25 Modeling Complex Circuits 
+Teoricamente, con los suficientes parametros, cualquier circuito complejo se
+puede modelar en terminos de ecuaciones. Las leyes de Kirchhoff funcionan
+siempre que el circuito consisto en elementos lieneales o no lineales. Los dispositivos
+lineales tienen respuestas que son proporcionales a la señal aplicada (por ejemplo
+duplicar el voltaje en un resistor duplica la corriente que pasa por el). Con un
+capacitor, duplicar la frecuencia del voltaje aplicado duplica la corriente a traves
+de el. Con un inductor, duplicar la frecuencia del voltaje aplicado divide a la 
+mitad la corriente en el. Se pueden aplicar las siguientes ecuaciones:
+(ecuaciones)
+Si un circuito solo contiene resistores, capacitores, inductores y una fuente dc
+o sinusoidal, se pueden aplicar las leyes de Kirchhoff para obtener el voltaje o
+corriente en el tiempo. Los circuitos lineales dc estan descritos por ecuaciones
+de algebra lineal, y los circuitos lineales dependientes del tiempo estan 
+descritos por ecuaciones lineales diferenciales. La dependencia del tiempo puede
+ser resultado de un fuente sinusoidal o una fuente dc que se enciende y apaga
+continuamente, tambien conocido como transient. Como ejemplo si tenemos el 
+siguiente circuito, se puede escribir con la ley de voltaje de Kirchhoff:
+(2.150)
+En este punto esta no es una ecuacion de uso practico. Matematicamente necesitamos
+simplificar para deshacernos de la integral, calculando la derivada respecto al
+tiempo: 
+(ecuacion)
+Ahora es una ecuacion homogenea diferencial de segundo orden. Para resolverla 
+hay que definir el punto en el que se enciende o apaga el switch.
+
+Ahora tomamos el mismo circuito RLC, pero removiendo el switch y la fuente dc, e
+insertando una fuente sinusoidal. La fuente se expresa matematicamente como (V0
+cos((omega)t)))
+(2.151)
+Esta expresion en una ecuacion diferencial no homogenea de segundo orden. Despues
+de que la solucion para la corriente es encontrada, se puede utilizar para 
+encontrar los voltajes en el resistor, capacitor e inductor. Aunque encontrar la
+solucion para la corriente no es facil porque requiere matematicas avanzadas.
+
+Las matematicas se complican mas cuando se utilizan fuentes no sinusoidales con 
+las ecuaciones de Kirchhoff. Existen algunos trucos en analisis electronico, pero
+en ocasiones es imposible evitar las matematicas complejas.
+
+2.26 Complex Numbers
+Aplicando algunos trucos se puede modelar y resolver circuitos sinusoidales 
+utilizando numeros complejos y las operaciones que ello conlleva, y asi evitar 
+las ecuaciones diferenciales en el proceso. 
+Un numero complejo consta de una parte real y una imaginaria:
+(2.153)
+a y b son numeros reales, e i=(raiz de -1) es una unidad imaginaria. Para evitar
+confundir la unidad imaginaria (i) con la corriente (I), se utiliza j en 
+electronica.
+Un numero complejo puede ser expresado graficamente en un plano complejo, con el 
+eje horizontal siendo el eje real, y el eje vertical el imaginario:
+(2.154 izda?) 
+Un numero complejo puede ser interpretado como un vector desde 0 hasta P teniendo
+una magnitud de longitud de:
+(2.61)
+esto hace un angulo relativo al eje real positivo de:
+(2.62)
+Para hacer un numero complejo mas util en analisis de circuitos se reemplaza a
+por r cos (theta) y b por r sin (theta). El numero complejo tiene ahora lo que 
+se denomina forma polar trigonometrica.
+(2.155)
+Hace un tiempo Euler se dio cuenta que el cos (theta) + la parte j sin (theta)
+de la forma trigonometrica del numero complejo esta relacionada con (ej0) por 
+la siguiente expresion:
+(2.63)
+Lo que significa que el numero complejo puede ser expresado de la siguiente forma:
+(2.64)
+Esto representa la forma exponencial polar de un numero complejo. Una version 
+abreviada de esta forma se puede escribir como:
+(2.65)
+Ahora tenemos cuatro formas de expresar un numero complejo:
+(formas)
+Cada una es util en una situacion diferente.
+(tabla 2.10 entera o solo shorthand?)
+Algunas relaciones utiles para tratar con numeros complejos son:
+(relaciones)
+(ejemplo?)
+En general, para suma y resta suele venir bien la forma rectangular, y para 
+multiplicacion y division la forma exponencial (abreviada)
+
+Notese que a veces se utiliza la siguiente expresion para representar numeros
+complejos:
+(2.66)
+donde |Z| es la magnitud de un numero complejo (o r), Re Z es la parte real del
+numero complejo, y Im Z es la parte imaginaria, mientras que arg(Z) (o fase 
+(theta)) representa el argumento de Z o el angulo de fase (theta). 
+
+2.27 Circuit with Sinusoidal Sources 
+2.27.1 Analyzing Sinusoidal Circuits with Complex Impedances
+Para hacer mas facil la resolucion de circuitos sinusoidales, se aplica una
+tecnica que comvierte los capacitores e inductores en una especie de resistores,
+de tal forma que el circuito se puede resolver como un circuito resistor,
+aplicando leyes y teoremas de circuitos dc. Para aplicarla, se hace uso del
+teorema de superposicion aplicado a las señales. Para obtener la corriente o 
+voltaje en un circuito no es necesario calcular su dependencia del tiempo porque
+siempre va a tener la forma (cos(omega t + theta)). En su  lugar, hay que calcular
+el vslor RMS y la fase y aplicar el teorema de superposicion. Para realizar las 
+operaciones que implica el teorema de superposicion es conveniente representar
+las amplitudes y fases como numeros complejos.
+Los numeros complejos tiene un comportamiento sinusoidal en el plano complejo. 
+Por ejemplo la forma trigonometrica (z1 = r1 cos ...) trazara un camino circular
+en el plano complejo donde (theta) va desde 0 a 360º. Para cambiar la amplitud
+se cambia el valor de r, y para cambiar la frecuencia se multiplica (theta) por
+algun numero. Para inducir un desfase relativo a otro patron de onda de la misma
+frecuencia, simplemente se suma algun numero a (theta). Si se reemplaza (theta)
+con (omega t)(donde omega = 2 pi f), r por V0, y se deja un hueco para un
+termino que se sume con (omega t) (un hueco para el desplazamiento de fase), se
+obtiene una expresion para la fuente de voltaje en terminos de numeros 
+complejos. Lo mismo deberia hacerse para las fuentes de corriente.
+
+Las corrientes y voltajes siempre son reales en la realidad y nos podriamos 
+preguntar porque se usan numeros complejos. La razon es porque de esta forma se
+mantiene un seguimiento de la fase. La parte compleja es como una parte oculta
+dentro de una maquina: su funcion no se muestra externamente, pero si afecta al 
+resultad externo: la parte real o la parte importante, por asi decirlo. 
+Al hacer la superposicion, siempre se va a
+obtener una cantidad real. Esto implica que al convertir el resultado complejo
+en forma polar-trigonometrica o polar-exponencial, se puede eliminar su parte
+imaginaria. Por ejemplo:
+V(t) = 5V + j 10V
+donde los voltajes son RMS. Podemos convertir esta expresion compleja en forma 
+exponencial:
+(conversion).
+Sea lo que sea que esté ocurriendo, ya sean efectos reactivos o resistivos, en 
+realidad hay 11.2 V RMS presentes. Si el resultado es un cálculo final, la fase 
+a menudo no es importante para fines prácticos, por lo que suele ignorarse.
+
+2.27.2 Sinusoidal Voltage Source in Complex Notation
+Comencemos por tomar la siguiente expresion de voltaje sinusoidal:
+(expr)
+y convertirla a forma polar-trigonometrica:
+(expr)
+El termino (term) es imaginario y no tiene significado fisico, asi que no afecta
+a la expresion de voltaje, aunque se necesita para el proceso de superposicion.
+Para facilitar los siguientes calculos, se converte la forma 
+polar-trigonometrica en la forma polar-exponencial usando la relacion de Euler
+(relacion)
+(2.67)
+En forma polar-exponencial abreviada sera:
+(2.68)
+Graficamente se puede representar este voltaje en el plano complejo con 
+frecuencia angular (omega). La longitud del vector representa el valor maximo de
+V, nombrado V0, mientras que la proyeccion del vector en el eje real representa
+la parte real, o el valor instantaneo de V, y la proyeccion en el eje imaginario
+representa la parte imaginaria de V.
+(2.159)
+Ahora que tenemos el voltaje en forma compleja, se puede conectar un resistor, 
+capacitor o inductor a la fuente y calcular la expresion compleja de la 
+corriente en cada componente. Para un resistor, se sustituye (cosa) en V en I = V/R. 
+Para un capacitor, se sustituye (cosa) en I = C dV/dt. Para un inductor, se
+sustituye (cosa) en I = 1/L (mas cosa).
+Comparando la diferencia de fase entre la corriente y el voltaje en cada componente
+observamos:
+Resistor: la corriente y el voltaje estan en fase.
+Capacitor: la corriente esta adelantada 90º respecto al voltaje. Por convencion,
+si el angulo de fase (griega) es positivo, la corriente esta adelantada, y si es
+negativo, esta atrasada.
+Inductor: la corriente esta atrasada 90º respecto al voltaje. 
+El fasor solo indica el valor instantaneo de la amplitud y la fase en un punto 
+determinada en el tiempo.
+Ahora viene el truco importante para hacer el analisis ac mas sencillo. Si 
+dividimos el voltaje de cada componente entre la corriente, tenemos: 
+(2.161)
+Se puede observar que el termino (term) se ha cancelado, dandonos la resistencia
+y reactancias en forma compleja. Notese que los resultados estan en funcion de 
+la frecuencia y no del tiempo, esto es parte del truco para evitar ecuaciones 
+diferenciales. Ahora podemos tratar los capacitores e inductores como resistores
+sensibles a la frecuencia en circuitos sinusoidales, que pueden ser tratados 
+como resistores normales en analisis de circuitos dc. Si los voltajes, corrientes,
+resistencias y reactancias estan expresados en forma compleja cuando analizamos
+un circuito, cuando se usen los teoremas antiguos, hay que tener en cuenta las
+operaciones con numeros complejos. Por ejemplo la ley de Ohm ahora es:
+(2.69)
+donde Z es la impedancia compleja que puede ser resistiva, inductiva, capacitiva
+o una mezcla de ellas.
+(2.162?)
+Como estamos tratando las impedancias complejas como resistores sensibles a la
+frecuencia, se usan las formulas de resistores cuando estan en serie o paralelo,
+asi como el divisor de voltaje y de corriente de resistores. Y lo que es mas
+importante, se pueden utilizar las ecuaciones de Kirchhoff para resolver 
+multiples nodos complejos.
+Ejemplo: (ejemplo 3) el siguiente circuito RL en serie tiene una fuente de 
+12-VAC (RMS) a 60Hz. L = 265 mH, R = 50 (ohms). Encontrar Is, Ir, Il, Vr y Vl,
+y la potencia aparente, la potencia real, la potencia reactiva y el factor de
+potencia.
+(2.167)
+Primero calculamosla reactancia del inductor
+(reactancia)
+Como el resistor y el inductor estan en serie, se suman los numeros complejos en
+forma rectangular:
+(suma)
+En forma polar el resultado es:
+(polar)
+Ahora se puede obtener la corriente usando la ley de Ohm ac:
+(term)
+El angulo negativo significa que la corriente esta atrasada respecto al voltaje.
+Como es un circuito en serie I = Ir = Il. El voltaje se obtiene usando la ley de
+Ohm ac  o el divisor de voltaje ac:
+(term)
+Notese que los calculos anteriores son para un instante de tiempo t = 0. Pero 
+esto es todo lo que necesitamos, porque conocemos las fases y los voltajes en
+esas fases, lo que nos permite relacionar la amplitud. Asi que para crear una
+imagen precisa de como el sistema se comporta a lo largo del tiempo, sustituimos
+el mas general (omega t) en la fuente de voltaje, y convertimos los valores RMS
+en valores reales multiplicando por 1.414. Obtenemos Vs = 17V (cosa) que no es
+un valor instantaneo si una descripcion matematica continua para todo el tiempo.
+Para hacer un grafico debemos convertir a la forma trigonometrica, ignorando la 
+parte imaginaria en el proceso: (cosa). Como solo nos importa la fase, podemos 
+expresar Vs en terminos de la funcion seno, (cosa) y hacer referencia a otros 
+voltajes y corrientes agregando su fase e incluyendo los valores pico como se
+muestra en las siguientes ecuaciones:
+(ecuaciones hasta el final)
+
+2.27.3 Odd Phenomena in Reactive Circuits
+En circuitos reactivos, la circulación de energía explica fenómenos que pueden 
+parecer extraños. En el ejemplo en el apartado anterior parece que la ley de 
+Kirchhoff no se cumple porque la suma aritmetica de los voltajes en el resistor
+y el inductor es:
+(suma)
+Esto es maas que los 12-VAC de la fuente de voltaje. El problema aqui es que no
+estamos teniendo en cuenta la fase. El resultado real cuando tenemos en cuenta
+la fase es:
+(res)
+Notese que el uso de "VAC", que representa el hecho de que los voltajes estan en 
+RMS no siempre se sigue. Algunas personas escriben V y asumen que todos los 
+voltajes son sinusoidales y estan dados en la forma RMS.
+En algunos casos en circuitos en serie, los voltajes entre los componentes 
+pueden exceder el valor de la 
+fuente porque la energia se almacena en el inductor y el capacitor devuelve la
+energia al circuito o viceversa. En un circuito paralelo, la corriente  en los 
+componentes puede superar la suministrada por la fuente por el campo colapsante
+del inductor o la descarga del capacitor. 
+
+2.28 Power in AC Circuits (Apparent Power, Real Power, Reactive Power)
+Para determinar que tipo de potencia se usa en un circuito complejo que contiene 
+resistores, inductores y capacitores, podemos comenzar por utilizar la ley 
+generalizada de la potencia P = IrmsVrms. Aunque por ahora reemplazamos P por VA
+y llamamos a VA potencia aparente: 
+(2.74)
+(referenciar o dibujar el 2.167)
+En este circuito, la potencia aparente es de 
+(potencia aparente)
+La potencia aparente no es diferente de la potencia calculada usando la ley 
+generalizada de la potencia. La razon de usar VA en vez de P es por convencion 
+para expresar que la potencia calculada no es puramente real y no esta 
+expresada en watts. La potencia aparente esta expresada en volt-amperes o VA. En
+esencia tiene en cuenta las perdidas de potencia resistiva y reactiva. Unicamente
+si un circuito es puramente resistivo la potencia aparente se expresa en watts. 
+La potencia real esta asociada con la perdida de calor por calentamiento en un 
+material ohmico, por lo que se define como:
+(2.75)
+En el circuito de ejemplo, la potencia real es:
+(potencia real)
+Notese que esta potencia siempre se mide en watts.
+La potencia reactiva viene dada en volt-amperes reactivos or VAR y se define 
+como: 
+(2.76)
+La potencia reactiva en el circuito de ejemplo es:
+(pot react)
+Se podria intentar sumar la potencia real con la potencia reactiva para obtener
+la potencia aparente, pero el resultado difiere. La razon es porque para potencia
+reactiva habria que tener en cuenta la fase:
+(4 operaciones)
+Añadiendo la potencia reactiva y la real ahora si da la potencia aparente:
+(operacion)
+Para evitar esos calculos se usa la siguiente relacion:
+(2.77)
+(2.169)
+Como se muestra en la figura anterior podemos usar el teorema de Pitagoras en el
+plano complejo sin preocuparnos de los angulos de fase. En el ejemplo:
+(operacion)
+2.28.1 Power Factor
+Otra forma de reprensentar la relacion entre la potencia aparente y la potencia
+reactiva es con el factor de potencia. El factor de potencia es la relacion entre
+la potencia consumida y la potencia aparente:
+(2.78)
+En el ejemplo:
+(.)
+El factor de potencia se suele expresar en porcentaje. Una definicion equivalente
+es:
+(2.79) 
+donde (phi) es el angulo de fase entre el voltaje y la corriente. En el ejemplo:
+(PF  )
+El factor de potencia en un circuito puramente resisitivo es 1, y en un
+circuito puramente reactivo es 0. Como el factor de potencia siempre es positivo,
+se debe decir si esta atrasado o adelantado para identificar la fase.
+El factor reactivo indica el porcentaje de potencia usado en reactancia:
+(2.80)
+En el ejemplo: 
+(RF)
+(ejemplos 6 y 7 ?)
+Ejemplo: el siguiente circuito LCR esta alimentado por una fuente de 1VAC (RMS)
+a 1000Hz. L = 25mH, C = 1(micro)F y R = 1(ohm). Encontrar la impedancia total Z,
+Vl, Vc, Vr e Is, y la potencia aparente, real, reactiva y el factor de potencia:
+(2.172)
+Primero encontramos las reactancias del inductor y capacitor:
+(xl y xc)
+Para encontrar la impedancia total, se toma L, C y R en serie:
+(z)
+En forma polar, el resultado es 2.33(ohm) /_ -64.5º. El hecho de que la fase sea
+-64.5º indica que la impedancia es mayormente capacitiva. 
+La corriente total: 
+(Is)
+Como es un circuito en serie Is = Il = Ic = Ir.
+El voltaje en cada componente:
+(Vl, Vc, Vr)
+Para convertir estos valores instantaneos en un set de funciones continuas, 
+convertimos de RMS a valores reales (x1.414), agregamos el termino (omega t) a 
+los angulos de fase y convertimos a forma trigonometrica. Despues eliminamos la
+parte imaginaria.
+(valores)
+Las diferentes potencias y el factor de potencia son:
+(calculos)
+Como puede notarse, los valores VAR del inductor y el capacitor son muy grandes.
+Cuando se trata con componentes de la vida real, los valores VAR se vuelven 
+importantes. Aunque los voltio-amperios no contribuyan a la perdida de potencia,
+esto no significa que no afecten a los componentes reactivos, que normalmente 
+tienen un limite de seguridad para evitar sobrecalentarse. 
+
+2.29 Thevenin’s Theorem in AC Form
+La forma revisada del teorema de Thevenin en ac se lee: cualquier red compleja
+de resistores, capacitores e inductores puede ser representada por una unica 
+fuente de potencia sinusoidal conectada a una unica impedancia equivalente.
+Ejemplo: Queremos encontrar la corriente en el resistor del siguiennte circuito:
+(2.175 circuito)
+Respuesta: primero se quita el resistor para tener los dos terminales de la caja
+negra. Despues se calcula el circuito abierto, o voltaje de Thevenin usando la
+ecuacion de divisor de voltaje ac. 
+Se calcula las reactancias: 
+(reactancias)
+Usando el divisor de voltaje:
+(vthev)
+Para encontrar Zthev, se puentea la fuente y se mide la impendacia del inductor
+y el capacitor en paralelo:
+(zthev)
+Ahora se vuelve a conectar la resistencia de carga al circuito equivalente de 
+Thevenin y se calcula la corriente:
+(Ztotal)
+(Ir)
+La corriente es de 3.28 mA y esta atrasada respecto al voltaje de la fuente en 
+24.3º.
+Para convertir las instanteneas en funciones reales respecto al tiempo, agregamos
+(omega t) en cada expresion de angulo de fase y convertimos de RMS a valores 
+reales.
+(2.175 al final)
+La potencia aparente, potencia real, potencia reactiva y factor de potencia son:
+(4 ecuaciones)
+
+2.30 Resonant Circuits
+Si se alimenta un circuito LC en serie a su frecuencia angular de resonancia
+(frec ang) o su frecuencia equivalente de resonancia (frec), la impedancia 
+efectiva en la red LC es cero, actuando como un corto. Esto significa que la 
+corriente de la fuente esta en su maximo valor. 
+(2.176)
+Ejemplo: para tener una idea de como funciona el circuito LC, obtenemos la 
+impedancia equivalente:
+(ztot)
+Notese que hemos obtenido el angulo de fase asumiendo que la arcotangente de 
+cualquier cosa dividida entre 0 es 90º.
+La corriente en la reactancia en serie es:
+(I)
+Sustituyendo los valores de L, C y (omega) tenemos: 
+(ztot y I)
+Notese que hemos alcanzado la frecuencia de resonancia:
+(f0)
+La impedancia se acerca a 0 mientras la corriente se acerca a infinito. Las
+reactancias inductiva y capacitiva en resonancia son iguales pero en la fase 
+opuesta. Se puede ver como que el voltaje en el inductor y el capacitor en 
+resonancia son iguales pero con la fase opuesta. Esto significa que el voltaje
+entre este par es 0, y por tanto la impedancia tambien es 0.
+La resonancia tambien ocurre en circuitos LC en paralelo. La frecuencia angular
+de resonancia es (frec) o su equivalente frecuencia de resonancia (f0). Esta es 
+la misma frecuencia de resonancia para el circuito LC en serie, pero el comportamiento
+del circuito es opuesto: la impedancia se acerca a infinito mientras la corriente
+se acerca a cero. En esencia actua como un circuito abierto. 
+Ejemplo:
+(2.177)
+Calculamos la reactancia en paralelo:
+(ztot)
+Notese que el angulo de fase se ha obtenido asumiendo que la arcotangente 
+negativa de algo sobre 0 es -90º.
+La corriente sobre la reactancia en paralelo es:
+(I)
+Sustituyendo los valores de L, C y (omega) tenemos: 
+(ztot y I)
+Las reactancias capacitiva e inductiva en resonancia son iguales pero en fase
+opuesta.
+(calculos xl y xc y f0 ?)
+Intuitivamente podemos imaginar que en resonancia, la impendancia y el voltaje
+sobre L son igual en magnitud pero opuestos en fase (direccion) con respecto a C.
+En otras palabras, en un momento dado, una corriente fluye hacia arriba a través 
+de L y hacia abajo a través de C. La corriente a través de L entra en la parte 
+superior de C, mientras que la corriente de C entra en la parte inferior del 
+inductor. En otro momento, las direcciones de las corrientes se invierten (la 
+energía se "rebota" en la otra dirección; L y C actúan como un par oscilador que 
+transfiere la misma cantidad de energía de un lado a otro, y la cantidad de 
+energía está determinada por los valores de L y C). Este flujo interno de 
+corriente alrededor de LC se conoce como corriente circulante. Desde este punto,
+la fuente no va a suministrar mas corriente. Esto sucede porque la fuente no 
+siente una diferencia de potencial a traves de ella. 
+Para la mayoría de los trabajos en electrónica, las fórmulas anteriores 
+permitirán calcular la frecuencia y los valores de los componentes dentro de los 
+límites de tolerancia de los mismos. Sin embargo, los circuitos resonantes 
+tienen otras propiedades importantes además de la frecuencia de resonancia. 
+Estas incluyen la impedancia, la caída de voltaje a través de los componentes en 
+circuitos resonantes en serie, las corrientes circulantes en circuitos 
+resonantes en paralelo y el ancho de banda. Estas propiedades determinan 
+factores como la selectividad de un circuito sintonizado y las especificaciones 
+de los componentes en circuitos que manejan una cantidad considerable de 
+potencia. Aunque el cálculo básico de la frecuencia de resonancia de un circuito 
+sintonizado ignora cualquier resistencia en el circuito, esta juega un papel 
+crucial en otras características del circuito.
+
+2.30.1 Resonance in RLC Circuits
+Los circuitos LC anteriores son ideales. En realidad hay una resistencia interna
+entre los componentes que lleva a una desviacion de los efectos de resonancia
+reales que observamos. En circuitos LC de resonancia la resistencia mas notable
+esta realcionada con perdidas en el indcutor en altas frecuencias (Rango HF). 
+Las perdidas resistivas en el capacitor son muy pequeñas y pueden ignorarse. 
+(2.178)
+(calculos ?)
+A diferencia del circuito ideal de resonancia LC en serie, cuando calculamos la
+corriente en la frecuencia de resonancia, no va hacia infinito, en su lugar va a
+2A. Esto es por la resistencia, que lo impide.
+La Q sin carga es la reactancia en resonancia dividida por la resistencia:
+(Qu)
+La reactancia del capacitor y del inductor en resonancia se cancelan, por lo que 
+la impedancia esta determinada unicamente por la resistencia. Aparte de la resonancia
+en cualquier direccion, la resistencia tiene un efecto insignificante en la 
+amplitud de corriente.
+Al observar la curva de corriente en el grafico se puede ver que tiene una forma
+puntiaguda. Cuando la reactancia del inductor o del capacitor es del mismo orden
+de magnitud que la resistencia, la corriente disminuye lentamente a medida que 
+nos alejamos de la frecuencia de resonancia en cualquier direccion. A una curva
+de este tipo se le dice que es ancha (broad). Por otro lado, cuando la reactancia
+del inductor o del capacitor es considerablemente mayor que la resistencia, la 
+corriente disminuye rapidamente al alejarse de la frecuencia de resonancia en 
+cualquier direccion. A una curva de este tipo se le dice que es estrecha (sharp).
+Un circuito resonante con una curva estrecha respondera mucha mas intensamente a la 
+frecuencia de resonancia que a frecuencias cercanas a esta. En cambio, un 
+circuito resonante con una curva ancha responderá casi igual de bien a un grupo 
+o banda de frecuencias centradas alrededor de la frecuencia de resonancia. Ambos
+tipos de circuito son utiles en diferentes situaciones.
+
+2.30.2 Q (Quality Factor) and Bandwidth
+la relación entre la reactancia o la energía almacenada y la resistencia o la 
+energía consumida es el factor de calidad Q. En un circuito RLC en serie, las perdidas 
+por resisitencia interna en el inductor dominan la energia consumida en altas 
+frecuencias. Esto significa que la Q del inductor determina en mayor medidad la 
+Q del circuito resonante. Como el valor de Q es independiente de cualquier carga 
+externa a la que se tenga que transmitir potencia, modificamos la Q del circuito
+llamandola unloaded Q o Qu.
+(2.179? solo izda?)
+En el circuito RLC de ejemplo, si dividimos la reactancia del inductor o el 
+capacitor (tienen la misma en resonancia) por la resistencia, obtenemos el Qu:
+(qus)
+Como se puede observar, si la resistencia se reduce, el Qu aumenta, dando lugar 
+a una curva de respuesta de corriente más afilada alrededor de la resonancia.
+
+2.30.3 Bandwidth (repasar con dibujo)
+(2.179 dcha)
+Una forma alternativa de expresar la nitidez (sharpness) de un circuito 
+resonante en serie es utilizando lo que se denomina ancho de banda. Para el 
+propósito de comparar circuitos sintonizados, el ancho de banda se define a 
+menudo como la diferencia de frecuencia entre las dos frecuencias en las que la 
+amplitud de la corriente disminuye a 0.707 o (raíz de 2) veces el valor máximo.
+Como la potencia consumida por la resistencia es porporconal al cuadrado de l a
+corriente, la potencia en esos puntos es la mitad de la potencia maxima en 
+resonancia, asumiendo que R es constante. 
+Para valores Q de 10 o mas, las curvas mostradas en la figura son apoximadamente
+simetricas. Con esta asumpcion, el ancho de banda(BW) puede ser calculado:
+(2.81)
+Donde BW y f estan en hertz
+
+2.30.4 Voltage Drop Across Components in RLC Resonant Circuit
+La caida de voltaje en el inductor y capacitor de un circuito resonante RLC 
+pueden ser calculado con la ley de Ohm, aunque estos voltajes volveran mucho mas
+grandes debido al campo magnetico y la energia almacenada devuelta al circuito.
+Esto es mas cierto para circuitos con valores de Q elevados. Por ejemplo el 
+circuito de ejemplo tiene las siguientes caidas de voltaje:
+(vc y vl)
+La amplitud real del voltaje cuado convertimos de RMS es 113V. Circuitos con un 
+Q alto como los que se pueden encontrar en acopladores de antenas, que manejan 
+una potencia significativa, pueden experimentar arcos por los altos voltajes 
+reactivos. Cuando el Qs es mayor de 10, la siguiente ecuacion da una aproximacion 
+del voltaje reactivo en resonancia: 
+(2.82)
+
+2.30.5 Capacitor Losses
+Notese que aunque las perdidas de un capacitor tienden a ser insignificantes
+comparadas con las de un inductor hasta 30 MHz en un circuito resonante en serie,
+estas perdidas pueden afectar a la Q del circuito en el rango VHF(30 a 300 MHz). 
+La resistencia interna de un capacitor suele representarse en paralelo en vez de 
+en serie, y debe ser convertida a su equivalente en serie antes de añadir la 
+resistencia del inductor. Esta resistencia en serie equivalente esta dada por:
+(2.83)
+donde Rp es la resistencia a fugas y Xc es la reactancia capacitiva. Este valor 
+es sumado a la resistencia interna del inductor y representa la R en un circuito
+resonante RLC.
+Como la resistencia de un inductor tiende a incrementarse con la frecuencia debido
+al skin effect, las perdidas combinadas del capacitor y el inductor pueden reducir
+seriamente el Q del circuito.
+
+2.30.6 Parallel-Resonant Circuits
+Aunque los circuitos resonantes en serie son comunes, la mayoria de circuitos
+resonantes son en paralelo. Como en los circuitos en serie, la resistencia 
+interna de la bobina es la principal causa de perdida resistiva, y por tanto se 
+pone en serie con el inductor. A diferencia de los circuitos resonantes en serie,
+cuya impedancia va hacia el minimo en la resonancia, en los circuitos resonantes en
+paralelo la impedancia va hacia el maximo. Por esta razon se suelen llamar circuitos
+de antiresonancia o rejector circuits (los circuitos RLC en serie se suelen 
+denonminar acceptor). 
+(2.180)
+Notese que en una frecuencia en particular, la impedancia va hacia el maximo, 
+mientras que la corriente total va hacia el minimo. De todas formas, este no es 
+el punto donde Xl = Xc (el punto conocido como la frecuencia de resonancia en un
+circuito LC paralelo o un circuito RLC en serie. La frecuencia de resonancia de
+un circuito RLC en paralelo es mas compleja y pruede ser expresada de tres formas. 
+Una aproximacion es: 
+(f0)
+La Q sin carga para este circuito, usando la reactancia de L es:
+(Qu)
+El tercer grafo muestra el factor de calidad y como es influenciado por el 
+tamaño de la resistencia en paralelo en la pata del inductor. La existencia de R
+cambia las condiciones de la resonancia. Por ejemplo, cuando las reactancias 
+inductiva y capacitiva sean iguales, las impedancias de las patas inductiva y 
+capacitiva no se cancelan. La corriente resultante no es el minimo real y no esta
+en fase con el voltaje. 
+(2.181)
+Ahora podemos alterar el valor del inductor un poco (manteniendo Q constante) y
+tenemos una nueva frecuencia dodne la corriente alcanza el verdadero minimo. 
+Asociamos la caída de corriente en esta nueva frecuencia con lo que se conoce 
+como la definición estándar de resonancia paralela en un circuito RLC. El punto 
+donde se alcanza el minimo de corriente se denomina punto de antiresonancia y no
+debe confundirse con la condicion Xl = Xc. Alterando la inductancia para alcanzar
+el minimo de corriente tiene un precio: la corriente se desfasa respecto al voltaje
+(ver linea B en la figura).
+Es posible alterar el diseño del circuito para dibujar algunos puntos de resonancia
+juntos, por ejemplo compensando la resistencia del inductor alterando la capacitancia. 
+La diferencia entre los puntos de resonancia tiende a reducirse y converger 
+dentro de un porcentaje de la frecuencia cuando el Q supera 10, en cuyo caso 
+pueden ignorarse para cálculos prácticos. Ajustar para obtener la corriente 
+mínima no introducirá un ángulo de fase lo suficientemente grande entre el 
+voltaje y la corriente como para causar problemas en el circuito. 
+Siempre que asumamos que Qs es mayor de 10, podemos usar un unico conjunto de 
+formulas para predecir el rendimiento del circuito. Lo que vamos a terminar 
+haciendo es quitar la resistencia en serie del inductor y sustituirla por una
+resistencia en paralelo equivalente a la resistencia en serie real del inductor,
+como se muestra a continuacion: 
+(2.182)
+Esta resistencia paralela equivalente es usualmente denominada dynamic resistance
+y es el inverso de la resistencia en serie: si su valor aumenta el otro disminuye.
+Esto significa que si la resistencia equivalente en paralelo se incrementa, tambien
+lo hara la Q del circuito. Se usa la siguiente formula para calcular la resistencia
+paralela equivalente:
+(2.84)
+Multiplicar Qu por la reactancia tambien nos da una resistencia paralela equivalente
+aproximada. En resonancia, asumiendo nuestra representacion equivalente, Xl = Xc, y
+Rp ahora define la impedancia del circuito paralelo resonante. Como las reactancias
+son iguales, el voltaje estan en fase con la corriente. En otras palabras, en 
+resonancia el circuito solo presenta una resistencia paralela. Se puede reescribir
+la ecuacion: 
+(2.85)
+En el ejemplo anterior, la impendancia del circuito en resonancia es 9510 (ohms).
+En frecuencias por debajo de la resonancia, la reactancia del inductor es mas 
+pequeña que la del capacitor y por tanto la corriente en el inductor sera mayor. 
+Esto indica que solo se cancela parte  de las dos corrientes reactivas y por tanto
+la corriente es mas grande que si estuviera la resistencia sola. Por encima de la
+resonancia, para lo contrario. 
+El ratio al que la impendancia se decrementa en resonancia es una funcion de Qu.
+Para el ancho de banda, se aplican las mismas ecuaciones que el circuito en serie:
+BW = f/Qu. 
+(tabla 2.11 ?)
+
+Note on Circulating Current
+Si consideramos el circuito resonante paralelo RLC, notamos una corriente circulante 
+en resonancia, que puede ser bastante grande en comparacion con la tension de la 
+fuente, pero ahora tambien existe una pequeña linea de corriente proporcionada 
+por la carga. Esta corriente es atribuida al hecho de que incluso aunque la
+impedancia de la red de resonancia sea alta, no es infinita por las perdidas 
+resistivas de la corriente circulando por el capacitor y el inductor. 
+Tomando el siguiente ejemplo y usando el circuito paralelo equivalente, asociamos 
+la linea de corriente total fluyendo a traves de la resistencia paralela al 
+inductor Rp. Como el inductor, capacitor, y resistor paralelo estan en paralelo,
+podemos determinar la corriente en cada uno.
+(2.183)
+(corrientes)
+La corriente es (Icir) = Ic = Il cuando el circuito esta en la frecuencia de 
+resonancia. Para circuitos resonantes en paralelo con una Q sin carga de 10 o 
+mas, la corriente circulante es aproximadamente:
+(2.86)
+Usando el ejemplo, si la linea de corriente total es 1mA, y Q es 30, la corriente
+circulante sera aproxidamente (30)(1mA) = 30mA  
+La corriente circulante en circuitos con alto Q puede alcanzar niveles que cause
+qu elos componentes se quemen y se pierda potencia. Por eso hay que comprobar que
+los componentes esten cualificados para aguantar las corrientes circulantes 
+anticipadas y no unicamente las corrientes de linea.
+Es posible usar circuitos resonantes tanto en serie como en paralelo para hacer
+el mismo trabajo en muchos circuitos. Asumiendo que ambos circuitos son resonantes
+en la misma frecuencia f y tienen el mismo Q: el circuito en serie tiene su 
+impedancia mas baja en la frecuencia de resonancia, permitiendo pasar solo esa
+frecuencia. El circuito paralelo tiene el efecto contrario, impide pasar la 
+frecuencia de resonancia. En teoria los efectos mostrados por ambos circuitos
+son el mismo, pero en diseño de circuitos real habria que tener otros aspectos 
+en cuenta para determinar cual es mejor una aplicacion particular.
+
+2.30.7 The Q of Loaded Circuits
+Aumentar el numero de vueltas en un inductor incrementa la reactancia
+a un ritmo mayor qu ela resistencia interna de la bobina. Los inductores utilizados
+en circuitos donde se requiere un Q elevado tienen grandes inductancias. 
+Cuando un circuito resonante se usa para suministrar energia a una carga, la 
+energia consumida dentro del circuito resonante suele ser insignificante en 
+comparacion con la consumida por la carga. Por ejemplo, en la siguiente figura
+se conecta una resistencia de carga paralela Rload al circuito de resonancia, del
+cual recibe potencia: 
+(2.185)
+Si la potencia disipada por la carga es al menos 10 veces mayor qu ela perdida de
+potencia en el inductor y capacitor, la impedancia paralela del circuito resonante
+sera muy alta comparada con la resistencia de la carga, y para todos los propositos
+practicos, la impedancia del circuito combinado es igual a la impedancia de carga.
+En estas circunstancias, la resistencia de carga reemplaza la impedancia del 
+circuito en el calculo del factor de calidad Q: 
+(2.87)
+La Q con carga de un circuito crece cuando la reactancia decrece. Cuando un 
+circuito es cargado con una resistencia baja, debe haber elementos de baja reactancia
+para tener un Q razonablemente alto. 
+A veces se agregan resistores de carga en paralelo con circuitos resonantes en 
+paralelo para disminuir el Q e incrementar el ancho de banda. 
+(ejemplo ?)
+
+2.31 Lecture on Decibels
+En ocasiones tenemos que comparar amplitudes o potencias relativas entre dos 
+señales. Por ejemplo un amplificador que tiene un voltaje de salida 10 veces 
+mayor que el de entrada, tiene un ratio de 10 llamado ganancia. Si fuera 10 veces
+menor el ratio seria de 0.10 y se llamaria atenuacion. 
+Al comparar variables con rangos de amplitud diferente se usan decibels. Un bel
+se define como el logaritmo de un ratio de potencia:
+(2.88)
+donde P0 es la potencia de referencia y P1 es la potencia que estamos comparando
+con la potencia de referencia. 
+En electronica es comun usar el decibel (dB), que equivale a 1/10 de bel.  
+Ejemplo: expresa la ganancia de un amplificador en terminos de decibelios, si 
+el amplificador toma una señal de 1W y la amplifica en una señal de 50W.
+Respuesta: 
+(calculo)
+El amplificador tienen una ganancia de 17 dB.
+
+Mientras la impedancia sea constante en un circuito, el voltaje e intensidad se
+pueden comparar en terminos de decibelios:
+(2.90)
+
+Hay algunos ratios de potencia que se deberian conocer y asociar a su correspondiente
+representacion en decibelios. Por ejemplo al doblar una potencia, el ratio de 
+potencia es 2 y en decibelios:
+(decibelios)
+Cuando la potencia es reducida a la mitad, el ratio es 0.5 y en decibelios:
+(decibelios)
+El signo negativo indica que la potencia se decrementa. Si la potencia se multiplica
+por 4, en decibelios: (3.01 dB + 3.01 dB = 6.02 dB) y si se divide en 4, en 
+decibelios: (-3.01 dB -3.01 dB = -6.02 dB) y asi sucesivamente.
+
+2.31.1 Alternative Decibel Representations
+Normalmente suele ser conveniente comparar un cierto nivel de potencia con una 
+referencia estandar. Un referencia comun de potencia es 1mW. El valor de decibel
+de una señal comparada con 1mW es conocido como dBm. Por ejemplo una antena con
+potencia de (2x10^-13 mW): 
+(calculo)
+Hay otras referencias usadas, dependiendo del circuito y los niveles de potencia
+utilizados. Si se usa 1W como referencia, se debe especificar dBW.  Siempre que 
+se use dB seguido de una letra, esa letra hace referencia a la unidad de 
+referencia usada. En acústica, dB SPL se usa para describir la presión de una 
+señal en términos de una presión de referencia de 20 µPa. El término decibel 
+también se utiliza en el contexto del sonido.
+
+2.32 Input and Output Impedance
+2.32.1 Input Impedance
+La impedancia de entrada Zin es la impedancia vista desde la entrada a un circuito
+o dispositivo. Nos da una idea de cuanta corriente puede ser utilizada por el
+dispositivo de entrada. En frecuencia bajas (menos de 1 kHz) los componentes 
+reactivos pueden tener menos influencia y se usa el termino resistencia de entrada.
+Los efectos de inductancia y capacitancia son mas significativos en frecuencias
+altas.
+(2.186 entrada)
+Cuando la impedancia de entrada es pequeña, el dispositivo de entrada tomara 
+mucha corrientea en una frecuencia especifica. Esto suele tener un efecto de caida 
+del voltaje de la fuente que alimenta la entrada del dispositivo. (Esto es 
+especialmente cierto si el circuito de excitacion tiene una impedancia de salida 
+alta). Un dispositivo con poca impedancia de entrada es un altavoz. 
+Cuando la impedancia de entrada es elevada, el dispositivo de entrada tomara 
+poca corriente en una frecuencia especifica y no causara una caida notable en el 
+voltaje de la fuente que alimenta la entrada. Un op amp es un dispositivo con mucha
+impedancia de entrada.
+Como norma general, en terminos de transmitir una señal, la impedancia de entrada
+del dispositivo deberia ser mayor que la de salida del circuito. La impendancia
+de entrada se calcula con:
+(formula)
+Ejemplos de calculo de impedancia de entrada: 
+(2.187)
+
+2.32.2 Output Impedance
+(dibujar en algun momento 2.186 salida)
+La impedancia de salida Zout se refiere a la impedancia mirando a la salida del
+dispositivo. La salida de cualquier circuito o dispositivo es igual a la 
+impedancia de salida Zout en serie con una fuente de voltaje ideal Vsource. Se 
+puede pensar en el circuito equivalente como un equivalente de Thevenin en el 
+cual debe estar claro que Vsource no es necesariamente la alimentacion real del 
+circuito, sino el voltaje equivalente de Thevenin. Al igual que la impendancia de
+entrada, la de salida puede ser dependiente de la frecuencia. El termino resistencia
+de salida se usa en casos donde la reactancia es muy pequeña o cuando la frecuencia
+de operacion es baja (menos de 1kHz). 
+Cuando la impendancia de salida en pequeña, el dispositivo de salida podra tomar
+mucha corriente sin una caida significante en el voltaje de entrada. Por ejemplo 
+una fuente de alimentacion dc de laboratorio puede ser vista como una fuente de 
+voltaje ideal con un resitencia interna pequeña, y puede suministrar una corriente
+considerable sin mucha caida en el voltaje de alimentacion. Una bateria tipicamente
+tiene mayor resitencia interna y sufre de mayores caidas de voltaje cuando la 
+corriente de salida aumenta. En general, una impedancia de salida pequeña se 
+considera algo bueno, porque indica que se pierde menos potencia. Por otra parte,
+cuando la impedancia de slaida es grande, poca corriente podra ser tomada por el 
+dispositivo de salida antes de que el voltaje caiga sustancialmente. Si una fuente
+con una impedancia de salida grande intenta alimentar una carga que tiene una 
+impendancia de entrada mucho mas pequeña, solo una pequeña porcion se sentira en 
+la carga. 
+Para una transferencia de señal eficiente se debe tener una impedancia de salida
+que sea al menos 1/10 de la impedancia de entrada de la carga a la que esta unida.
+
+En terminos de calculo, la impedancia de salida de un circuito es simplemente su
+resistencia equivalente de Thevenin Rthev. A veces se refiere a ella como impendancia
+de la fuente. En el circuito de ejemplo, encontramos la resistencia de Thevenin
+cortocircuitando la fuente, quitando la carga y calculando la impedancia entre
+los terminales de salida: 
+(2.188)
+
+2.33 Two-Port Networks and Filters
+2.33.1 Filters
+
+Low-Pass Filters
+Los siguientes circuitos actuan como filtro paso bajo (low-pass filter) 
+permitiendo pasar frecuencias bajas pero rechazando las altas:
+(2.189 circuitos(con funcion de transferencia vout) atenuacion)
+El capacitor produce un retraso. A muy baja frecuencia, el voltaje de salida y 
+el de entrada tienen fases similares. Cuando la frecuencia aumenta, la salida 
+empieza a retrasarse frente a la entrada. En el valor de corte, el voltaje de 
+salida esta retrasado 45º, y cuando la frecuencia va infinito, la fase alcanza
+90º.
+La siguiente figura muestra un filtro paso bajo RL que usa reactancia inductiva
+como elemento sensible a la frecuencia en vez de reactancia capacitiva: 
+(2.190 circuito atenuacion)
+Si se coloca una carga, la funcion de transferencia de voltaje queda asi:
+(2.192) 
+(donde R' = R || Rl) (gabriel: || indica que estan en paralelo)
+Esto es similar a la funcion de transferencia para el filtro RC sin terminar, pero
+con la resistencia R siendo sustituida por R'. Ademas:
+(omega  = )
+Como puede observarse, la carga reduce el filtro de ganancia y desplaza la 
+frecuencia de corte a una frecuencia mas alta (R = R||Rl < R).
+La impedancia de entrada y salida con una resistencia de carga son:
+(Zin, Zout y 2.193)
+Mientras Rl >> Zout o R >> Zout|max=R (condicion para un buen acoplamiento de
+voltaje), R ~ R y el filtro RC terminado se ve exactamente como un filtro sin 
+terminar. La ganancia es 1, el desplazamiento de la frecuencia desaparece y la 
+resistencia de entrada y salida son igual que antes. 
+
+Para encontrar la funcion de transferencia o atenuacion de un circuito RL sin 
+carga, buscamos Vout en funcion de Vin usando el divisor de voltaje:
+(3 op)
+La magnitud y fase son:
+(h y fase)
+Aqui (omega c) es lo que se denomina frecuencia angular de corte del circuito,
+relacionada con la frecuencia estandar de corte por (..). La frecuencia de corte
+representa la frecuencia a la que el voltaje de salida se atenua por un factor de
+1/raiz de 2, el equivalente a la mitad de potencia. 
+(fc formula)
+El valor de la impendacia de entrada depende de la frecuencia (omega). Para un 
+buen acoplamiento de voltaje, la impedancia de entrada del filtro deberia ser mucho 
+mayor que la impedancia de salida del escenario anterior. El valor minimo de Zin
+es importante, y su valor es minimo cuando la impedancia del inductor es cero ya
+que (omega) tiende a 0. 
+(zin)
+La impedancia de salida se obtiene haciendo un corto en la fuente y obteniendo 
+la impedancia equivalente en la salida:
+(zout)
+donde la resistencia de la fuente es ignorada. La impedancia de salida tambien
+depende de la frecuencia (omega). Para un buen acomplamiento de voltaje, la 
+impendacia de salida debe ser mucho menor que la de entrada del siguiente 
+escenario. El valor maximo de Zout alcanza su maximo cuando la impedancia del 
+inductor es infinita (omega -> infinito):
+(zoutmax)
+Cuando el filtro paso bajo es cerrado con una resistencia de carga Rl, la
+funcion de transferencia de voltaje cambia:
+(H)
+La impendancia de entrada:
+(Zin)
+La impedancia de salida:
+(Zout)
+El efecto de la carga desplaza la frecuencia de corte a un valor inferior. El 
+filtro de ganancia no es afectado. Para (Rl >> Zout o Rl >> Zout|max = R) (condicion
+para un buen acoplamiento de voltaje), el desplazamiento en la frecuencia de 
+corte desaparece y el filtro se ve como uno sin cerrar.
+
+High-Pass Filters
+(2.194)
+(H, H, |H|, arg)
+donde (tau) es la constante de tiempo y (omega c) es la frecuencia angular de 
+corte del circuito (wc = 2pifsubc). La frecuencia de corte representa la frecuencia a la que el 
+voltaje de salida es atenuado por un factor de 1/(raiz de 2), el equivalente a 
+la mitad de potencia. En el ejemplo:
+(fc)
+En terminos de fase, a muy poca frecuencia la salida adelanta a la entrada por 
+90º. Cuando la frecuencia se acerca a la frecuencia de corte, la salida adelanta
+45º. Cuando la frecuencia va a infinito, la fase alcanza 0, punto en el que 
+el capacitor actua como un corto. 
+La impendancia de entrada y de salida se obtienen como:
+(zin y zout)
+Con una resistencia de carga:
+(h)
+(wc)
+La carga desplaza la frecuencia de corte a una frecuencia mayor. Las impendacias
+con resistencia de carga son:
+(zin y zout)
+Mientras Rl >> Zout o Rl >> Zout|max=R (condicion para un buen acoplamiento de
+voltaje), R' ~ R y el filtro RC con carga se ve como uno sin carga. El desplazamiento
+desaparece y las resistencias de entrada y salida son igual que antes.
+
+RL High-Pass Filter
+(2.195)
+(H |H|, arg, fc)
+En terminos de fase, a muy baja frecuencia, la salida adelanta a la entrada por
+90º. Cuando la frecuencia aumenta hacia la frecuencia de corte, la salida adelanta
+por 45º. Cuando la frecuencia va a infinito, la fase alcanza 0, punto en el que 
+el inductor actua como un circuito abierto. 
+La impendacia de entrada y de salida son:
+(zin, zout)
+Cuando se cierra con una carga:
+(H, zin, zout)
+La carga tiene un efecto de disminucion de la ganancia y desplaza la frecuencia
+de corte a un valor inferior. Mientras Rl >> Zout o Rl >> Zout|max=R (condicion 
+para un buen acoplamiento de voltaje), R' ~ R y el filtro RC con carga se ve 
+como uno sin carga.
+
+Bandpass Filter
+El filtro paso banda RLC permite pasar un rango de frecuencias mientras rechaza
+o atenua el resto. 
+(2.196)
+(H)
+Al acoplar una resistencia de carga, debemos reemplazar R con Rt, que es la
+resistencia paralela de R y Rload:
+(Rt)
+Ahora la funcion de transferencia es:
+(H)
+en el ejemplo:
+(H)
+La frecuencia de resonancia Q, ancho de banda y frecuencias de corte superior e
+inferior estan dadas por:
+(multiples operaciones)
+
+Notch Filter
+El filtro suprime banda permite pasar un rango amplio de frecuencias mientras
+bloquea o atenua un rango pequeño de frecuencias.
+(2.197)
+(H)
+En el caso del circuito cerrado con una carga, la resistencia de carga es tan 
+grande que podemos asumir que consume una corriente insignificante, por lo que 
+no se incluye en la ecuacion: 
+(H)
+En el ejemplo:
+(H)
+La frecuencia de resonancia Q, ancho de banda, y frecuencias de corte superior e
+inferior estan dadas por:
+(operaciones)
+
+2.33.2 Attenuators
+A veces es deseable atenuar un voltaje sinusoidal en una cantidad independientemente
+de la frecuencia. Esto se puede conseguir con un divisor de voltaje, dado que la
+salida es independiente de la frecuencia.
+(2.198)
+En (a), Zout = Rs
+En (b), 
+Zin =  R1 + R2
+Zout = R2
+(H)
+En (c)
+Zin = Rl
+En (d)
+Zin = ...
+En (e)
+Zout = ...
+La impendancia de entrada en la carga sigue siendo Rl. Esta impendancia es 
+equivalente a la impedancia equivalente de Thevenin Zthev. Con los valores de
+f, si sustituimos Rl = 330 (ohm), obtenemos:
+Vl
+
+Compensated Attenuator
+En circuitos reales, siempre existe capacitancia parasita, y eventualmente la 
+frecuencia alcanzada hace que el divisor de voltaje se comporte como un filtro 
+pasa bajos o pasa altos. Este problema se puede disminuir usando un circuito 
+atenuador compensado:
+(2.199)
+A bajas frecuencias, el circuito se compora como un divisor resistivo, pero
+en altas frecuencias se comporta como un divisor de voltaje capacitivo. La 
+atenuacion es independiente de la frecuencia, provista por: 
+(2.91)
+
+2.34 Transient Circuits
+Las transiciones en los circuitos eliminan cualquier condicion de estado estable.
+Representan un cambio repentino en el voltaje producido por un agente externo como 
+un switch. Durante la transicion, los voltajes y corrientes en el circuito se 
+reajustan a un nuevo valor dc. La condicion final e inicial son un circuito dc,
+pero durante la transicion puede haber un comportamiento complejo. La existencia
+de reactancias en circuito hace que una transicion implique resolver
+ecuaciones diferenciales.
+Ejemplo:
+(2.200 1)
+(desglose)
+(2.200 2)
+(..)
+2.200 3)
+(..)
+
+Con ayuda de las leyes de Kirchhoff se pueden modelar circuitos transitorios con
+capacitores e inductores.
+(2.201)
+(2.202)
+(ejemplos 1 , 2 y 3?)
+(ejemplos 4, 5 y 6?)
+
+2.34.1 Series RLC Circuit ??
+(2.209)
+La solucion para la corriente es: 
+(2.93) (2.92)
+La solucion para la ecuacion anterior depende de si lo que hay bajo la raiz 
+cuadrada es positivo, cero o negativo:
+
+Case 1: Overdamped
+Para R^2 > 4L/C, la cantidad dentro de la raiz cuadrada es positiva.
+(2.210 grafica)
+
+Case 2: Critically Damped
+Para R^2 = 4L/C, la cantidad dentro de la raiz cuadrada es cero. Esto produce
+una indeterminacion en la ecuacion, por lo que se usa una aproximacion. 
+(2.211 grafica)
+
+Case 3: Underdamped
+Para R^2 < 4L/C, la cantidad dentro de la raiz cuadrada es negativa. La grafica
+es diferente de las otras al ser oscilatoria. 
+(2.212 grafica)
+AQUI
+2.35 Circuits with Periodic Nonsinusoidal Sources
+La mejor forma de representar matematicamente formas de ondas no sinusoidales
+evitando ecuaciones diferenciales y usando una aproximacion simple a las 
+impedancias complejas es expresando las ondas no sinusoidales como una superposicion
+de ondas sinoidales. Esto se puede hacer con las series de Fourier
+
+2.35.1 Fourier Series
+Una forma de onda puede ser representada como una serie de Fourier de senos y 
+cosenos:
+(2.98)
+donde (omega 0) es llamada frecuencia angular fundamental
+(2.99)
+2(omega 0) es la segunda armonica, y asi sucesivamente. Las constantes (asubn y
+bsubn) estan determinadas por:
+(2.100 y 2.101)
+El termino constante (asub0/2) es el valor promedio de V(t). El teorema de 
+superposicion permite analizar cualquier circuito lineal con fuentes periodicas
+considerando el comportamiento del circuito para cada componente sinoidal de la
+serie de Fourier.
+
+Usando la expresion de Euler podemos convertir la primera ecuacion en una expresion
+general para formas de onda periodicas:
+(2.102) (2.103?) (2.104?)
+
+Para formas de onda mas complicadas que la cuadrada, las integrales con mas dificiles,
+pero siguen siendo mas faciles de calcular que las ecuaciones diferenciales.
+
+2.36 Nonperiodic Sources
+Las corrientes y voltajes no periodicos pueden ser representados como una superposicion
+de ondas seno en las series de Fourier, pero en vez de ser una suma sobre un 
+conjunto discreto de frecuencias relacionadas armonicamente, las formas de onda 
+tienen un espectro continuo de frecuencias. La frecuencia angular fundamental, 
+que es (omega 0 = 2pi/T) para las series de fourier, alcanza cero cuando el 
+periodo tiende a infinito. 
+Analizar un circuito por este metodo implica primero convertir el dominio de la
+frecuencia calculando la transformada de Fourier de las fuentes:
+(2.106)
+despues usar la impedancia para determinar la transformada de Fourier de la
+incognita:
+(2.107)
+y finalmente volver al dominio del tiempo calculando la transformada inversa de
+Fourier de la incognita:
+(2.105)
+Realizar estas operaciones complejas suele ser mas facil que utilizar ecuaciones
+diferenciales.
+
+
+
+CHAPTER 4 - Semiconductors
+
+4.1 Semiconductor Technology
+4.1.1 What Is a Semiconductor?
+Los semiconductores son materiales que tienen una conductividad σ entre 10^-7 y
+10^3 mho/cm. Pueden ser estructuras de elemento puro, aleaciones o liquidos.
+
+Silicon
+El silicio es el material mas usado como semiconductor en electronica debido a
+sus propiedades y a que es el segudo material mas abundante en la corteza terrestre.
+Para que el material cambie de estado, actuando como conductor o aislante, se 
+debe aplicar una fuerza externa sobre el, como un voltaje aplicado. Una oblea de
+silicio actua mas bien como aislante. Para que pueda alterar su estado se debe
+transformar y combinar con otras obleas de silicio en un proceso conocido como 
+dopaje (doping).
+
+Doping
+Para que la oblea de silicio sea util para diseñar dispositivos semiconductores, 
+se debe dopar con otros materiales como boro y fosforo para alterar su conductividad
+electrica. Normalmente el silicio puro no tiene electrones libres, y los cuatro
+electrones de su capa de valencia estan fijos. El fosforo tiene 5 electrones en 
+su capa de valencia, por lo que al juntarse con el silicio, se forman 4 enlaces
+covalentes y el quinto electron del fosforo queda libre. Cuanto mas fosforo se
+agregue, mas flujo de electrones podra haber. El silicio dopado con fosforo se
+conoce como n-type silicon o negative-charge-carrier-type silicon.
+
+El boro contiene 3 electrones de valencia, por lo que al doparse en una oblea de
+silicio, deja un hueco. Este hueco se va desplazando cuando se aplica voltaje a
+la oblea dopada "conduciendo" una carga positiva. El silicio dopado con boro es
+conocido como p-type silicon o positive-charge-carrier-type silicon.
+
+Ambos tipos de silicio dopado conducen la electricidad. Uno con electrones libres
+y el otro con huecos.
+
+4.1.2 Applications of Silicon
+Los silicios de tipo-n y tipo-p se usan en conjunto para hacer canales de una 
+via para el flujo de corriente, que se abren y cierran con un voltaje o corriente
+externos aplicados. Al juntar semiconductores de tipo-n y tipo-p y aplicarles un
+voltaje, los electrones saltan del lado n al lado p, produciendo fotones. De forma
+contraria, al exponer a luz la union, se generan electrones en la union, produciendo
+una corriente.
+
+4.2 Diodes
+Un diodo es un dispositivo semiconductor con dos terminales que permite el paso
+de corriente en una unica direccion. Cuando el terminal anodo tiene carga mas 
+positiva que el catodo, se produce una polarizacion directa (forward biasing) y 
+la corriente puede fluir. Cuando el anodo tiene carga mas negativa que el catodo,
+se produce una polarizacion inversa (reversed biasing) y el diodo bloquea la corriente.
+(4.10)
+Los diodos se suelen usar en circuitos que convierten voltajes y corrientes ac en
+voltajes y corrientes dc. 
+
+4.2.1 How p-n Junction Diodes Work
+Un diodo de union p-n (diodo rectificador) esta formado por una union de silicio
+tipo-n y tipo-p. Cuando se aplica corriente en la direccion del lado p, los huecos
+del lado p se desplazan hacia el lado n y se conbinan con los electrones libres 
+del lado n. Asi los electrones que vienen de la fuente pueden fluir por el diodo.
+Cuando se aplica corriente en la direccion del lado n, los huecos del lado p y los
+electrones del lado n se desplazan a los bordes, dejando una zona vacia en el interior
+que no tiene conductores de carga, teniendo una propiedad aislante.
+(4.11) 
+Un diodo de una via necesita un voltaje minimo para activarse cuando esta en 
+polarizacion directa, que suele ser de 0.6V o mayor en diodos de silicio. Los
+diodos de germanio solo necesitan 0.2V o mas para activarse. Los diodos de silicio
+disipan el calor mucho mejor que los diodos de germanio.
+
+4.2.3 Kinds of Rectifiers/Diodes
+Los diodos para aplicaciones de alta potencia que consumen mucha corriente o 
+rectifican altos voltajes, se suelen denominar diodos rectificadores. Otros diodos
+como los de señal, conmutacion, de recuperacion rapida o de alta velocidad esta 
+diseñados para ofrecer una baja capacitancia interna. A altas velocidades, estos 
+diodos reducen las constantes de tiempo RC por lo que decrementan los desfases y
+bajan las perdidas de señal.
+Los diodos Schottky tienen una capacitancia de unión particularmente baja y una 
+conmutación más rápida (~10 ns) en comparación con los diodos de unión n-p de 
+silicio, debido a su interfaz especial de unión metal-semiconductor. Tambien tienen
+un umbral de voltaje menor (entre 0.15V y 0.4V). Estas caracteristicas permiten 
+detectar señales de bajo voltaje y alta frecuencia. Por esta razon los diodos 
+Schottky son populares en rectificadores de señales de bajo voltaje en circuitos
+RF, intercambio de señales en telecomunicaciones, convertidores dc/dc pequeños, 
+etc. 
+
+Los diodos de germanio se usan principalmente en deteccion de señales RF en logica
+de diseño de bajo nivel debido a su bajo umbral de activacion (0.2V). En muchas
+aplicaciones, un buen diodo Schottky puede sustituir a uno de germanio.
+
+Common Diode/Rectifier Packages ?
+
+4.2.4 Practical Considerations
+Las especificaciones importantes a la hora de elegir un diodo son: voltaje pico 
+inverso (PIV), capacidad de manejo de corriente directa (Io(max)), velocidad de
+respuesta (tR), corriente de fuga inversa (IR(max)), y Caída de tensión directa 
+máxima (VF(max)). Estas caracteristicas se pueden manipular durante el proceso de
+fabricacion para producir diodos de proposito especifico.
+Los diodos tienen varios encapsulados: de dos terminales, de alta potencia con
+disipadores de calor, SMT, conjuntos de diodos en forma IC, etc. 
+
+4.2.5 Diode/Rectifier Applications
+
+Voltage Dropper
+(4.15)
+Voltage Regulator
+(4.16)
+Reverse-Polarity Protection
+La inversion de la polaridad en un circuito portable puede ser fatal. El mejor 
+diseño es usar un bloqueo mecanico para evitar la instalacion inversa de las
+baterias. Aun asi hacer un contacto momentaneo puede dar problemas, especialmente
+en aplicaciones con mas de una bateria alcalina-AA, NiCad o NiMH. Para estos 
+sistemas se debe asegurar que el flujo de corriente inversa es suficientemente
+bajo para evitar dañar el circuito o la bateria. 
+(dibujos con cada explicacion en 4.17)
+Diodo en serie: el diodo bloquea la corriente inversa. El problema es que debe 
+manejar toda la carga de corriente, y ademas consume voltaje en polarizacion 
+directa. Los diodos Schottky son mejores en estos casos.
+Diodo en paralelo: esta estructura protege la carga, pero consume mucha corriente
+en polarizacion inversa. Es util con baterias alcalinas con una alta impedancia 
+de salida. Un uso es como proteccion en medidores, evitando que 
+la corriente inversa entre en el terminal negativo. 
+
+Transient Suppression with Fly-Back Diodes
+(3 circuitos)
+
+Diode Clamps
+Los diodos de sujeción (clamps) se usan para recortar niveles de señal, o desplazar
+una forma de onda ac arriba o abajo para crear una forma de onda dc pulsante. 
+
+En el recortador de onda ajustable, la salida maxima es recortada a un nivel 
+determinado por la resistencia del potenciometro. La idea es establecer el terminal
+negativo del diodo en 0.6V menos que el nivel de salida maximo deseado, para 
+compensar la caída de voltaje en directo del diodo. Eso es lo que se espera que 
+haga el potenciómetro. +V debe ser aproximadamente un voltio más alto que el 
+voltaje pico de entrada.
+(adjustable waveform clipper)
+El siguiente atuenuador ajustable tambien se puede usar poniendo un potenciometro
+en cada diodo para ajustar individualmente el recorte positivo y negativo.
+(adjustable attenuator)
+(Diode Voltage Clamp  (DC Restoration))
+(Diode Switch)
+(Half-Wave Rectifier)
+(Full-Wave Center-Tap Rectifier)
+(Full-Wave Bridge Rectifier)
+
+Voltage Multiplier Circuits
+(Half-Wave Voltage Doubler)
+Half-Wave Voltage Doubler: durante el primer ciclo negativo, DA conduce, cargando
+C1 hasta VIN (peak). Durante la mitad 
+negativa del ciclo DA bloquea y DB conduce, cargando C2. El voltaje entregado a 
+C2 es VIN (peak) mas el voltaje almacenado en C1, que es el mismo, asique suma
+2 VIN (peak). En el siguiente ciclo negativo, DB no conduce y C2 se descargara
+en la carga. Si no hay carga presente, los capacitores permanecen cargados. Cuando
+una carga se conecta a la salida, el voltaje en C2 cae durante el ciclo negativo
+y se recarga hasta 2 VIN (peak) durante el ciclo positivo.
+(Full-Wave Voltage Doubler)
+Full-Wave Voltage Doubler: durante el ciclo positivo DA conduce, cargando C1 a 
+V1(peak). Durante el ciclo negativo, DB conduce, cargando C2 a V1(peak). El 
+voltaje de salida es la suma de los dos capacitores: 2V1(peak), cuando no hay 
+carga. La capacitancia es C1 + C2 al estar en serie. R1 y R2 se usan para limitar
+la corriente en los rectificadores. 
+
+Pros and Cons of the Rectifier Circuits
+Al comparar los rectificadores de onda completa vemos que el center-tap tiene 
+la mitad de diodos que el bridge. Estos diodos requieriran el doble de ratio de
+voltaje inverso maximo. Los ratios de corriente para los diodos son identicos en
+ambos circuitos. El bridge hace mejor uso del transformador secundario porque se
+aprovecha su alimentacion durante los dos ciclos, mientras que el center-tap solo
+aprovecha el ciclo positivo.
+El rectificador bridge no es tan popular como el full-wave center-tap en aplicaciones
+de alta corriente y bajo voltaje porque los diodos consumen voltaje y por tanto 
+potencia.
+La configuracion half-wave raramente se usa en rectificacion a 60Hz, excepto para
+fuente de polarizacion (bias supplies). En cambio, se usa para fuentes de alimentacion
+conmutadas de alta frecuencia.
+
+(Voltage Triplier)
+(Voltage Quadrupler)
+
+Diode Logic Gates
+(AND Gate)(OR Gate)
+
+Battery Backup
+
+AM Detector ? 
+
+Schottky Diode Termination
+Una terminación con diodo Schottky consiste en una combinación de dos diodos en 
+serie, donde uno se conecta para limitar a VCC (o voltaje de alimentación) y el 
+otro a tierra. Los diodos al final de la línea de transmisión minimizan el 
+efecto de las reflexiones mediante una acción de “clamp” (limitación). El diodo 
+superior limita los voltajes que superan a VCC por encima del umbral de 
+conducción directa. Esta limitación reduce los sobresaltos (overshoots) causados 
+por las reflexiones. Para señales con flancos descendentes, un diodo de 
+limitación hacia tierra realiza una función de terminación similar
+
+Read-Only Memory (ROM)
+
+4.2.6 Zener Diodes
+Un diodo Zener actua como puerta de doble direccion para la corriente. En polarizacion
+directa permite pasar facilmente la corriente (0.6V) y en polarizacion inversa es
+mas dificil pasar (se requiere un voltaje igual al voltaje de ruptura del zener
+Vz). Los zener pueden tener un voltaje de ruptura entre 1.8 y 200 V y power 
+ratings desde 0.25 hasta 50W.
+
+Zener Voltage Regulator
+(fig 4.29)
+(buscar expliacion ?)
+
+4.2.7 Zener Diode Applications
+Split Supply from Single Transformer Winding (no entiendo)
+
+Waveform Modifier and Limiter
+
+Voltage Shifter
+
+Voltage Regulator Booster
+
+Overvoltage Protection ?
+
+Increasing Wattage Rating of Zener
+Este circuito aumenta efectivamente la potencia nominal (capacidad de manejo de 
+corriente) de un diodo Zener, permitiendo que un transistor de potencia se 
+encargue de la mayor parte de la corriente de regulación. El propio Zener solo 
+conduce una pequeña parte de la corriente total y genera un voltaje/corriente de 
+base (con la ayuda de una resistencia entre la base y tierra), que controla el 
+flujo de corriente del colector al emisor en función de cualquier variación en 
+la tensión de entrada o en la carga.
+
+4.2.8 Varactor Diodes (Variable Capacitance Diodes)
+Un varactor, varicap o diodo de capacitancia variable es un diodo cuya capacitancia
+de union puede ser alterada cuando se aplica voltaje inverso. Cuando el voltaje 
+inverso aplicado se incrementa, la anchura de la union se incrementa, lo que 
+decrementa su capacitancia. El rango de capacitancia varia entre unos pocos 
+picofaradios hasta mas de 100 pF, con un voltaje inverso que va desde unos pocos
+volts hasta cerca de 100 volts, dependiendo del dispositivo. 
+Los niveles de baja capacitancia se limitan a circuitos RF de alta frecuencia.
+Cuando se diseña con varactors, el voltaje de polarizacion inversa debe estar 
+absolutamente libre de ruido porque la minima variacion en el voltaje de 
+polarizacion cambiara la capacitancia. 
+Los varactor pueden venir en configuracion dual, con dos varactor unidos por el anodo. 
+De esta forma actua como capacitores en serie que cambian la capacitancia cuando
+el voltaje se aplica en el anodo comun.
+(FM Modulator ?)
+(Oscillator with Pot-Controlled Varactor Tuning ?)
+
+4.2.9 PIN Diodes
+Los diodos PIN son usados en RF y switches de microondas. Para señales de alta
+frecuencia, actuan como un resistor variable donde a alto voltaje dc, la resistencia
+es pequeña, y a poco voltaje inverso, la resistencia es muy grande. Se construyen
+con una capa de semiconductor intrínseco (no dopado) situado entre un material 
+altamente dopado p-type y n-type, creando una union PIN. 
+(RF Switching with PIN Diodes)
+
+4.2.10 Microwave Diodes (IMPATT, Gunn, Tunnel, etc.)
+Existen diodos especializados para frecuencias muy altas (microondas y ondas
+milimetricas) donde los diodos y transistores estandar son muy lentos en el 
+movimiento de portadores. 
+El diodo tunel aprovecha el efecto de tunelamiento cuántico a través de la 
+barrera PN, en lugar de la emisión térmica clásica. El diodo Gunn exhibe 
+resistencia negativa por cambios en la masa efectiva de los electrones al 
+avanzar, gracias a la compleja simetría de la banda de conducción. El diodo 
+IMPATT genera resistencia negativa al mover electrones a bandas de menor movilidad
+bajo polarizacion directa, reduciendo asi la corriente.
+
+Simbolos de la tabla 4.3 ?
+
+4.3 Transistors
+Los transistores son dispositivos semiconductores que actuan como switches o 
+controles de amplificacion. En un transistor, un pequeño voltaje o corriente en 
+un terminal hace que fluya mucha corriente entre los otros dos terminales. 
+
+4.3.1 Introduction to Transistors
+Los transistores pueden variar mucho en diseño y en la forma que se controlan. 
+Muchos transistores vienen con la caracteristica de control de corriente variable. 
+Algunos transistores se activan al recibir voltaje, y otros se apagan. Algunos 
+transistores requieren de voltaje y corriente para activarse, mientras que otros 
+solo requieren voltaje. Algunos transistores requieren voltaje positivo y otros
+negativo. 
+Las dos principales familias de transistores son los bipolares, que requieren una
+corriente de polarizacion, y los de efecto-campo (FETs), que solo requieren voltaje.
+Los FETs consumen poca corriente, y por tanto tienen una impedancia de entrada
+elevada. Mientras que los FETs no alteran demasiado la dinamica de corriente del
+circuito, los bipolares si lo hacen porque toman corriente de entrada y producen
+gran corriente al activarse. En general, los FETs suelen ser mas utilizados.
+
+TABLE 4.4 Overview of Transistors ?
+
+4.3.2 Bipolar Transistors
+Los transistores bipolares son dispositivos de tres terminales que actuan como 
+switches controlados electricamente o como controles de amplificacion. Vienen en
+dos configuraciones: npn, que usa poca corriente de entrada y voltaje positivo
+en su base para controlar una corriente colector-emisor mucho mayor, y pnp que 
+usa pequeña corriente de salida y voltaje negativo en su base para controlar una 
+corriente emisor-colector mucho mayor. 
+(fig 4.44)
+
+How Bipolar Transistors Work
+(los dos dibujos)
+
+Theory
+A continuacion se muestra la curva caracteristica de un transistor bipolar: 
+(fig 4.46 dibujos y grafica)
+La region de saturacion es la region de operacion donde fluye la maxima corriente de 
+colector y el transistor actua mas como un switch cerrado desde colector hasta 
+emisor. La cutoff region es la region de operacion donde el transistor actua 
+como un switch abierto. La region activa es la region a la derecha de la saturacion
+y encima de cutoff.
+
+The Formulas
+Reglas importantes:
+ - Regla 1: para un transistor npn, el voltaje del colector Vc debe ser mayor que
+el voltaje del emisor Ve por al menos unas decimas de voltio. De otra manera, la
+corriente no fluira en la union colector-emisor sin importar el voltaje aplciado 
+en la base. Para transistores pnp, el voltaje del emisor debe ser mayor que el del
+colector por una cantidad similar.
+ - Regla 2: para un transistor npn, hay una caida de voltaje desde la base al emisor 
+ de 0.6V. Para un transistor pnp hay un incremento de 0.6V desde la base al emisor. 
+ En terminos de operacion esto significa que el voltaje de la base del transistor
+ npn debe ser al menos 0.6V mayor que el voltaje del emisor, y para un transistor
+ pnp debe ser 0.6V menor que el voltaje del emisor.  
+
+La formula que define el comportamiento de un transistor bipolar mientras esta
+en la region activa es:
+(form)
+donde hFE (tambien conocido como (beta)) es la ganancia de corriente, que es unica
+para cada transistor y suele ser constante.
+Si se aplica la ley de conservacion de la corriente se obtiene la siguiente expresion:
+(Ie = Ic + Ib)
+(fig 4.47)
+El valor de Vc no puede ser determinado con formulas porque depende de la red 
+que haya conectada a el. 
+
+La transresistencia (..) representa una pequeña resistencia en la union del 
+emisor y esta determinada por la temperatura y el flujo de corriente del emisor. 
+Una aproximacion es: 
+(aprox)
+
+Basic Operation
+TRANSISTOR SWITCH (fig 4.52)
+(mirar algun ejemplo de los del libro (no entiendo la mayoria))
+
+Important Things to Know about Bipolar Transistors
+La ganancia de corriente (hfe) no es un buen parametro en el que fijarse, porque
+puede llegar a ser impredecible. Todos los transistores tienen ratios de corriente 
+y voltaje maximos y de disipacion de potencia que no deberian ser superados. Una
+forma de salvaguardarse contra (BVeb) es colocar un diodo desde el emisor a la 
+base. Asi se previene la conduccion emisor a base cuando el emisor es mas positivo 
+que la base. Para prevenir exceder BVcbo, se situa un diodo en serie con el colector
+que evita la conduccion colector-base cuando el voltaje de la base se vuelve 
+mucho mas grande que el del colector. Para evitar exceder BVceo, se ubica un diodo
+en paralelo con la carga, que conducira los picos que van al colector desde una
+carga inductiva. 
+(fig 4.62)
+
+Pinouts for Bipolar Transistors
+Los transistores bipolares vienen en distintos encapsulados (plástico, metal, 
+etc.), y sus patillas (base, emisor, colector) pueden variar según el modelo.   
+Si no hay diagrama de pines, se recurre a un catálogo de referencia 
+(“cross-reference”), pero en lotes a granel a menudo no hay etiqueta ni garantía 
+de polaridad.
+La solución más práctica es usar un multímetro digital con probador de 
+transistores: colocas el dispositivo en los zócalos correspondientes, pulsas un 
+botón y el equipo te indica si es NPN o PNP, el orden de pines y su ganancia hFE.
+
+Applications
+RELAY DRIVER (4.63)
+(hay otros ejemplos que no entiendo: mirar)
+TRANSISTOR LOGIC GATES (4.69)
+
+4.3.3 Junction Field-Effect Transistors
+Los transistores de efecto campo de union (Junction field-effect transistors o 
+JFET) son dispositivos semiconductores de tres patas que se usan como switches
+controlados electricamente, controladores de amplificacion y resistores controlados
+por voltaje. A diferencia de los bipolares, los JFET solo son controlados por 
+voltaje. Cuando hay diferencia de voltaje entre gate y source, el JFET se vuelve 
+mas resistivo. Por este motivo son conocidos como dispositivos de reduccion, a 
+diferencia de los bipolares, que amplifican (se vuelven menos resistivos cuando
+se aplica corriente/voltaje en su base).
+Los JFETs pueden venir en configuracion n-channel, donde un voltaje negativo en 
+su gate reduce el flujo de corriente desde drain a source, o p-channel, donde un
+voltaje positivo reduce el flujo de corriente desde source a drain.  
+(FIGURE 4.70)
+Una caracteristica importante de los JFET es que tienen un impedancia de entrada 
+extremadamente grande, por lo que consumen muy poca corriente de entrada. 
+
+How a JFET Works
+(4.71)
+
+Technical Stuff
+La siguiente curva muestra como la corriente del drenador Id es influenciada por
+el voltaje puerta-a-fuente Vgs y el voltaje drenador-a-fuente Vds. El grafico 
+para un JFET de canal p es similar, excepto que Id decrece cuando Vgs crece
+(4.73)
+Cuando Vg tiene el mismo voltaje que Vs (Vgs = 0), fluye la maxima corriente en
+el JFET. Esta corriente se llama Idss y es una constante que varia entre cada 
+JFET. 
+Cuando Vds es pequeña, la corriente del drenador Id varia linealmente con Vds. La
+region donde esto ocurre se denomina region ohmica o region lineal. En esta region
+el JFET se comporta como un resistor controlado por voltaje. 
+La zona del grafico donde las curvas se aplanan se denomina region activa, y aqui
+Id esta fuertemente influenciada por Vgs, y muy poco influenciada por Vds. 
+
+El valor de Vgs que hace que el JFET se apague (no fluya corriente al dispositivo)
+se llama cutoff voltage. 
+
+Hay un punto en el que Id se dispara y el JFET pierde la capacidad de resistir
+corriente. Este efecto se denomina drain-source breakdown y su voltaje se expresa
+como BVds.
+
+Useful Formulas
+(formulas del final ?)
+
+Sample Problems
+?
+
+Practical Considerations
+Los JFET vienen agrupados en las siguientes categorias: pequeña señal y switching, 
+que se usa para acoplar una fuente de alta impedancia a un aplificador, o para controlar
+voltaje; de alta frecuencia, que se usan para amplificar señales de alta frecuencia
+en el rango RF o como switches de alta frecuencia; y dual, que contienen dos JFET.
+
+Applications
+RELAY DRIVER
+AUDIO MIXER/AMPLIFIER ? 
+
+4.3.4 Metal Oxide Semiconductor Field-Effect Transistors
+En los transistores MOSFET (Metal oxide semiconductor FET) cuando se aplica un 
+voltaje pequeño en su gate, se altera la corriente entre el drain y el source. 
+A diferencia de los JFET, los MOSFET tienen una impedancia de entrada en gate mucho
+mayor lo que implica que practicamente no consumen corriente. Este incremento de 
+impedancia se consigue situando un aislante de oxido metalico entre el gate y el
+canal drain-source. El precio a pagar por este incremento de impedancia de entrada,
+que produce una muy baja capacitancia gate-to-channel, es que si se acumula electricidad
+estatica en el gate, la carga puede atravesar el gate y romper el MOSFET.
+
+Hay dos tipos de MOSFET: depletion-type, que normalmente estan encendidos (fluye 
+la maxima corriente drain-source) cuando Vgs = 0V, y cuando se aplica voltaje en su 
+gate, se apagan; y los enhancement-type que normalmente esta apagados cuando Vgs = 0V, y
+se encienden cuando se aplica voltaje en su gate. Ambos tipos pueden venir en 
+forma n-channel o p-channel: con n-channel hace falta voltaje positivo para 
+activarlo, y con p-channel hace falta voltaje negativo.
+(fig 4.87)
+Los MOSFET son el tipo de transistores mas populares debido a que consumen poca
+corriente, son faciles de fabricar y se pueden hacer muy pequeños. 
+
+How MOSFETs Work
+(4.88)
+
+Basic Operation
+(4.89)
+
+Theory
+(4.90 ?)
+(4.91 ?)
+
+Important Things to Know about MOSFETs
+Los MOSFET pueden venir con un cuarto terminal llamado body terminal, que forma 
+un diodo de union con el canal drain-source. Para que este terminal no conduzca 
+se conecta a un voltaje igual o mas negativo que source (n-channel) o igual o mas
+positivo que source (p-channel). Si el body no esta al mismo potencial que source
+se genera un desplazamiento en el voltaje umbral necesario para que el MOSFET 
+conduzca. El desplazamiento es proporcional a la raiz cuadrada de la diferencia de
+potencial entre body y source. Esto es importante cuando se necesita ajustar el
+punto de operacion del transistor o para compensar fugar, capacitancias o polaridades
+de señal.
+(4.96)
+
+Kinds of MOSFETs
+Los MOSFET de alta potencia vienen en contenedores de metal con disipador. Tambien
+ICs con MOSFET independientes dentro. Para escoger un MOSFET hay que fijarse en
+los voltajes de ruptura, Idmax, Rds(on)max, disipacion de potencia, velocidad de
+switching y proteccion electrostatica.
+
+Applications ?
+
+4.3.5 Insulated Gate Bipolar Transistors (IGBTs)
+Los IGBT tiene el terminal gate del MOSFET y los terminales colector y emisor del 
+bipolar. Este transistor se usa como switch con alta corriente/voltaje. Se controla
+como un MOSFET pero con las altas capacidades de corriente de un bipolar.
+(4.104)
+
+4.3.6 Unijunction Transistors
+El transistor unijuntura (UJT) es un dispositivo de tres terminales que actua
+exclusivamente como switch controlado electricamente. Cuando no existe diferencia
+de potencial entre el emisor y cualquiera de las dos bases, fluye poca corriente
+entre las bases, pero cuando se aplica voltaje positivo en el emisor, fluye mucha
+corriente desde el emisor que se combina con la corriente B2-a-B1. A diferencia de
+los otros transistores, cuando el terminal de control no tiene corriente, el UJT
+tiene como principal fuente de corriente la del emisor. 
+
+How UJTs Work
+4.106
+
+Technical Info
+4.107
+
+TYPICAL APPLICATION (RELAXATION OSCILLATOR)
+4.108 (explicar ?)
+
+4.4 Thyristors
+4.4.1 Introduction
+Los trisistores son dispositivos semiconductores de 2 a 4 terminales que se usan
+como switches. Un trisistor de tres terminales usa un pequeño voltaje/corriente 
+en un terminal para controlar una corriente mayor en sus otros dos terminales. 
+Un trisistor de dos terminales esta diseñado para conducir cuando un voltaje entre
+sus temianels alcance un nivel especifico, en vez de tener un terminal de control.
+A diferencia de los transistores, los trisistores no tienen estados intermedios:
+estan apagados o encendidos.
+
+4.4.2 Silicon-Controlled Rectifiers
+Los SCR trisistores de tres terminales. Cuando se aplica voltaje/corriente positiva
+en su gate (G), se forma un canal conductor desde el anodo hasta el catodo.
+(4.114 mirar dibujos en la tabla anterior tambien)
+Despues de que el SCR comienza a conducir, no tiene ningun efecto quitar la corriente 
+de gate. La unica forma de apagar el dispositivo es quitar la corriente anodo-catodo o
+invertir su polaridad.
+
+How SCRs Work
+4.115
+
+
+4.4.3 Silicon-Controlled Switches
+Un SCS está diseñado para situaciones que requieren mayor control y sensibilidad 
+previsibilidad de activacion. Tienen un tiempo de activacion menor que los SCR, 
+pero tambien tienen ratings mas bajos. El SCS se puede apagar cuando se
+aplica voltaje positivo en su extra anode gate, y se enciende cuando se aplica
+voltaje negativo.
+4.120
+Se suelen usar en practicamente todos los circuitos que necesiten un switch que
+se active con dos pulsos de control distintos.
+
+How an SCS Works
+4.121
+
+4.4.4 Triacs
+Los triacs estan diseñados para pasar corriente en dos direcciones, por lo que son
+utiles para ac. Para activar o desactivar el dispositivo se aplica o quita 
+voltaje/corriente de su gate
+4.122
+
+How a Triac Works
+4.123
+
+4.4.5 Four-Layer Diodes and Diacs
+Los diodos de cuatro capas y diacs se activan cuando un voltaje de ruptura se 
+alcanza entre sus terminales. Un diodo de cuatro capas es como un SCR sin terminal
+gate, y esta diseñado solo para dc. Un diac es como un transistor pnp sin terminal
+base, y esta diseñado solo para ac.
+4.129
+Estos dispositivos se utilizan para ayudar a los SCR y triacs a activarse correctamente.
+
+4.5 Transient Voltage Suppressors
+4.5.1 Lecture on Transients
+Los transitorios son picos de voltaje o corriente que varian en tamaño y duracion. 
+En algunos casos pueden ser periodicos. Pueden provenir de dentro o fuera del 
+circuito, siendo los internos los mas comunes.
+Las cargas inductivas, al conmutar vuelcan su energia en el 
+circuito, produciendo picos de voltaje. La conmutacion en circuitos TTL y CMOS
+produce picos de corriente.
+El arqueo es otro generador de transitorios que proviene de diversas fuentes, 
+como contactos defectuosos en interruptores automáticos, conmutadores y 
+conectores, donde los arcos saltan entre los huecos.
+Los transitorios tambien pueden salir de un circuito y atacar a circuitos cercanos
+o lineas electricas a las que esten conectadas. Normalmente suelen ser consumidos
+por otras cargas paralelas.
+Las descargas electrostaticas (ESD) son otra fuente de transitorios externos.
+Los transitorios deben ser evitados, dado que producen un mal funcionamiento en 
+los dispositivos e incluso pueden llegar a fundir chips pequeños. 
+
+4.5.2 Devices Used to Suppress Transients
+(Lo siguiente es una tabla, hacer dibujos de cada cosa)
+- Bypass capacitor:
+    x Usado para aplicaciones de baja potencia
+    x Bajo coste, facil de aplicar, bipolar, rapido
+    x Supresision desigual, puede fallar imprediciblemente
+- Diodo Zener: 
+    x Desviacion/recorte en circuitos de baja energia a alta frecuencia
+    x Bajo coste, rapido, recorte de voltaje calibrado, bidireccional
+    x Se usa mas para regular que para transitorios
+- Transient voltage suppressor diodes (TVS):
+    x Desviacion/recorte en circuitos de bajo voltaje, baja energia y frecuencia
+    moderada.
+    x Rapidos, recorte de bajo voltaje calibrado, facil de usar
+    x Su alta capacitancia limita la frecuencia, poca energia, caros
+- Metal oxide varistors (MOVs)
+    x Desviacion/recorte es la mayoria de circuitos a poca o moderada frecuencia
+    en todos los niveles de voltaje y corriente
+    x bajo costo, rapidos, recorte de voltaje calibrado, bidireccional
+    x moderada a alta capacitancia que limita el rendimiento en alta frecuencia
+- Multilayer varistor (MLTV) 
+    x Desviacion/recorte en bajo voltaje(3-70V) en frecuencias moderadas
+    x rapidos, compactos, bajo voltaje calibrado bidireccional
+    x caros, limitados en alta frecuencia
+- Surgectors
+    x Desviacion para circuitos de energia y frecuencia moderada-alta
+    x alta velocidad, recorte de voltaje afilado
+    x cuesta mas que otros metodos
+- Avalanche diode
+    x Bajo voltaje y proteccion en logica de alta velocidad
+    x muy rapido, poca capacitancia
+    x baja capacidad de sobretension
+- Gas discharge and spark gap TVS
+    x Desviacion para aplicacion de muy alto voltaje/energia
+    x Muy poca fuga de corriente
+    x Mas caro, tiempo de respuesta bajo
+- PolySwitches
+    x Proteccion de sobrecorriente para altavoces, motores, fuentes, etc.
+    x Bajo coste, facil de usar
+    x Requiere un tiempo de enfriamiento para resetearse
+    
+    
+4.6 Integrated Circuits
+Un circuito integrado es un circuito miniaturizado que contiene resistores, 
+capacitores, diodo y transistores en un solo chip de silicio. El truco para 
+contener todo en un paquete tan pequeño es fabricar los componentes a partir de 
+diminutas estructuras de silicio tipo n y tipo p que se incrustan en el chip de 
+silicio durante la fase de produccion. Para conectar los componentes entre si, se
+aplica un recubrimiento de aluminio sobre la superficie del chip
+4.137
+Los IC vienen en diferentes formas:
+    - ICs analogicos (o lineales) producen, amplifican o responde a variaciones 
+    de voltaje. Ej: reguladores de voltaje, timers, osciladores, etc.
+    - ICs digitales (o logicos) producen señales con estados de alto o bajo
+    voltaje. Ej: puertas logicas, microcontroladores, memorias, etc.
+    - ICs analogico-digitales comparten caracteristicas de ambos. Por ejemplo un IC
+    que tenga entrada digital pero produzca salida lineal.
+
+? 4.6.1 IC Packages  
+? tabla
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+C4 semiconductors (2 paginas) (ok)
+C7 hands-on electronics (1 pagina) (interesante pero no necesario)
+C10 Oscillators and Timers (corto) (ok)
+C12 Digital Electronics (2 paginas muy largo) (ok)
+C13 Microcontrollers (1 pagina largo) (ok?)
+C14 Programmable Logic (1 pagina) (fpgas)
+C16 Audio Electronics (corto)

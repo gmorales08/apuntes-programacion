@@ -1,0 +1,72 @@
+Las fuentes de alimentacion pueden ser lineales o conmutadas.
+Transforman de 230V/130V AC a xV DC
+
+*** FUENTE DE ALIMENTACION LINEAL
+Las antiguas son de este tipo. Son mas caras por el transformador. Ademas suelen
+pesar mas que las conmutadas tambien por el transformador, que tiene hierro.
+Tiene cuatro fases: 
+1. Transformador
+Transforma los voltios de entrada AC para sacar otro valor de voltaje AC con dos
+bobinas. En este caso el valor suele ser menor, por ejemplo 12AC o 15AC. Lo hace 
+a costa de subir la corriente (tiene la misma potencia antes y despues de 
+transformar).
+2. Rectificador
+El rectificador rectifica los valores negativos de la onda AC para convertirlos
+en positivos (onda completa) y asi solo tener corriente positiva. Se hace con 
+diodos (pueden estar en un integrado).
+3. Filtro
+Minimiza el rizado (ondulacion de la onda) con condensador(es), que hacen que
+la onda sea mas lineal. Puede ser un solo condensador, o varios en con 
+resistencias (filtro RC) o con bobinas (filtro PI). Este ultimo se puede 
+confundir con el transformador debido al tamaño de la bobina.
+4. Regulador
+Elimina por completo el rizado bajando el voltaje que le entrega el filtro. Si 
+por ejemplo el filtro entrega 8V con un poco de rizado, el regulador lo baja 
+Suelen estar en integrados de 3 patillas como los 78XX (XX es el numero de 
+voltios que entrega) o 79XX (para tension negativa).
+
+
+*** FUENTE DE ALIMENTACION CONMUTADAS
+La idea es hacer mas pequeño el transformador para que sean mas pequeñas,
+ligeras y baratas. Esto se consigue incrementando la frecuencia (a mayor 
+frecuencia, el transformador puede ser mas pequeño para la misma potencia).
+Son mas eficientes porque solo entregan la potencia que se requiere en cada
+momento. La desventaja es que son mas complejas y producen picos de tension.
+Tiene cinco fases:
+1. Rectificador
+Como el transformador esta mas adelante, el recticador trabaja con el voltaje de
+entrada, por lo que saca 300V DC ondeantes (para entrada de 230V).
+Aqui pasa de AC a DC.
+2. Filtro
+Como el rectificador sigue teniendo alto voltaje, los condensador(es) del filtro
+estan cargados a alto voltaje tambien.
+Aqui sigue en DC.
+3. Interruptor
+Es un transistor (normalmente MOSFET) que chopea la corriente a cierta 
+frecuencia, produciendo una onda AC cuadrada de alta frecuencia, lo que permite
+que el transformador posterior pueda ser mas pequeño y barato.
+Hay un chip conectado a la salida y al interruptor, que controla el tiempo de
+chopeo segun la demanda de la carga, entregando ondas con mayor o menor amplitud
+segun la necesidad de la carga (a la misma frecuencia).
+4. Transformador
+Transforma los ~300V AC cuadrados que le entrega el interruptor a un valor 
+menor (tambien en AC y cuadrado).
+5. Filtro 
+Otro filtro para rectificar la onda y transformarla en DC.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

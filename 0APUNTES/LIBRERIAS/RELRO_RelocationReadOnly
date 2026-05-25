@@ -1,0 +1,41 @@
+Relocation Read-Only (RELRO)
+El hecho de que el got.plt sea escribible en tiempo de ejecucion es una 
+vulnerabilidad. Un atacante podria escribir en el got.plt para cambiar la 
+direccion de una funcion a una que ponga el, y asi al llamar a una funcion del 
+binario (por ejemplo printf) se estaria llamando a la funcion del atacante. El 
+got.plt es escribible porque es la tabla para resolver de forma lazy los 
+simbolos externos. La got es de solo lectura porque contiene los simbolos 
+resueltos en linking time. Para minimizar el riesgo, existen los modos RELRO que
+se pueden activar al compilar el binario:
+* Partial RELRO: es la opcion por defecto de gcc. Esta opcion coloca la seccion 
+got.plt antes de la seccion bss, para evitar ataques por buffer overflow que 
+sobreescriban el got.plt. Esta opcion mantiene la resolucion de simbolos lazy, 
+resolviendose en tiempo de ejecucion cuando se necesitan, y si no se usan 
+durante la ejecucion, no se resuelven, por lo que ofrece menor tiempo de carga.
+Para compilar un binario con partial RELRO se deben usar los flags: 
+$ gcc -Wl,-z,relro codigo.c
+* Full RELRO: hace que la got.plt sea de solo lectura, lo que evita los ataques.
+Esta opcion fuerza a que todos los simbolos se resuelvan en tiempo de carga, 
+para poder dejar la tabla como solo lectura, pero esto incrementa mucho el 
+tiempo de carga. Para compilar con full RELRO se deben usar los flags:
+$ gcc -Wl,-z,relro,-z,now codigo.c
+
+Motivos para utilizar got y plt + got.plt en lugar de poner directamente las 
+direcciones en la llamada a los simbolos: 
+1. Seguridad de memoria: si se tuviera que sobreescribir la seccion de codigo 
+del programa (.text) se tendria que hacer escribible, lo que es contradictorio 
+con una seccion .text. Ademas haria que la seccion .text no pudiera ser 
+compartida entre procesos, dando lugar a un gasto de memoria adicional.
+2. Comparticion entre procesos: varios procesos pueden compartir secciones got
+porque son data y solo lectura, lo que permite que sean compartidas. Esto 
+permite ahorrar memoria. 
+La desventaja de mantener separadas estas secciones es que hay que realizar 
+saltos indirectos que gastan ciclos de CPU, pero es un coste menor en 
+comparacion con la mejora en la seguridad de memoria de procesos.
+
+En la GOT se resuelven variables globales o estaticas externas, en tiempo de 
+carga, dado que no existe un mecanismo de acceso indirecto o lazy para este tipo
+de simbolos.
+En la GOT.PLT se resuelven funciones externas de forma lazy, en tiempo de 
+ejecucion.
+

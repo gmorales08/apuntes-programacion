@@ -1,0 +1,588 @@
+How To Write Shared Libraries
+
+Ulrich Drepper
+
+December 10, 2011
+
+******************
+*** 1. Preface ***
+******************
+
+*** 1.1 A Little Bit of History
+El formato binario usado inicialmente por Linux era una variantes del formato 
+a.out (assembler output). Una de las limitaciones de este formato es que no se 
+pueden hacer relocaciones en tiempo de carga ni de ejecucion. Las librerias 
+compartidas tienen que poder ser cargadas en tiempo de ejecucion en disco. Esto 
+obliga a que cada libreria debe tener una direccion de carga predefinida, sin 
+pisar el espacio de otras librerias. Como las aplicaciones que usan librerias 
+compartidas no pueden ser relincadas despues de cambiar la libreria que usan, 
+los simbolos de esa libreria no deben cambiar. Esto solo se puede conseguir si 
+los simbolos se mantienen separados del codigo real, porque si no el codigo 
+deberia tener una longitud fija. La solucion usada en Linux para esto es 
+mantener una tabla de function stubs que apuntan a las funciones reales. El 
+linker busca esa tabla de funciones en un fichero con extension .sa. La ventaja 
+de este esquema es que el programa se ejecuta muy rapido, ya que solo tiene que 
+ejecutar dos saltos absolutos (uno al stub y otro a la funcion), pero esto tiene 
+algunas desventajas: 
+-Se necesita una asignacion de direcciones centralizada
+-Puede haber colisiones
+-El espacio de direcciones se framenta mucho
+Por estas razones, Linux cambio a ELF como formato binario. ELF tiene una 
+especificacion general (gABI) con extensiones especificas para procesadores 
+(psABI).
+
+*** 1.2 The Move to ELF
+En ELF, la unica diferencia entre una aplicacion y una libreria es que la 
+libreria no tiene una direccion de carga fija, por lo que necesita de un linker 
+dinamico para ser ejecutable. Con PIE (Position Independent Executable) la 
+diferencia es incluso menor.
+LOS DSOs no solo se usan para ahorrar espacio, tambien se pueden usar para 
+estructurar los programas en diferentes partes, que luego se conectan con el 
+linker. Esto permite compilar cada parte solo cuando es modificada.
+
+*** 1.3 How is ELF Implemented?
+Para cargar una aplicacion linkada estaticamente, el kernel la carga en una 
+direccion fija en el proceso y transfiere el control al punto de entrada de la 
+aplicacion. 
+Para binarios linkados dinamicamente, un programa, el dynamic linker, debe 
+resolver los simbolos dinamicos del ejecutable cargando los DSOs que sean 
+necesarios, antes de pasar el control al programa.
+Es posible que un binario requiera resolver sus simbolos dinamicos de forma 
+lazy, despues de que el programa haya entrado en ejecucion, en el momento en que 
+necesite dicho simbolo. Esto lo resuelve tambien el dynamic linker en tiempo de 
+ejecución. Esto es opcional, y algunas optimizaciones del linker resuelven todos 
+los simbolos en tiempo de enlazado dinamico, incluso los lazy.
+
+*** 1.4 Startup: In the Kernel  
+La ejecucion de un programa comienza en el kernel, generalmente con la syscall 
+execve. El ejecutable se carga en el espacio de direcciones del proceso. Esto no 
+se realiza con un mmap del contenido del fichero. Los ficheros ELF tienen al 
+menos tres secciones diferentes: 
+- Codigo a ejecutar. Suele ser una seccion de solo lectura.
+- Datos modificables. Esta seccion no suele ser ejecutable.
+- Datos no usados en runtime.
+Para que el kernel pueda encontrar las diferentes secciones del binario, existe 
+un struct Elf32_Ehdr o Elf64_Ehdr que contiene metainformacion, y entre ella 
+e_phnum que indica el numero de Elf_Phdr, e_phentsize que indica el tamaño de un 
+Elf_Phdr, y e_phoff que indica la direccion del binario donde se encuentra la 
+primera Elf_Phdr. La Elf_Ehdr siempre va en el offset cero del binario. Un 
+Elf32_Phdr o Elf64_Phdr es una estructura que tiene informacion sobre una 
+seccion. En ella hay campos como p_offset y p_filesz que sirven para localizar 
+dicha seccion en el binario.
+El tamaño del fichero en disco puede ser menor que en memoria. Esto se debe a 
+como se gestionan las secciones BSS: segun el estandar de C las variables sin 
+inicializar se deben inicializar a cero. Cuando un programa tiene variables sin 
+inicializar, en lugar de guardar x ceros en el binario, no guarda nada, y en la 
+cabecera de la seccion BSS se marca la diferencia con el campo p_memsz (que sera 
+mayor que su p_filesz). Cuando el kernel crea el proceso para el ejecutable, 
+reserva la memsz necesaria para esas variables sin inicializar. Como el kernel 
+por seguridad pone los bits del proceso nuevo a cero, solo tendra que copiar las 
+variables inicializadas desde el disco al comienzo de la seccion de variables, y 
+el resto (que son ceros) se asignan a estas variables sin inicializar. La carga 
+de secciones en memoria se realiza con la interfaz mmap.
+Las diferentes secciones se identifican con el valor PT_LOAD en el campo p_type 
+en las cabeceras Elf_Phdr. Una vez cargadas todas los segmentos PT_LOAD y 
+reservada la memoria para los objetos dinamicos que no tienen direccion de 
+memoria fija, se crea el espacio de direcciones virtual para el binario. Despues 
+de esto se debe llamar al dynamic linker, que se debera cargar de la misma forma 
+que lo ha hecho el binario (mirando y cargando sus secciones). 
+El dynamic linker que se usara no esta definido por el kernel. El program header 
+de la aplicacion contiene una entrada con el tag PT_INTERP, cuyo campo p_offset 
+contiene el offset del string con nombre del binario que hace de dynamic linker. 
+El unico requisito es que el dynamic linker no tenga conflicto en su direccion 
+de carga con otro programa que lo utilice, y por tanto deberia poder ser cargado 
+en cualquier direccion (como un binario dinamico).  
+Una vez que el dynamic linker se mapea en la memoria del proceso, se debe 
+indicar cual es el punto de entrada de la aplicacion para que le transfiera el 
+control cuando termine el linking y el ejecutable este completo. Para ello, el 
+kernel pone en el stack una serie de pares tag-valor denominados auxiliary 
+vector (se pueden encontrar en el header elf.h con prefijo AT_), entre los que 
+se encuentra este valor. Despues de esto el kernel puede transferir el control 
+al dynamic linker en modo usuario. 
+
+*** 1.5 Startup in the Dynamic Linker
+La segunda fase del startup del programa ocurre en el dynamic linker, que se 
+encarga de: 
+- Determinar y localizar las dependencias
+- Relocar la aplicacion y todas sus dependencias
+- Inicializar la aplicacion y sus dependencias en el orden correcto
+La parte de relocacion es la mas costosa del proceso de linking.
+
+--- 1.5.1 The Relocation Process
+Relocar consiste en adaptar la aplicacion y sus dependencias en su espacio de 
+carga de direcciones y en el espacio global. Existen dos tipos de dependencias: 
+- Dependencias de localizaciones que estan en el mismo objeto. Estas no se 
+asocian con nigun simbolo ya que el linker las puede ubicar por su poisicion 
+relativa. Nota: las aplicaicones no tienen relocaciones relativas porque la 
+direccion de carga del codigo se conoce en link time, y por tanto el static 
+linker es capaz de realizar la relocacion.
+- Dependencias basadas en simbolos, donde generalmente la referenia esta en un 
+objeto diferente a la definicion.
+Para las relocalizaciones relativas, el linker estatico calcula las direcciones,
+y el linker dinamico suma esas direcciones a la direccion donde se ha cargado la
+aplicacion.
+Para las relocaciones basadas en simbolos, el proceso en ELF es mucho mas 
+complejo, dado que intenta solventar los posibles problemas, aunque esto agrega 
+un overhead en runtime.
+El resultado de las relocaciones sera guardado en algun lugar del objeto con la 
+referencia. Idealmente la localizacion objetivo es el data segment, porque 
+permite la escritura. Si en los DT_FLAGS se especifica DF_TEXTREL es posible que
+estas relocaciones se graben en el segmento de text, pero esto es un problema de
+rendimiento y seguridad, dado que es un segmento de solo lectura. 
+
+--- 1.5.2 Symbol Relocations
+La relocacion de simbolos se realiza para todos los simbolos que se necesitan en
+run time y no se han podido resolver en link time. En algunas arquitecturas se 
+puede posponer este proceso hasta que el binario necesite ese simbolo en 
+runtime. Esto suele suceder para muchas arquitecturas en las llamadas a 
+funciones. 
+Para forzar a que todos los simbolos se resuelvan durante la carga, se puede 
+usar la variable de entorno LD_BIND_NOW, o compilar el binario indicando al 
+linker el flag "-z now", para que configure el DT_FLAG DF_BIND_NOW. 
+El lookup de simbolos se repite desde cero por cada relocacion de simbolo en 
+cada objeto cargado.
+El lookup scope es un subset ordenado de los objetos cargados que puede ser 
+diferente para cada objeto. La forma en la que se computa este scope es muy 
+compleja y esta definida en la especificacion ELF. El tamaño de este scope es 
+directamente proporcional al numero de objetos cargados.
+Existen dos metodos para el proceso de lookup de un simbolo. El metodo 
+tradicional de ELF tiene los siguientes pasos: 
+1. Determinar el hash value del nombre del simbolo
+2. En el primer/siguiente objeto en el lookup scope: 
+2a. Determinar el hash bucket para el simbolo usando el hash value del simbolo y
+el tamañoo de la tabla en el objeto.
+2b. Obtener el offset del nombre del simbolo
+2c. Comparar el nombre del simbolo con el nombre de la relocacion.
+2d. Si coinciden, comparar el nombre de versiones tambien (si existen 
+versiones). 
+2e. Si la definicion no coincide, se intenta con el siguiente elemento en la 
+cadena para el hash bucket.
+2f. Si la cadena no contiene mas elementos, se procede con el siguiente objeto 
+en el lookup scope.
+3. Si no hay mas objetos en el lookup scope, el lookup ha fallado.
+
+Cuando un simbolo esta definido varias veces en el scope, se utiliza la primera 
+definicion encontrada. Cuando una definicion en un DSO es weak, no tiene efecto 
+aqui, solo en el linking estatico.
+El hecho de el linker se quede con la primera definicion del simbolo que 
+encuentre, da lugar a la interposicion de codigo, que puede ser util en algunos 
+casos (por ejemplo usando LD_PRELOAD), pero tambien puede ser perjudicial en 
+otros.
+
+El coste del lookup de un programa se puede mejorar cambiando alguno de sus 
+factores: 
+- Numero de simbolos exportados
+- Longitud de los string de los nombres de los simbolos (esto es especialmente 
+notable en nombres mangled como los de C++)
+- Numero y longitud de los prefijos comunes en los nombres de los simbolos
+- Numero de DSOs
+- Optimizacion del tamaño de la hash table (gcc intenta solventar esto)
+En general el tiempo que ocupan las relocaciones durante el startup suele ser de
+50-70% si el binario ya estaba en cache, y del 20-30% si se tiene que cargar 
+desde el disco.  
+
+--- 1.5.3 The GNU-style Hash Table
+Aunque se mejore el coste del lookup con los puntos mencionados en la seccion 
+anterior, sigue siendo un proceso muy costoso para el que el formato ELF no 
+propone ninguna alternativa. GNU ofrece un hash table diferente que puede 
+convivir con la antigua de ELF dado que usa su propia seccion dinamica: 
+DT_GNU_HASH. Esta nueva tabla, al igual que la antigua, esta autocontenida en 
+los objetos.
+Los factores que hacen mas lenta el formato antiguo de tabla hash son la 
+comparacion de nombres de simbolos, y que la lista de entradas de la tabla es 
+una lista enlazada (con peor rendimiento de cache que una contigua).
+El proceso de lookup en esta tabla es: 
+1. Determinar el hash value para el nombre del simbolo
+2. En el primer/siguiente objeto en el lookup scope: 
+2a. Se usa un fitro 2-bit Bloom para determinar si la entrada esta en la tabla.
+Si no esta, se pasa al siguiente objeto.
+2b. Se determina el hash bucket del simbolo.
+2c. Se obtiene la entrada y se comparan los hash values. Se ignora el bit 0.
+2d. Si coinciden, se obtiene el nombre del simbolo.
+2e. Se comparan el nombre del simbolo con el de la relocacion.
+2f. Se comparan las versiones del nombre de los simbolos.
+2g. Si la definicion no coincide y el valor cargado del hash bucket no tiene el 
+bit 0, se continua con la siguiente entrada en el array del hash bucket.
+2h. Si el bit 0 esta establecido no hay mas entradas en la cadena y se procede 
+con el siguiente objeto en el lookup scope.
+3. Si no hay mas objetos en el lookup scope, ha fallado el lookup.
+
+Unicamente el filtro Bloom reduce un 80% la comparaciones realizadas. Esto junto
+con otras caracteristicas como el uso de listas adyacentes o la reduccion de 
+entradas quitando los simbolos no usados, hacen que la hash table de GNU sea 
+mucho mas eficiente.
+Para usar la hash table de GNU se puede especificar a LD --hash-style=gnu, 
+aunque por defecto suele ser both, que incluye la antigua y la de GNU.
+
+--- 1.5.4 Lookup Scope
+Para cargar el lookup scope, primero se lee las DSOs de las que depende el 
+binario y se van agregando a la lista en orden. Luego se agregan recursivamente
+las dependencias de cada DSO.
+Si un ejecutable tiene el flag DF_SYMBOLIC (seccion 2.2.7) se carga primero en 
+el lookup scope global. Se carga primero el propio objeto, pero no sus 
+dependencias.
+Cuando un DSO se carga dinamicamente con dlopen, sus simbolos no se cargan en el
+global lookup scope y no se buscaran en lookups normales, sino que se cargan en
+un local lookup scope. Este comportamiento se puede cambiar con el flag 
+RTLD_GLOBAL de dlopen, aunque suele ser una mala idea. Al cargarse en el lookup
+scope local se evitan conflictos y relocaciones innecesarias en el scope global
+que afectarian a otros DSOs.
+
+--- 1.5.5 GOT and PLT
+(Para mas informacion sobre estas secciones de ELF, mirar los apuntes en 
+ASM/ELF/got_y_plt)
+
+--- 1.5.6 Running the Constructors
+Despues de la relocaciones en tiempo de carga, se pueden ejecutar constructores
+opcionalmente para los DSOs cargados. Para ello se puede utilizar el codigo del 
+DSO y de sus dependencias, por eso es importante cargar las dependencias del DSO
+antes que el propio DSO, si utiliza un constructor que use el codigo de sus 
+dependencias. Para asegurar este orden, el linker tiene que realizar un 
+ordenamiento topologico de coste O(n logn). Ademas, para los destructores, el 
+orden puede cambiar por lo que tiene que volver a realizar el ordenamiento en el
+shutdown.
+Para definir un constructor o destructor se puede usar el nombre _init o _fini, 
+aunque esto sea aceptado por GNU ld, no es estandar, dado que sobreescribe el 
+_init y el _fini del sistema. Es preferible utilizar los atributos del 
+compilador: 
+void
+__attribute ((constructor))
+init_function (void)
+{
+...
+}
+void
+__attribute ((destructor))
+fini_function (void)
+{
+...
+}
+
+*** 1.6 Summary of the Costs of ELF
+-Tamaño del codigo: cada DSO incluye un overhead de data y codigo, por lo que 
+menos DSOs implica menor text.
+-Numero de objetos: el tener un numero menor de objetos ofrece multiples 
+beneficios: 
+ .Se cargan menos objetos en runtime, lo que implica menos syscalls (En GNU ld, 
+cargar un DSO implica al menos 8 syscalls).
+ .La aplicacion y sus dependencias deben grabar los nombres de las dependencias
+ .El lookup scope crece
+ .Mas objetos implica mas tablas de simbolos, lo que supone mayor duplicacion
+ .Se complica el ordenamiento de initializers/finalizers
+ .Cada vez que se carga un DSO, se debe comprobar si esta en la lista de DSOs ya
+cargados por ld.
+-Numero de simbolos: el numero de simbolos exportados y sin definir determina el
+tamaño de la tabal de simbolos dinamicos, la hash table, y la longitud media de
+la hash table chain. La tabla de simbolos normal no se usa en runtime y no tiene
+impacto en el rendimiento.
+-Longitud de los string de los simbolos: un lookup exitoso para un simbolo 
+requiere comparar la cadena completa, y generalmente se comprueban decenas o 
+cientos de cadenas.
+-Numero de relocaciones: procesar las relocaciones supone la mayor parte del 
+tiempo de carga, por lo que su reduccion es notable.
+-Tipo de relocaciones: las relocaciones relativas son mucho menos costosas que 
+las relocaciones normales.
+-Ubicacion del texto y los datos: el texto se suele situar en secciones de solo 
+lectura por el compilador. Los datos constantes van en secciones de solo 
+lectura, y las no constantes deben ir en segmentos escribibles.
+
+*** 1.7 Measuring ld.so Performance
+Con la variable de entorno LD_DEBUG se pueden especificar opciones para medir 
+diferentes parametros durante el trabajo de ld.so.
+Por ejemplo: 
+$ env LD_DEBUG=statistics ejecutable
+
+*********************************
+*** 2. Optimizations for DSOs ***
+*********************************
+La recomendacion mas importante es usar siempre -fpic o -fPIC al generar codigo
+que termina en un DSO. El codigo que no se compila de esta forma siempre va a 
+contener relocaciones.
+Algunas personas argumentan que usar -fpic en algunas arquitectura tiene muchas
+desventajas, como en IA-32, donde se usa %ebx como registro PIC, privandoselo al
+compilador para otras optimizaciones. Esto generalmente no es muy notable y un 
+compilador moderno podra usar otros mecanismos que no sea utilizar el registro 
+ebx.
+Cuando se compila un ejecutable que contiene simbolos globales, el compilador 
+puede utilizar directamente la direccion de estos simbolos, porque un ejecutable
+es el primero en cargarse en memoria. Con los DSOs no pasa la mismo, porque no 
+se conoce en que orden va a ser cargado, y puede que un simbolo que se define en
+la libreria haya sido cargado previamente por el ejecutable u otra DSO. En este
+caso, por la regla de Linux de que el orden de carga determina que simbolos se
+sobreescriben, al usar -fpic el compilador no utiliza la optimizacion del salto
+directo, sino que todos los accesos a simbolos internos tambien los ubica en la 
+GOT.
+La diferencia entre -fpic y -fPIC es que -fpic limita el tamaño de la GOT al 
+limite especificado por la arquitectura (p.e. 8KB en SPARC), lo que permite al 
+compilador utilizar instrucciones mas pequeñas y menos instrucciones para 
+acceder a esta tabla. La opcion -fPIC no pone limites a la GOT mas alla de los 
+de la propia arquitectura (32bits/64bits).
+
+*** 2.1 Data Definitions
+Las variables en C y C++ pueden tener tres tipos de definiciones: 
+-Common: cuando se definen variables con el mismo nombre sin inicializar en 
+diferentes ficheros, el compilador las junta todas para que se definan una sola 
+vez. Esto era el comportamiento por defecto antiguo de gcc. Estas variables se 
+inicializan con valor 0, por lo que no es necesario guardar su valor en el 
+binario (Seccion 1.4).
+-Uninitialized: si se compila con -fno-common (por defecto en compiladores 
+modernos), o individualmente para cada variable el atributo nocommon: 
+int foo __attribute ((nocommon));, Las variables seran de tipo uninitialized. 
+Estas variables se comportan en runtime de la misma forma que las common, y en 
+el fichero no se guarda su valor, pero su representacion en el objeto es 
+diferente, y permite al linker encontrar multiples definiciones y marcarlas como
+error, lo que evita problema de multiple definicion. Alguna optimizacion del 
+compilador puede convertir las variables inicializadas a cero en variables 
+unitialized.
+-Initialized: el valor de inicializacion se guarda en el fichero.
+Una buena practica es utilizar valores equivalentes a cero en ciertos tipos para
+que las variables se creen como uninitialized en lugar de initialized. Por 
+ejemplo:
+bool empty = true; Necesita guardar el valor 1 en el fichero, por lo que se 
+creara como initialized en .data
+Si en su lugar se hace: bool not_empty = false; (cambiando la semantica), el 
+valor inicial es cero, por lo que el compilador lo pone en el .bss como 
+unitialized.
+Lo mismo se puede aplicar a los enums. Situando el valor del enum mas usado como
+primera opcion (equivalente a int 0), se crearan menos variables inicializadas:
+enum {val3, val1, val2}; si val3 es el mas usado.
+
+*** 2.2 Export control
+
+--- 2.2.1 Use static
+La manera mas facil de no exportar una variable es definirla como static. Al 
+hacerlo asi, la direccion de la variable tiene un offset fijo respecto al PIC y 
+puede ser inlineada, sin cargarla en el GOT.
+Para las funciones sucede lo mismo, cuando se llama a una funcion static, se 
+realiza un call a una direccion relativa, sin necesidad de acceder al GOT.
+
+--- 2.2.2 Define Global Visibility
+La ABI generica de ELF define clases para la visibildad de simbolos:
+-STV_DEFAULT: visibilidad normal. El simbolo es exportado y puede ser 
+interpuesto.
+-STV_HIDDEN: los simbolos no se exportan.
+La visibilidad se puede cambiar con el flag -fvisibility=default o 
+-fvisibility=hidden
+
+--- 2.2.3 Define Per-Symbol Visibility
+Como C no provee mecanismos para definir la visibilidad de simbolos, se tienen 
+que usar atributos del compilador: 
+int last
+__attribute__ ((visibility ("hidden")));
+Tanto los atributos (globales o por simbolo) como static evitan que un simbolo 
+se exporte. La diferencia es que un simbolo con atributo hidden puede ser 
+utilizado por otros ficheros del DSO, mientras que static limita su uso al 
+fichero local.
+Tambien es posible definir a la vez la visibilidad de todos los simbolos de un 
+fichero con el pragma de GCC: 
+#pragma GCC visibility push(hidden)
+// Simbolos con visibilidad hidden
+#pragma GCC visibility pop
+// Simbolos con la visibilidad predeterminada
+
+Al definir simbolos como hidden, el compilador asume que son locales, lo que 
+significa que su direccionamiento se puede realizar como si se hubiesen definido
+como static. Por tanto, un simbolo con visibilidad hidden es equivalente a un 
+simbolo static, salvo que no se puede inlinear.
+Por esto, es conveniente juntar ficheros fuente y marcar tantas funciones como 
+se pueda como static, para que tambien puedan ser inlineadas. Las funciones que 
+no se vayan a exportar se deberian marcar como hidden en sus declaraciones. 
+
+--- 2.2.4 Define Visibility for C++ Classes
+En C++ se exportan mas simbolos que en C, porque tambien se tienen que exportar
+las vtables, el rtti, etc. Se recomienda usar -fvisibility=hidden y utilizar 
+atributos o pragma para hacer visibles los simbolos necesarios.
+
+--- 2.2.5 Use Export Maps
+Mas informacion en la seccion 42.3 Linker Version Scripts de 
+0APUNTES/LIBRERIAS/ApuntesTheLinuxProgrammingInterface
+Los export maps solo estan soportados por el linker de GNU y de Solaris. Se 
+recomienda usarlos junto con los metodos mencionados previamente.
+Para C++, el linker debe soportar sintaxis no mangled para los nombres, entonces
+se podra definir un mapa asi: 
+{
+global:
+    extern "C++" {
+        foo*;
+        baz::baz*;
+        baz::s*
+    };
+local: *;
+};
+A pesar de que usar export maps parezca la solucion ideal, no lo es, porque solo
+afecta al proceso del linker. Para la compilacion no se aplican las 
+optimizaciones mencionadas y el binario se genera sin tener en cuenta la 
+visibilidad de los simbolos.
+
+--- 2.2.6 Libtool’s -export-symbols
+Este ultimo metodo es el menos deseable de todos. Permite manejar la exportacion
+de simbolos en tiempo de enlazado como los export maps, pero tiene los mismos 
+problemas, porque no optimiza en tiempo de compilacion. 
+
+--- 2.2.7 Avoid Using Exported Symbols
+Cuando una funcion se exporta, las llamadas a esa funcion tienen que pasar por 
+el PLT, lo que es logico para las llamadas externas, pero para las llamadas a 
+esa funcion dentro de la propia libreria seria deseable no pasar por la PLT y 
+usar una llamada interna. Para ello se pueden usar varias tecnicas:
+-Wrapper functions: solo aplica para funciones. Es la manera mas portable pero 
+la mas costosa. Consiste en crear una funcion que llama a la funcion real y 
+exportala, y la funcion real no exportarla (p.e. marcarla como static) para uso 
+interno. Esto crea un overhead minimo para las llamadas externas pero agiliza 
+las llamadas internas.
+-Usar alias: se puede usar alias para crear dos nombres sin agregar codigo. Esto
+solo es soportado por gcc, pero no funciona si el simbolo es static, por lo que
+hay que usar los atributos de visibilidad. Por ejemplo: 
+int last;
+extern __typeof (last) last_int
+    __attribute ((alias ("last"),
+                    visibility ("hidden")));
+
+int next (void) {
+    return ++last_int;
+}
+
+extern __typeof (next) next_int
+    __attribute ((alias ("next"),
+                visibility ("hidden")));
+
+int index (int scale) {
+    return next_int () << scale;
+}
+
+-DF_SYMBOLIC: es un flag que se puede incluir en las DT_FLAGS y que indica al 
+dynamic linker que prefiera las definiciones locales. Esto tiene muchas 
+desventajas por que trata a todas las interfaces por igual, a diferencia de las 
+dos propuestas anteriores, y el compilador tampoco realiza optimizaciones (el 
+flag es del linker), por lo que seguira usando la PLT.
+
+*** 2.3 Shortening Symbol Names
+Para buscar un simbolo en un ELF se tiene que comparar su cadena. En C++ las 
+cadenas son mas largas porque incluyen los parametros, namespaces y clases. 
+Ordenar los nombres de los simbolos puede ser una microoptimizacion a 
+considerar, para que las operaciones de comparacion de strings involucren menos 
+bytes.
+
+*** 2.4 Choosing the Right Type
+
+--- 2.4.1 Pointers vs. Arrays
+En algunos contextos, como dentro de una funcion, la diferencia entre array y 
+puntero a char cambia el codigo generado. Por ejemplo, si se usa: 
+char *str = "some string";
+El compilador necesita guardar la cadena en la seccion de datos del binario, 
+porque str es un puntero y no contiene la informacion de la cadena, solo su 
+direccion. En cambio si se usa: 
+char str[] = "some string";
+El compilador sustituye el uso de str por los bytes que reprensentan la cadena 
+(por ejemplo usando movabs de sus bytes). Esto hace que no sea necesario guardar
+la cadena en la seccion data. Observacion: si la cadena es muy larga se usaran 
+multiples instrucciones movabs, lo que puede no ser conveniente con strings 
+largos.
+
+--- 2.4.2 Forever const
+En el punto anterior, si las cadenas son const, se pueden guardar en secciones 
+de data de solo lectura, lo que mejora el rendimiento. Si no son const, se 
+tienen que guardar en secciones compartidas.
+
+--- 2.4.3 Arrays of Data Pointers
+Al usar arrays de punteros, los punteros se deben relocar porque la direccion a 
+la que apuntan puede cambiar. Por ejemplo:
+
+static const char *msgs[] = {
+    [ERR1] = "message for err1",
+    [ERR2] = "message for err2",
+    [ERR3] = "message for err3"
+};
+const char *errstr (int nr) {
+    return msgs[nr];
+}
+
+En cambio si se declara como array, las referencias no cambian:
+static const char msgs[][17] = {
+    [ERR1] = "message for err1",
+    [ERR2] = "message for err2",
+    [ERR3] = "message for err3"
+};
+
+El problema es que hay que especificar el mismo tamaño para todos los strings.
+Una forma eficiente es la propuesta por Bruno Haible:
+#include <stddef.h>
+
+#define MSGSTRFIELD(line) MSGSTRFIELD1(line)
+#define MSGSTRFIELD1(line) str##line
+static const union msgstr_t {
+    struct {
+#define _S(n, s) char MSGSTRFIELD(__LINE__)[sizeof(s)];
+#include "stringtab.h"
+#undef _S
+    };
+    char str[0];
+} msgstr = { {
+#define _S(n, s) s,
+#include "stringtab.h"
+#undef _S
+} };
+static const unsigned int msgidx[] = {
+#define _S(n, s) [n] = offsetof(union msgstr_t, MSGSTRFIELD(__LINE__)),
+#include "stringtab.h"
+#undef _S
+};
+const char *errstr (int nr) {
+    return msgstr.str + msgidx[nr];
+}
+// stringtab.h: 
+_S(ERR1, "message for err1")
+_S(ERR3, "message for err3")
+_S(ERR2, "message for err2")
+
+--- 2.4.4 Arrays of Function Pointers
+
+--- 2.4.5 C++ Virtual Function Tables
+Las vtables para las funciones virtuales involucran punteros a funciones, lo que
+hace necesarias las relocaciones del linker.
+
+*** 2.5 Improving Generated Code
+
+*** 2.6 Increasing Security
+
+*** 2.7 Simple Profiling of Interface Usage
+
+************************************
+*** 3. Maintaining APIs and ABIs ***
+************************************
+
+*** 3.1 What are APIs and ABIs?
+Cuando un objeto que depende de un DSO es compilado, en el ELF se guardan las 
+referencias al DSO, que se supone que deben ser satisfechas en tiempo de 
+ejecucion. 
+La ABI de un DSO comprende las definiciones que deben estar disponibles durante
+el ciclo de vida del DSO. Mantener la compatibilidad de la ABI consiste en que 
+no se no se pierda ninguna definicion (tambien llamada interfaz). Para las 
+variables esto significa que el tamaño y estructura no cambien de forma que no 
+puedan ser manejadas por la aplicacion. 
+
+*** 3.2 Defining Stability
+La estabilidad de la ABI implica que los programas antiguos que usan cualquier 
+interfaz del DSO deben seguir pudiendo usarla aunque haya cambios en el DSO.
+
+*** 3.3 ABI Versioning
+El metodo mas antiguo para versionar ABIs es utilizar un fichero diferente para 
+cada version incompatible. En los binarios ELF se graban las dependencias usando
+las entradas DT_NEEDED, donde se guarda el string de la dependencia. Este string
+suele coincidir con el campo DT_SONAME en el DSO.
+
+*** 3.4 Restricting Exports
+Para restringir la exportacion de simbolos versionados es conveniente usar 
+export maps, junto con los otros metodos mencionados en 2.2. (Ver tambien 
+apuntes 0APUNTES/LIBRERIAS/ApuntesTheLinuxProgrammingInterface).
+
+*** 3.5 Handling Compatible Changes (GNU)
+Ver 0APUNTES/LIBRERIAS/ApuntesTheLinuxProgrammingInterface
+
+*** 3.6 Handling Compatible Changes (Solaris)
+
+*** 3.7 Incompatible Changes
+
+*** 3.8 Using Versioned DSOs
+
+*** 3.9 Inter-Object File Relations
+

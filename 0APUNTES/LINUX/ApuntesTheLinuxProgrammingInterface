@@ -1,0 +1,473 @@
+The Linux Programming Interface
+Michael Kerrisk
+ISBN-10: 1-59327-220-0
+ISBN-13: 978-1-59327-220-3
+
+
+**************************************
+*** Ch. 19: Monitoring file events ***
+**************************************
+
+Desde la version del kernel 2.6.13 se provee la API de inotify, que sustituye al
+antiguo dnotify.
+Algunas librerias mas abstractas y portables son FAM (File Alteration Monitor) y
+Gamin (de gnome).
+
+*** 19.1 Overview
+Los pasos para usar la API son: 
+1. Con inotify_init() se crea una instancia de inotify, que devuelve un 
+descriptor de fichero que puede ser usado para operaciones posteriores.
+2. La aplicacion informa al kernel sobre los ficheros de interes con 
+inotify_add_watch(). Esta funcion devuelve un watch descriptor que sera usado 
+para referenciar a este watch. Con  inotify_rm_watch() se elimina el watch.
+3. Para obtener notificaciones de eventos, se usa read() sobre el descriptor de 
+inotify. Cada read devuelve uno o varios structs de inotify_event con 
+informacion sobre lo que ha pasado en los ficheros.
+4. Cuando se ha terminado de monitorizar, se cierra el descriptor de inotify, lo
+que elimina automaticamente todos los watch items que tenia asociados.
+
+Se puede usar inotify para ficheros y para directorios. Para directorios observa
+cambios en el directorio y en los ficheros que contiene, pero no es recursivo, 
+si se quiere usar recursivamente hay que abrir un watch nuevo por cada 
+subdirectorio.
+Un descriptor de inotify puede ser monitoreado usando select(), poll(), epoll, y
+desde Linux 2.6.25, con signal-driven IO (cap. 63).
+El mecanismo de inotify es un componente opcional del kernel, que se configura 
+con la opcion CONFIG_INOTIFY y CONFIG_INOTIFY_USER.
+
+*** 19.2 The inotify API
+#include <sys/inotify.h>
+// Primero se crea la instancia de inotify que devuelve el FD o -1
+int inotify_init(void);
+// Se agrega un watch a un path en la instancia de inotify. Devuelve el WD o -1
+int inotify_add_watch(int fd, const char *pathname, uint32_t mask);
+// Para eliminar un watch. Devuelve 0 o -1
+int inotify_rm_watch(int fd, uint32_t wd);
+
+*** 19.3 Inotify events
+En la tabla 19-1 se muestran todos los inotify events.
+Algunas interesantes son: 
+* IN_MODIFY: el fichero ha sido modificado
+* IN_ALL_EVENTS: para notificar sobre todos los eventos
+
+*** 19.4 Reading inotify events
+Si no ocurren eventos, la llamada a read() bloquea hasta que ocurra un evento 
+evitando estar haciendo polling constantemente, a no se que se indique el flag 
+O_NONBLOCK, en cuyo caso read() fallara automaticamente con el error EAGAIN si 
+no hay eventos disponibles.
+El struct de eventos es el siguiente:
+
+struct inotify_event {
+int wd;          /* Watch descriptor on which event occurred */
+uint32_t mask;   /* Bits describing event that occurred */
+uint32_t cookie; /* Cookie for related events (for rename()) */
+uint32_t len;    /* Size of 'name' field */
+char name[];     /* Optional null-terminated filename */
+};
+
+La cookie sirve para agrupar eventos relacionados. Tipicamente se usa cuando se 
+renombra el archivo.
+
+*** 19.5 Queue limits and /proc files
+El encolado de eventos de inotify requiere memoria del kernel. Por esta razon el
+kernel pone limites configurables por superusuario en /proc/sys/fs/inotify/
+
+*** 19.6 An Older System for Monitoring File Events: dnotify
+Este mecanismo esta disponible desde el kernel 2.4, pero se quedo obsoleto con 
+inotify por las siguientes razones:
+* A diferencia de inotify, usa señales para su funcionamiento
+* dnotify monitoriza directorios, mientras que inotify puede monitorizar 
+ficheros individuales
+* dnotify usa descriptores de ficheros, lo que impide desmontar el disco 
+mientras se usa.
+* La informacion que ofrece dnotify sobre los eventos es menos precisa que la de
+inotify
+
+************************************************
+*** Ch. 41: Fundamentals of shared libraries ***
+************************************************
+En 0APUNTES/LIBRERIAS/ApuntesTheLinuxProgrammingInterface_Librerias
+
+************************
+*** Ch.62: Terminals ***
+************************
+
+En los primeros sistemas UNIX, las lineas de terminal se representaban con los
+dispositivos /dev/ttyn (tty de teletype). En linux los dispositivos /dev/ttyn 
+son las consolas virtuales del sistema.
+Al principio los dispositivos de terminal no estaban estandarizados, lo que 
+significa que se pueden requerir diferentes secuencias de caracteres para 
+realizar operaciones como mover el cursor al comienzo de la pantalla. 
+Eventualmente los estandares ANSI se volvieron el estandar de facto, pero 
+siguieron existiendo otras estandarizaciones. Ante esta falta de estandarizacion
+se crearon bases de datos como termcap y terminfo, y librerias como curses.
+Actualmente, solo se utiliza una pantalla que suele incluir un emulador de 
+terminal, por lo que el uso de estas terminales antiguas no es comun. 
+Igualmente, dispositivos como impresoras que antiguamente usaban comunicacion
+serie, hoy dia utilizan interfaces de red en su lugar.
+
+*** 62.1 Overview
+Tanto las terminales convencionales como los emuladores de terminal tienen un
+driver asociado que maneja la entrada y salida en el dispositivo. En el caso de
+los emuladores de terminal, el dispositivo es una pseudoterminal.
+
+Al ejecutar entrada, el driver es capaz de operar en dos modos: 
+* Canonical mode: en este modo la entrada es procesada linea por linea, y esta 
+habilitada la edicion de linea. El modo de entrada por defecto espera a que cada
+nueva linea para ejecutar read().
+* Noncanonical mode: la entrada de la terminal no se recoge en lineas. Programas
+como vi, more y less ponen la terminal en este modo para poder leer caracteres
+individuales sin necesidad de presionar Enter.
+Los drivers de terminales tambien suelen gestionar caracteres especiales que 
+tienen funciones concretas como Control-C o el caracter interrupt.
+Un driver de terminal opera en dos colas: una para los caracteres de entrada 
+transmitidos desde los dispositivos a los procesos lectores, y otra para los
+caracteres de salida transmitidos desde los procesos a la terminal
+
+*** 62.2 Retrieving and Modifying Terminal Attributes
+*** 62.3 The stty Command
+*** 62.4 Terminal Special Characters
+*** 62.5 Terminal Flags
+*** 62.6 Terminal I/O Modes
+--- 62.6.1 Canonical Mode
+--- 62.6.2 Noncanonical Mode
+--- 62.6.3 Cooked, Cbreak, and Raw Modes
+*** 62.7 Terminal Line Speed (Bit Rate)
+*** 62.8 Terminal Line Control
+*** 62.9 Terminal Window Size
+*** 62.10 Terminal Identification
+*** 62.11 Summary
+
+**************************************
+*** Ch. 63: Monitoring file events ***
+**************************************
+
+*** 63.1 Overview
+El modelo tradicional de IO con system calls como read() o write() es 
+bloqueante, lo que puede ser un impedimento para ciertas aplicaciones. 
+Particularmente, algunas aplicaciones pueden necesitar comprobar la I/O sobre un 
+file descriptor sin bloquearse, o monitorizar multiples descriptores a la vez.
+La IO no bloqueante se puede conseguir con el flag O_NONBLOCK al abrir un FD, lo 
+que devuelve error cuando se hace un read() y no hay nada que leer, en lugar de 
+bloquearse. Tambien se pueden usar tecnicas como pipes, FIFOs, sockets, etc. 
+Todo esto requiere hacer un polling constante para comprobar si hay contenido 
+nuevo.
+El uso de procesos y hilos es una alternativa, pero generalmente es complejo de 
+programar y consume recursos. Como alternativa a la IO no bloqueante y al uso de 
+threads y procesos, es preferible usar alguna de las siguientes alternativas: 
+* IO multiplexing: permite a un proceso monitorizar multiples FD. Es lo que usan 
+select() y poll().
+* Signal-driven IO: es una tecnica por la cual el proceso solicita al kernell 
+que le avise por una señal cuando la entrada este disponible o cuando se pueda 
+escribir en un fichero especifico. Esta tecnica tiene mejor rendimiento que 
+select() y poll() cuando se manejan muchos FD.
+* La API epoll(): es una caracteristica especifica de Linux desde el kernel 2.6. 
+Es similar al signal-driven IO, con mejor redimiento para muchos FD.
+Estas tres tecnicas se usan principalmente para manejar multiples FD (o uno 
+solo) y comprobar cuando se puede hacer una system call sin bloquearse.
+
+Cuando usar cada tecnica: 
+* select() y poll(): su principal ventaja es la portabilidad debido a su 
+antiguedad. El problema es que no escalan bien con muchos FD.
+* epoll API: su desventaja es que es especifica de Linux. Permite manejar muchos 
+FD simultaneamente.
+* signal-driven IO: epoll ofrece las mismas caracteristas que esta tecnica, 
+ademas de no usar señales y ofrecer algunas caracteristicas adicionales, por lo 
+que es preferible usar epoll.
+Lo ideal seria usar epoll siempre que se pueda, y si el sistema no es 
+compatible, usar select() y poll(). Esto es lo que hacen librerias como 
+libevent.
+
+--- 63.1.1 Level-Triggered and Edge-Triggered Notification
+* Level-triggered notification: un FD se considera listo si es posible hacer una 
+syscall de IO sin bloquearse.
+* Edge-triggered notification: se produce notificacion si hay actividad de IO 
+(por ejemplo nueva entrada) sobre un FD desde la ultima vez que se monitoreo.
+select() y poll() usan level-triggered notification, signal-driven IO usa 
+edge-triggered, y epoll puede usar ambas.  
+Los programas que usan edge-triggered notification usualmente se diseñan con las 
+siguientes reglas: 
+* Despues de la notificacion de un evento de IO, el programa deberia ejecutar la 
+IO lo antes posible sobre el FD, para evitar que el evento termine y entonces 
+tenga que esperar a otro evento para ser notificado, o incluso perder esa 
+informacion.
+* Si el programa emplea un bucle para leer la entrada y el FD esta marcado como 
+bloqueante, entonces se bloqueara cuando no sea posible mas IO. Por este motivo 
+los FD se suelen marcar como no bloqueantes, y despues de ser notificado de un 
+IO event, se ejecuta el bucle hasta que la system call (p.e. read() o write()) 
+devuelva un EAGAIN o EWOULDBLOCK.
+
+--- 63.1.2 Employing Nonblocking I/O with Alternative I/O  Models
+Al usar modelos asincronos es recomendable usar O_NONBLOCK para los FD. Esto 
+evita varios problemas como bloqueos innecesarios, o bloqueos debidos a señales 
+espureas por errores externos.
+
+*** 63.2 I/O Multiplexing
+Esta tecnica sirve para comprobar cuando un FD esta disponible para hacer una 
+syscall sobre el. Las syscall que se usan son dos: select() y poll().
+
+--- 63.2.1 The select() System Call
+select() bloquea hasta que uno o mas FD esten listos.
+#include <sys/time.h>
+#include <sys/select.h> /* For portability */
+
+int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
+struct timeval *timeout);
+// Returns number of ready file descriptors, 0 on timeout, or -1 on error
+
+readfds, writefds y exceptfds son los punteros a sets de FDs que contienen los 
+ficheros que se quiere comprobar si se pueden escribir, leer o si estan en 
+estado de excepcion, respectivamente.
+El estado de excepcion no indica necesariamente error. En Linux sucede en dos 
+circunstancias:
+* Un cambio de estado ocurre en un pseudoterminal slave conectado a un master 
+que esta en packet mode (Seccion 64.5)
+* Se reciben datos fuera de banda en un stream socket (Seccion 61.13.1)
+La manipulacion de los FD de los fd_set se realiza con cuatro macros:
+* void FD_ZERO(fd_set *fdset): inicializa el set vacio
+* void FD_SET(int fd, fd_set *fdset): agrega el FD al set
+* void FD_CLR(int fd, fd_set *fdset): elimina el FD del set
+* int FD_ISSET(int fd, fd_set *fdset): indica si el FD esta en el set
+El argumento nfds debe ser mayor que el mayor numero de FD en los sets. Esto 
+permite al kernel saber si un FD esta en algun set de forma eficiente. 
+El argumento timeout controla el bloqueo de select(). Si esta a NULL, select() 
+es bloqueante, mientras que si apunta a una struct timeval, la llamada a 
+select() esperara ese tiempo:
+
+struct timeval {
+    time_t tv_sec;       /* Seconds */
+    suseconds_t tv_usec; /* Microseconds (long int) */
+};
+
+select() se bloquea hasta que: al menos uno de los FD este listo, una señal 
+interrumpa el proceso o la cantidad de tiempo en timeout pase.
+
+Como resultado de funcion, select() devuelve uno de los siguientes valores:
+* -1 si ocurre un error. EBADF si algun FD es invalido, y EINTR si una señal ha 
+interrumpido la llamada.
+* 0 si ha pasado el timeout y ningun de los FD ha estado listo. En este caso los
+fd_set quedaran vacios.
+* Un numero positivo indicando el numero de FD que estan listos. En este caso 
+cada FD devuelto debe ser inspeccionado con FD_ISSET para saber que evento ha 
+ocurrido (porque puede estar en readfds, writefds y exceptfds a la vez).
+
+--- 63.2.2 The poll() System Call
+La diferencia entre poll() y select() es como se especifican los FD que van a 
+ser monitoreados.
+Con poll() se indica una unica lista de FD, cada uno con los eventos de interes.
+
+#include <poll.h>
+int poll(struct pollfd fds[], nfds_t nfds, int timeout);
+// Returns number of ready file descriptors, 0 on timeout, or -1 on error
+
+struct pollfd {
+    int fd;        /* File descriptor */
+    short events;  /* Requested events bit mask */
+    short revents; /* Returned events bit mask */
+};
+
+nfds indica el numero de pollfd en el array. 
+events es una mascara que indica que eventos se quiere monitorizar, y revents es
+la mascara devuelta por poll que indica que eventos de los solicitados han 
+ocurrido.
+En la tabla 63-2 se muestran todos los bits posibles de la mascara.
+Si la mascara de eventos se indica como 0 no se monitorizara ningun evento en 
+especifico, y si se indica como un valor negativo, no se monitorizara el 
+fichero. 
+
+El argumento timeout puede tener tres valores: 
+* -1 para bloquearse hasta que uno de los FD este listo o sea interrumpido con 
+una señal.
+* 0 para no bloquearse
+* Un numero positivo para esperar ese numero de milisegundos. 
+
+El valor de retorno de poll() puede ser: 
+* -1 si ocurre un error (por ejemplo EINTR).
+* 0 si sucede el timeout sin ningun FD listo
+* Un valor positivo indicando el numero de revents distintos a cero en el array.
+
+--- 63.2.3 When Is a File Descriptor Ready?
+* Regular files: siempre van a estar listos porque read() y write() retornan 
+inmediatamente, ya sea con error o datos.
+
+--- 63.2.4 Comparison of select() and poll()
+* select() solo puede monitorizar un maximo de FD_SETSIZE FDs, mientras que 
+poll() solo tiene el limite que la memoria le ponga.
+* Como los fd_set de select() se reinician despues de la llamada, hay que volver
+a rellenarlos con los FDs cada iteracion. poll() evita esta separando events y 
+revents.
+* Si uno de los FDs monitorizados se cierra, poll() informa con el bit POLLNVAL,
+mientras que select() solo devuelve -1 y hay que itererar sobre los fd_set.
+* En general el rendimiento de poll() suele ser mejor con un numero alto de FDs.
+
+--- 63.2.5 Problemas con select() y poll()
+* Tanto en select() como poll() el kernel tiene que comprobar todos los FDs a 
+monitorizar en cada llamada.
+* En select() la estructura se altera en cada llamada, lo que obliga a volver a
+configurarla. En poll() la estructura crece con cada FD, y moverla de espacio de
+usuario a espacio de kernel cuesta mucha CPU. 
+* Despues de cada llamada a select() o poll() se tiene que escanear las 
+estructuras para determinar que descriptores estan listos.
+
+*** 63.3. Signal-Driven I/O
+Con esta tecnica, el proceso en lugar de comprobar con syscalls si es posible 
+hacer IO sobre FDs, se pide al kernel que envie una señal avisando cuando sea 
+posible la IO, y mientras el proceso puede hacer otras tareas.
+Para lograrlo se siguen los siguientes pasos:
+1. Se establece un handler para la señal. Por defecto la señal que notifica es 
+SIGIO.
+2. Se establece el proceso o procesos propietarios del FD que van a recibir la 
+señal de IO. El owner se establece con:
+fcntl(fd, F_SETOWN, pid);
+3. Se establece la IO no bloqueante abriendo el fichero con O_NONBLOCK.
+4. Se establece la signal-driven IO abriendo el fichero con O_ASYNC. 
+Los dos pasos anteriores se puede combinar con fcntl (Seccion 5.3):
+flags = fcntl(fd, F_GETFL);  /* Get current flags */
+fcntl(fd, F_SETFL, flags | O_ASYNC | O_NONBLOCK);
+5. El calling process puede ahora realizar otras tareas. Cuando el kernel envie 
+la señal al proceso, se invocara el signal handler del paso 1.
+6. Se debe ejecutar toda la IO posible (por ejemplo leer todos los bytes 
+recibidos) hasta que la syscall caiga en error al no haber mas IO.
+
+--- 63.3.1 When Is IO Possible Signaled?
+* inotify file descriptors: se genera una señal cuando el FD de inotify esta 
+disponible, es decir, cuando ocurre un evento en los FD que monitorea.
+--- 63.3.2 Refining the Use of Signal-Driven IO
+Como el signal-driven IO recuerda los FD que esta monitoreando y solo actua 
+cuando sucede un evento, su rendimiento escala mejor que select() y poll(). 
+Para aprovechar al maximo esta tecnica se deben realizar dos pasos: 
+* Usar la operacion F_SETSIG de fcntl(), exclusiva de Linux, para especificar 
+que señal se debe esperar en lugar de SIGIO por defecto.
+* Especificar el flag SA_SIGINFO usando sigaction() (Seccion 21.4) para 
+establecer el handler para la señal.
+
+*** 63.4 The epoll API
+epoll (event poll) se usa igual que signal-driven IO para monitorizar 
+asincronamente varios FD. Sus ventajas son: 
+* su rendimiento escala mucho mejor que con poll() o select()
+* permite tanto level-triggered como edge-triggered notifications.
+* tiene un rendimiento similar a signal-driven IO, pero evitando la gestion de 
+señales y con mayor flexibilidad para el tipo de eventos que queremos 
+monitorear.
+epoll se introduce en el kernel 2.6. Su estructura de datos central es la epoll 
+instance, que se refiere como un FD abierto manejado por el kernel que sirve 
+para dos propositos: 
+* recordar la lista de interes de FDs del proceso (interest list)
+* mantener una lista de FDs que estan listos (ready list)
+La API de epoll consiste en tres syscalls: 
+* epoll_create(): crea una instancia de epoll y devuelve el FD que la apunta.
+* epoll_ctl(): para gestionar la interest list de la instancia de epoll. Permite
+agregar y eliminar FDs, y modificar los eventos esperados de los FDs.
+* epoll_wait(): devuelve los items de la ready list de una instancia de epoll.
+
+--- 63.4.1 Creating an epoll instance: epoll_create()
+#include <sys/epoll.h>
+int epoll_create(int size);
+// Returns file descriptor on success, or -1 on error
+El parametro size es un hint para el kernel en el que indicamos cuantos FDs 
+esperamos monitorear. No es un limite sino una sugerencia para que el kernel 
+dimensione inicialmente las estructuras.
+
+--- 63.4.2 Modifying the epoll Interest List: epoll_ctl()
+#include <sys/epoll.h>
+int epoll_ctl(int epfd, int op, int fd, struct epoll_event *ev);
+// Returns 0 on success, or 1 on error
+fd hace referencia al FD que queremos actualizar. Este no puede ser un FD de un 
+fichero o directorio normales, sino que tiene que ser un FD de un pipe, FIFO, 
+socket, cola de mensajes POSIX, instancia de inotify, terminal, device u otra 
+instancia de epoll.
+op hace referencia a la operacion, que puede ser: 
+* EPOLL_CTL_ADD: agrega el FD a la lista de interes
+* EPOLL_CTL_MOD: actualiza los eventos esperados del FD con ev.
+* EPOLL_CTL_DEL: elimina el FD de la lista de interes
+La estructura de ev es:
+
+struct epoll_event {
+    uint32_t events;    /* epoll events (bit mask) */
+    epoll_data_t data;  /* User data */
+};
+
+typedef union epoll_data {
+    void     *ptr; /* Pointer to user-defined data */
+    int       fd;  /* File descriptor */
+    uint32_t  u32; /* 32-bit integer */
+    uint64_t  u64; /* 64-bit integer */
+} epoll_data_t;
+
+El struct epoll_event sirve indicar una mascara de eventos y el epoll_data_t 
+asociado.
+El epoll_data_t es una union en la que se puede especificar informacion que se 
+pasara al calling process (por epoll_wait()) si el FD esta disponible.
+
+Los limites para la API de epoll se gestionan en el directorio 
+/proc/sys/fs/epoll
+
+--- 63.4.3 Waiting for Events: epoll_wait()
+epoll_wait() devuelve informacion sobre los FDs que estan listos en una lista de
+struct epoll_event
+
+#include <sys/epoll.h>
+int epoll_wait(int epfd, struct epoll_event *evlist, int maxevents, int 
+timeout);
+// Returns number of ready file descriptors, 0 on timeout, or -1 on error
+
+evlist es allocada por el caller, y el numero de elementos que contiene se 
+indica por maxevents. En esta lista, el campo events de cada struct contiene la 
+mascara de eventos, y data contiene lo que se haya especificado en ev.data 
+cuando se registro el interes sobre ese FD con epoll_ctl(). Data es el unico 
+mecanismo que existe para obtener informacion sobre el FD asociado al evento. 
+Por esto cuando se hace epoll_ctl() se debe establecer ev.data.fd al FD, o 
+ev.data.ptr a un puntero a un struct que contenga el FD. timeout determina el 
+comportamiento de bloqueo:
+* -1 bloquea hasta que suceda un evento o llegue una señal
+* 0 para hacer una comprobacion no bloqueante sobre los FDs
+* un numero positivo para esperar ese numero de milisegundos hasta recibir un 
+evento
+epoll_wait() devuelve el numero de items que se han agregado a la evlist o -1 si
+ha habido un error. 
+
+La lista de epoll events que puede haber especificados en la mascara se indican
+en la tabla 63-8.
+
+The EPOLLONESHOT flag
+Este flag se puede especificar cuando se llama a epoll_ctl() para que a partir 
+de la proxima llamada a epoll_wait(), ese FD se marque como inactivo, y solo 
+notifique la primera vez. 
+
+--- 63.4.6 Edge-Triggered Notification
+Por defecto, epoll tiene notificaciones level-triggered, como poll y select. 
+Tambien puede usar edge-triggered notification si se indica la flag EPOLLET:
+
+struct epoll_event ev;
+ev.data.fd = fd
+ev.events = EPOLLIN | EPOLLET;
+if (epoll_ctl(epfd, EPOLL_CTL_ADD, fd, ev) == -1)
+    errExit("epoll_ctl");
+
+*** 63.5 Waiting on Signals and File Descriptors
+--- 63.5.1 The pselect() System Call
+--- 63.5.2 The Self-Pipe Trick
+*** 63.6 Summary
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

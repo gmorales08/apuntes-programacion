@@ -1,0 +1,38 @@
+***** TOP *****
+
+Entre la informacion basica que muestra esta:
+* up (uptime)
+* %Cpu(s): muestra el tiempo dedicado por la CPU a cada tarea (en total suman 
+100). us es tiempo dedicado a procesos de usuario. sy a procesos de kernel. id
+es tiempo idle. etc. Si se pulsa 1, se desglosa en nucleos
+* MiB Mem : informacion sobre el uso de memoria
+Y en las columnas de los procesos:
+* VIRT : memoria virtual (codigo + datos + librerias cargas + etc)
+* RES  : memoria residente. Subset de VIRT que representa la memoria no swapeada
+* SHR  : subset de RES que representa memoria que puede ser compartida
+* S : status (I idle, R running, S sleeping, etc.)
+* TIME+ : tiempo de CPU
+
+
+*** PARAMETROS
+-e k|m|g para escalar los valores de memoria a kb, mb o gb
+$ top -e m
+
+-d para cambiar el delay (3 segundos por defecto)
+$ top -d 1
+
+--- INTERACTIVOS
+c : para mostrar el path completo y argumentos de los procesos
+M : ordena por uso de memoria
+P : ordena por uso de CPU
+R : invierte el orden de seleccion
+h : muestra ayuda
+
+***** DIFERENCIAS *****
+Intervalo de refresco: htop se actualiza cada 1.5 segundos y top cada 3 segundos
+
+CPU: la mide acumulativamente, calculando la suma de todos los nucleos. htop 
+escala este valor al total de nucleos de la maquina.
+
+Memoria: htop no cuenta la memoria usada en buffers para la memoria usada, por 
+lo que su valor puede ser menor que el de top.
