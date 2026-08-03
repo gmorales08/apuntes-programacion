@@ -27,3 +27,9 @@ $ man -k . | grep '(4)'
 
 Tambien se puede encontrar online en webs como:
 https://manpages.org/
+
+Con los comandos que son bash-builtins se puede usar el builtin help para 
+acceder al manual que ofrece la propia shell:
+
+$ help bg
+

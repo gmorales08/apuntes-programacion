@@ -1,0 +1,191 @@
+TLS es el protocolo sucesor de SSL para comunicaciones seguras en la red. En 
+Linux las implementaciones mas populares son OpenSSL y GnuTLS.
+
+TLS sirve para cifrar una comunicacion de datos, haciendo que los datos sean 
+ilegibles de extremo a extremo y solo los puedan desencriptar los dos 
+participantes de la comunicacion con sus claves.
+
+
+*** CLAVE PUBLICA Y CAs
+Utiliza un sistema de clave publica en el que el servidor contiene una clave 
+privada y los clientes usan su clave publica para comunicarse con el.
+Primero el servidor genera un par de claves. La clave publica la agrega a un 
+fichero .csr donde ademas de la clave publica, tambien contiene informacion 
+sobre el servidor y la web (pais, nombre de empresa, email, etc.). Este .csr se
+envia a la certificate authority (CA) para que esta la firme. Antes de firmar 
+comprueba que el dominio no exista para evitar suplantaciones, que el email es
+valido, etc. Despues firma el .csr con su clave privada para generar un .crt o
+.pem con validez por x dias, que envia al servidor. El servidor utiliza este 
+.crt para ofrecerlo a los clientes, que pueden ver que esta autorizado por una 
+CA y es confiable.
+
+Las claves publicas de las CAs publicas se suele distribuir en paquetes como 
+ca-certificates para que los ordenadores las tengan ya almacenadas. Cuando un
+navegador se intenta conectar a un sitio web con TLS, el servidor le envia el 
+.crt firmado y el navegador lo intenta descifrar con la clave publica del CA 
+donde se firmo. Si puede descifrarlo es que es confiable, y entonces lo guarda
+en memoria para poder usarlo para cifrar la comunicacion con el servidor.
+
+Las CAs pueden ser publicas o privadas. Las publicas son mas utilizadas porque
+permiten a los sistemas operativos y navegadores obtener sus certificados y 
+descargarlos (como los paquetes ca-certificates o similares).
+Suelen estar organizadas en varios niveles (CAs intermedias) donde una CA puede
+firmar certificados que se pidan a una CA superior.
+
+
+*** FORMATOS
+.pem y .crt son formatos de contenedores de claves. Ambos pueden contener uno o
+varias claves, y tambien informacion adicional. 
+
+Un certificado (generalmente se usa .crt o .pem) es una clave publica con 
+informacion adicional como la firma de la CA, la caducidad, el dominio, etc.
+
+Un .p12 o .pfx es un comprimido cifrado con contraseña que contiene una clave
+privada, su clave publica y certificados intermedios de la CA. Se usa por 
+ejemplo para entregar una clave ya firmada como la de la firma digital.
+
+
+*** CERTIFICADOS DE LAS CAs
+Los certificados de las CAs se almancenan en un contenedor comun en el 
+sistema para que pueda ser usado por las aplicaciones que hagan peticiones a 
+internet (curl, wget, apt, dnf, git, etc.).
+
+Los certificados de las CAs publicas se guardan en:
+En Debian y Arch:
+/usr/share/ca-certificates/
+En Fedora:
+/usr/share/pki/ca-trust-source/
+
+Los certificados de las CAs privadas se guardan en:
+En Debian:
+/usr/local/share/ca-certificates/
+En Fedora: 
+/etc/pki/ca-trust/source/anchors/
+En Arch:
+/etc/ca-certificates/trust-source/anchors/
+
+En /etc/ssl/certs/ se guardan todos los certificados encontrados en los
+directorios anteriores cuando se ejecuta el comando de actualizacion de 
+certificados de CAs. Se generan symlinks y un fichero ca-certificates.crt o 
+ca-bundle.crt que contiene toda la informacion. Este es el que usan los 
+programas generalmente. En Fedora se guardan en /etc/pki/tls/certs/ca-bundle.crt
+
+
+*** AGREGAR UN NUEVO CERTIFICADO .CRT COMO CA DE CONFIANZA
+Se tiene que mover el .crt al directorio de certificados de CAs privadas y 
+ejecutar:
+En Debian:
+$ sudo update-ca-certificates
+En Fedora y Arch:
+$ sudo update-ca-trust
+
+Hay dos excepciones, Firefox y Chromium, que traen su propio almacen de CAs en 
+su codigo fuente, por lo que para actualizar sus CAs se tiene que hacer desde
+estas aplicaciones.
+
+
+*** PROBAR LA COMUNICACION TLS CON UN SERVIDOR
+Se puede usar curl para mostrar los mensajes en la comunicacion con un servidor:
+$ curl -vI https://google.com
+O con openssl:
+$ openssl s_client -connect google.com:443 -servername google.com
+
+======================== FUNCIONAMIENTO DE TLS =================================
+*** ESTRATEGIA DE TLS
+Generalmente una comunicacion segura se realiza primero encriptando una clave
+simetrica con una clave asimetrica, y luego enviandola por la red. Una vez 
+descrifrada en el cliente, se usa esta clave simetrica para comunicarse con el
+servidor.
+Se utiliza de esta manera porque el cifrado simetrico es mucho mas rapido que el
+asimetrico, entonces el asimetrico se usa para cifrar unicamente la clave 
+simetrica, y luego la comunicacion de datos se puede hacer rapidamente con la
+clave simetrica.
+Esta es la estrategia que usa el protocolo TLS para las comunicaciones.
+
+CIFRADO CON CLAVE SIMETRICA
+Se llama asi porque se usa la misma clave para cifrar que para descifrar. Es
+mucho mas rapido que el cifrado con clave asimetrica. 
+El algoritmo mas utilizado es AES.
+El hecho de que ambos extremos necesiten la misma clave implica que se tiene que
+enviar a traves de la red, lo que lo haria inseguro. Es por esto que para enviar
+la clave simetrica que se usara en una comunicacion, primero se cifra con clave
+asimetrica y luego se envia de forma segura. 
+
+CIFRADO CON CLAVE ASIMETRICA
+En este tipo de cifrado existen dos claves matematicamente vinculadas. Una sirve
+para cifrar (la publica) y otra para descrifrar (la privada). En las 
+comunicaciones por este metodo, el emisor cifra el mensaje con la clave publica
+del receptor y se la envia. Cualquiera que intercepte el mensaje no puede 
+descrifrarlo si no tiene la clave privada del receptor. La seguridad radica en 
+que la clave privada solo la tiene el receptor y no la comparte.
+
+COMUNICACION POR TLS 1.3
+CLIENT          SERVER
+  |                |
+  |--CLIENT-HELLO->|
+  |<-SERVER-HELLO--|
+  |<-SERVER-FINISH-|
+  |<-CLIENT-FINISH-|
+  |                |
+  |<-COMMUNICATION>|
+
+Handshake: en este paso se establece el algoritmo de cifrado que se usara, la 
+version del protocolo, se autentica el servidor para identificar que es quien
+dice ser, y se intercambian las claves.
+
+Client Hello: en el hello el cliente indica su version de TLS y los algoritmos 
+de cifrado que soporta. Tambien se incluye un numero de 32 bytes aleatorio que 
+identifica al cliente, para evitar ataques de repeticion. En TLS 1.3 ademas de
+esto, el cliente genera su parte de la clave simetrica comun (ver 
+Diffie-Hellman), y la envia. Esto lo hace intentando adivinar que el servidor 
+soporta ese tipo de cifrado, lo que ahorrara un mensaje si acierta.
+Los algoritmos de cifrados se suelen indicar con la siguiente terminologia:
+TLS_AES_128_GCM_SHA256
+donde AES es el tipo de cifrado simetrico, 128 es el tamano de la clave, GCM el 
+tipo de operacion del cifrado por bloques (de AES en este caso) y SHA256 la 
+funcion hash utilizada.
+
+Server Hello: el servidor confirma la version y el cifrado que se usaran. Envia
+un numero aleatorio. Envia un certficado que incluye su clave publica, el nombre
+de dominio, la fecha de caducidad y su firma (obtenida de un CA). Este
+certificado ya va firmado con la clave simetrica que ambos han creado, dado que 
+ya tiene la informacion completa de la clave.
+Dado que es posible que dos comunicacion diferentes generen la misma clave 
+simetrica, se utiliza el numero aleatorio generado por el cliente y por el 
+servidor para reducir esta posibilidad.
+
+Despues de esto, se puede abrir el tunel de comunicacion segura con la clave
+simetrica que ambos conocen.
+
+
+DIFFIE-HELLMAN, RSA, ECDHE-RSA
+DH es un protocolo para compartir claves simetricas que se suele utilizar en TLS 
+para que ambos extremos de una comunicacion puedan generar una clave sin que 
+esta viaje en la conversacion. Funciona asi: 
+1. A y B se quieren comunicar, y ambos acuerdan un numero primo aleatorio 
+grande. Este numero es g y es conocido por ambos y por cualquiera que escuche la
+conversacion.
+2. A genera una clave privada que solo conocera A, y con ella cifra el numero g
+con una operacion g^A. Despues de esto se lo envia a B. 
+3. B tambien genera una clave privada que solo conoce B, y cifra g^B, que se lo
+envia a A.
+4. Teniendo A g^B, hace g^AB, y teniendo B g^A, hace g^AB. Ahora ambos tienen
+una clave en comun, que es la clave simetrica que usaran en la comunicacion. 
+
+Alguien que este escuchando la conversacion tiene acceso a g, a g^A y a g^B, 
+pero con ninguno de esos valores es viable sacar g^AB con los algoritmos 
+actuales.
+
+Este protocolo es vulnerable a ataques MITM. Un atacante se puede situar entre 
+medias, generar una clave s, y hacer de intermediario entre los dos, leyendo 
+los mensajes de A con la clave g^AS, y enviandolos a B con la clave g^BS. Entre
+medias puede leer o modificar los mensajes porque puede descrifrar en ambas 
+direcciones. Para evitar esto existen los protocolos de cifrado de claves
+asimetricas como RSA, que permiten autenticar a los extremos de una 
+conversacion. Con RSA, el servidor (B) firma su clave en el intercambio DH con 
+su clave privada, por lo que A puede saber si es B realmente quien le envia los 
+mensajes, ya que tiene su clave publica.
+Cuando se conbinan DH y RSA se denomina DHE_RSA, o si se usa la variable de 
+curva eliptica (mas rapida e igual de segura), ECDHE_RSA. Esta ultima es la que
+se utiliza desde TLS 1.2.
+

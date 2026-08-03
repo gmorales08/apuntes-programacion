@@ -1,0 +1,105 @@
+En un sistema operativo el time esta formado por:
+-Un valor de tiempo, ya sea local o UTC
+-Time zone
+-Daylight Saving Time (DST), si aplica
+
+Para calcular el tiempo existe un reloj hardware y un reloj de sistema. El 
+comportamiento estandar es: 
+1. Establecer el system clock con el valor del hardware clock en el boot
+2. Sincronizar el system clock con algun protocolo
+3. Establecer el hardware clock con el system clock al apagar el equipo
+
+Dependiendo del sistema operativo, el hardware clock se puede establecer con 
+local time (Windows), UTC (macOS) o variar. Si se usa UEFI, tambien es capaz de
+guardar la timezone y DST.
+
+HARDWARE CLOCK
+El paquete util-linux del kernel trae el programa hwclock para gestionar el 
+reloj hardware.
+Para ver el clock actual:
+$ hwclock --show
+Para establecer el hardware clock con el valor del system clock:
+$ hwclock --systohc
+
+SYSTEM CLOCK
+El paquete gnu-coreutils trae date para gestionar el system clock.
+Para ver el clock actual:
+$ date
+En utc:
+$ date --utc
+Para establecer una hora concreta: 
+$ date -s "2026-11-03 12:00:00"
+Para establecer el system clock con el valor del hardware clock:
+$ hwclock --hctosys
+
+TIME ZONE
+El timezone se establece con el fichero /etc/localtime, que es un enlace 
+simbolico al binario que define la time zone. Por ejemplo: 
+$ ln -sf /usr/share/zoneinfo/Europe/Madrid /etc/localtime
+
+UTC vs LOCALTIME
+Si se utilizan diferentes sistemas operativos es conveniente establecer el 
+formato en el que se guardara el hardware clock. Con el comando hwclock esto se
+indica con el flag --utc o --localtime. Al usarlo, se crea el fichero 
+/etc/adjtime, que contiene el formato utilizado en el hardware clock (UTC o 
+LOCAL). Es recomendable utilizar siempre UTC.
+
+NTP
+Es un protocolo para obtener informacion de tiempo desde varios servidor y 
+realizar tareas como compensar el retraso del reloj. Un cliente y servidor de 
+NTP muy extendido es chrony, recomendado para sistemas que no estan online todo
+el tiempo.
+
+CHRONY
+Chrony ofrece un cliente y un servidor NTP. Ajusta el drift del hardware clock.
+Se configura en /etc/chrony.conf:
+// Configurar un pool. Con offline se indica que el sistema puede arrancar sin
+// conexion y por tanto debe esperar a la red para obtener la hora.
+pool 2.arch.pool.ntp.org iburst offline
+
+En el boot, el system time se sincroniza con el hw time. Si el hardware clock 
+esta desfasado, el system time tambien lo estara hasta que se sincronice. Para 
+gestionar esto chrony tiene tres opciones: 
+-rtcsync: sincroniza periodicamente el RTC. Esto impide el calculo del drift.
+-rtcautotrim: sobreescribe el RTC solo cuando se pasa un limite. Se puede usar
+junto con rtcfile, que permite ver el error.
+-rtcfile: el RTC no se actualiza, pero se guarda su error en un fichero. chrony
+puede verlo y hacer correccion en el system time.
+Cuando se usa rtcfile, impide que hwclock o timedatectl puedan acceder al RTC.
+
+La opcion rtconutc indica que el hw clock se guarde en UTC. Por defecto se 
+guarda en local time.
+
+Con dumpdir se puede indicar un directorio a chrony para que guarde un historial
+de desfase, para mejorar los calculos.
+
+Con makestep 0.1 3 se indica que se actualice el system clock en las primeras
+tres actualizaciones solo si es mayor que un segundo.
+
+Una configuracion interesante para equipos que funcionan intermitentemente es:
+/etc/sysconfig/chronyd
+OPTIONS='-r -s'
+
+/etc/chrony.conf
+pool 2.arch.pool.ntp.org iburst offline
+dumpdir /var/lib/chrony
+rtcfile /var/lib/chrony/rtc
+rtcautotrim
+rtconutc
+
+
+SNTP
+Es un protocolo con menos funciones que NTP, ofreciendo menos precision en favor
+de consumir menos recursos. systemd-timesyncd es el mas tipico, ofreciendo solo
+la parte de cliente.
+
+DESVIACION DE HORA
+Si no se usa NTP para corregir la hora, el desfase del system clock puede ser de
+1 a 3 segundos al dia, y del hardware clock de 0.5 a 1.5 segundos. Por eso es
+interesante tener una sincronizacion con NTP. Si el desvio es muy grande, por
+ejemplo sincronizando el reloj solo una vez al dia, pueden producirse problemas
+como que ciertos cron se lanzen dos veces por "volver hacia atras en el tiempo".
+Por esto es recomendable ajustar con cierta frecuencia el reloj, ya sea con SNTP
+o con NTP.
+
+

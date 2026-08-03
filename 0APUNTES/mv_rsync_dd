@@ -1,0 +1,46 @@
+***** RSYNC *****
+Es util para mover cantidades grandes de bytes entre dos sistemas de ficheros 
+distintos como un disco y un pendrive, porque permite reanudar la transferencia
+si hay algun error o interrupcion.
+
+--remove-source-files para que se eliminen los ficheros fuente despues de haber
+confirmado que se han movido
+
+-a (archive) para guardar permisos
+
+-h (human readable) para mostrar tamaños en MB, GB, etc.
+
+--info=progress2 para mostrar el progreso
+
+--hard-links, -H preserve hard links
+
+--links, -l copy symlinks as symlinks
+
+
+$ rsync -ahHl --info=progress2 --remove-source-files /origen /destino
+
+
+***** MV *****
+Move es mas rapido porque solo cambia punteros, pero no tiene recuperacion.
+
+
+***** DD *****
+dd copia por bloques desde un fichero de entrada a uno de salida. Realiza una
+copia de bajo nivel sin comprobaciones, por lo que su uso puede ser peligroso.
+Es util en algunas situaciones como para grabar una iso en un disco, dado que 
+sobreescribe los bytes del disco desde el comienzo.
+
+Generar un fichero con bytes aleatorios:
+$ dd if=/dev/urandom of=/fichero bs=1M count=1024 status=progress
+
+Clonar un disco completo:
+$ dd if=/dev/sda of=/dev/sdb bs=64K status=progress
+
+Crear una imagen backup:
+$ dd if=/dev/sdc of=/path/to/backup_disk.img bs=4M status=progress
+Y para restaurarlo:
+$ dd if=/path/to/backup_disk.img of=/dev/sdc bs=4M status=progress
+
+Crear un fichero con bytes a cero (por ejemplo para un swapfile):
+$ dd if=/dev/zero of=swapfile bs=4M count=256 status=progress
+

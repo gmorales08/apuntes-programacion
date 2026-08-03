@@ -1,0 +1,18 @@
+Parte de gnu coreutils
+
+-s Para hacer symlink en lugar de hardlink
+-v Para mostrar los enlaces creados
+
+*** Crear un symlink de un fichero (preferiblemente usar rutas absolutas):
+$ cd dest_dir
+$ ln -sv /path/source_file .
+
+*** Crear un symlink de un directorio recursivamente:
+$ cd dest_dir
+$ ln -sv /path/source_dir .
+es equivalente a:
+$ ln -sv /path/source_dir/ .
+
+
+Se puede eliminar un symlink sin que afecte al bind original:
+$ rm symlink

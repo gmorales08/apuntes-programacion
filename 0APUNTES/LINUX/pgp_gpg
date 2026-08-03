@@ -1,0 +1,80 @@
+*** OPENPGP
+Es un estandar criptografico de clave publica que sirve para cifrar ficheros y 
+se suele utilizar en emails y paquetes de software distribuido.
+
+La persona que quiere cifrar y distrubuir un fichero genera un par de claves. La
+clave privada se guarda en el ordenador y la publica se distribuye. Con la 
+privada se cifran los ficheros y cualquier persona que tenga la clave publica 
+puede descrifrarlos. La seguridad reside en mantener protegida la clave privada
+y no perderla, pues inutilizaria las claves publicas.
+
+Existen keyservers que almacenan claves publicas donde se pueden buscar y 
+descargar, aunque es mas comun descargarlas de urls directas de cada 
+distribuidor (https://url.com/gpg) porque es mas seguro.
+
+
+*** GNUPG
+Es la implementacion de OPENPGP mas utilizada. Suele venir instalada con los 
+gestores de paquetes.
+
+El fichero de configuracion por defecto es ~/.gpg.conf. Los gestores de paquetes
+usan su propia configuracion al invocar a gpg. Por ejemplo pacman usa 
+/etc/pacman.d/gnupg/gpg.conf
+
+dirmngr es el programa para acceder a los keyserver y su configuracion esta en 
+dirmngr.conf
+
+Las claves privadas se guardan en ~/.gnupg/private-keys-v1.d/ en un formato 
+.key, cifrado por gnupg. Este formato esta cifrado con la passphrase que 
+solicita gnupg cuando se crea la clave por primera vez, por lo que estan 
+protegidas si alguien consigue acceder al disco y obtener esos ficheros .key.
+
+Las claves publicas se guardan en una base de datos como ~/.gnupg/pubring.kbx,
+~/.gnupg/public-keys.d/pubring.db, o en las versiones mas antiguas, en un
+unico archivo .gpg
+
+Los gestores de paquetes pueden usar diferentes estrategias para guardar las 
+claves PGP. RPM en lugar de usar el keyring de GNUPG, utiliza una base
+de datos propia donde guarda las claves que va descargando. Pacman guarda las 
+claves en su propio keyring en /etc/pacman.d/gnupg/pubring.gpg usando GNUPG.
+
+El programa gpg-agent es un demonio que viene con gpg y se encarga de cachear
+las credenciales de las claves en memoria, para que no las solicite en cada 
+operacion que las requiera. Tambien es quien muestra el prompt para introducir 
+contraseña cuando se requiera. Puede gestionarse con un servicio de systemd o 
+simplemente como un demonio junto a gpg (ver con ps).
+
+
+--- Generar un par de claves PGP
+$ gpg --full-gen-key
+Siguiendo los pasos se genera una clave 
+
+--- Exportar una clave publica
+Primero listar las claves publicas para copiar la huella de la que queremos 
+exportar: 
+$ gpg --list-keys
+Exportar la clave en formato ASCII: 
+$ gpg --export --armor --output gabriel.asc DA1696A7167653DBF5F0477F92CE18EBF394
+
+--- Exportar una clave privada
+$ gpg --export-secret-keys --armor --output gabriel_privada.asc DA1696A7167653D4
+
+--- Importar una clave publica o privada ASCII:
+$ gpg --import gabriel.asc
+
+
+--- Listar las claves publicas
+$ gpg --list-keys
+muestra las claves publicas en el anillo. Los 40 bytes son la huella digital de 
+la clave publica.
+
+--- Listar las claves privadas
+$ gpg --list-secret-keys
+muestra las claves privadas que estan almacenadas en el sistema.
+
+--- Claves del gestor de paquetes
+Los comandos anteriores al ser invocados con el usuario del sistema, acceden a
+~/.gnupg. Si se quiere ver el keyring del gestor de paquetes, hay que indicar 
+su ubicacion. Por ejemplo para pacman: 
+$ sudo gpg --homedir /etc/pacman.d/gnupg --list-keys
+

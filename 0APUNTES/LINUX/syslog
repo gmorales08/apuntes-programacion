@@ -1,0 +1,167 @@
+SYSLOG
+La especificacion syslog indica los siguientes severity groups:
+0 emerg
+1 alert
+2 crit
+3 error
+4 warning
+5 notice
+6 info
+7 debug
+
+Tambien indica facility codes, para clasificar los mensajes. Los facility number
+pueden no coincidir en diferentes sistemas operativos, por lo que se recomienda
+usar keywords. Los siguientes son de arch:
+
+Facility Number  Keyword       Description
+00               kern     
+01               user          Mensajes de nivel de usuario
+02               mail     
+03               daemon   
+04               auth     
+05               syslog        Mensajes internos de syslog
+06               lpr           Impresora
+07               news          NNS
+08               uucp
+09               cron
+10               authpriv      Como auth
+11               ftp
+12               ntp
+13               security      Log audit
+14               console       Log alert
+15               solaris-cron
+16-23            local0-local7 Uso local
+
+El formato de los mensajes de log RFC 5424 es:
+<PRI>VERSION TIMESTAMP HOSTNAME APP-NAME PROCID MSGID STRUCTURED-DATA MSG
+
+
+
+RSYSLOG
+Se configura en /etc/rsyslog.conf. Se puede utilizar sintaxis basica (versiones
+6 y anteriores) o sintaxis avanzada en las posteriores.
+
+Para incluir configuracion adicional se recomienda usar /etc/rsyslog.d/ y luego
+incluirla: 
+include(file="/etc/rsyslog.d/*.conf" mode="optional")
+o en sintaxis basica:
+$IncludeConfig /etc/rsyslog.d/
+
+Para establecer los permisos de los ficheros de log explicitamente:
+$FileCreateMode 0640
+
+La siguiente linea aplica el formato de hora de Syslog BSD (Aug  3 10:15:30):
+module(load="builtin:omfile" Template="RSYSLOG_TraditionalFileFormat")
+
+Si se usa junto con journald, las siguiente lineas indican que no se lea el 
+socket unix y se obtengan los mensajes de journald:
+module(load="imuxsock" SysSock.Use="off")
+module(load="imjournal" FileCreateMode="0600" StateFile="imjournal.state")
+Si no se usa journald y se quiere conectar al socket de syslog:
+$ModLoad imuxsock.so
+
+Las reglas de filtrado indican a que fichero enviar cada tipo de log. Tienen un
+formato facility.severity file.
+La siguiente linea guarda todos los logs de nivel info o superior, en 
+/var/log/messages, excluyendo los de mail, authpriv y cron.
+*.info;mail.none;authpriv.none;cron.none /var/log/messages
+
+Para guardar los mensajes de authpriv de cualquier severity en /var/log/secure:
+authpriv.* /var/log/secure
+
+Si se pone un - delante del fichero, la escritura se realiza asincronamente con 
+buffer, para reducir el desgaste del disco: 
+mail.* -/var/log/maillog
+
+La siguiente linea envia todos los mensajes de severity emerg a las terminales 
+de los usuarios conectados: 
+*.emerg :omusrmsg:*
+
+Con una funcion action(type="omfwd"...) se pueden enviar los logs por TCP a otro
+ordenador.
+
+Para enviar logs directamente a un servidor por UDP:
+*.*       @192.0.2.1
+Y por UDP:
+*.*       @@192.0.2.1
+
+El servidor se debera configurar para recibir los logs:
+$ModLoad imudp
+$UDPServerRun 514
+o
+$ModLoad imtcp
+$InputTCPServerRun 10514
+
+
+Para validar la configuracion se puede ejecutar:
+$rsyslogd -N1
+
+Para validar el logeo de mensajes se puede ejecutar: 
+$ tail -f /var/log/messages
+Y generar un log en otra terminal:
+$ logger -t test syslog-test-message
+
+
+LOGGER
+Es un programa posix que permite enviar mensajes al log del sistema. En linux,
+el paquete utils-linux trae una version con mas opciones y soporte para formato
+syslog moderno.
+Opciones interesantes son -t para indicar un tag y -p facility.serverity:
+$ logger -p local0.warning -t tag "mensaje de log"
+
+Con -f se puede enviar un fichero entero por log:
+$ logger -f /var/log/app_errors.tmp -t app_cleanup -p local1.err
+
+Para enviar en formato RFC 5424:
+$ logger --rfc5424 -p local0.warning -t tag "mensaje de log"
+
+Con -s, ademas de guardar en el log, imprime el mensaje por stderr:
+$ logger -s -p local0.warning -t tag "mensaje de log"
+
+
+LOGROTATE
+Se configura en /etc/logrotate.conf y /etc/logrotate.d/
+La configuracion de logrotate.conf es la generica y no afecta a las otras 
+configuraciones de logrotate.d/. Un ejemplo de configuracion es: 
+# rotate log files weekly
+weekly
+# keep 4 weeks worth of backlogs
+rotate 4
+# create new (empty) log files after rotating old ones
+create
+# use date as a suffix of the rotated file
+dateext
+# uncomment this if you want your log files compressed
+#compress
+# packages drop log rotation information into this directory
+include /etc/logrotate.d
+
+En los ficheros incluidos, la configuracion es: 
+/path/a/log {
+    opcion1
+    opcion2
+    etc.
+    postrotate
+        /usr/lib/script
+    endscript
+}
+
+Algunas opciones interesantes son: 
+-notifempty: para no rotar si el log esta vacio
+-missingok : no se produce error si no existe el log
+-postrotate: indica el script que se ejecuta despues de que el log haya sido 
+rotado
+-size x : cuando el log supere x tamano se rota forzadamente
+
+Para probar la configuracion se puede ejecutar: 
+$ logrotate /etc/logrotate.conf --debug
+
+Para forzar el rotado de todos los logs: 
+$ logrotate /etc/logrotate.conf
+
+O de un solo log: 
+$ logrotate /etc/logrotate.d/rsyslog
+
+Para ver el estado de rotacion de cada fichero:
+$ cat /var/lib/logrotate/logrotate.status
+

@@ -38,9 +38,16 @@ BindsTo=s.service // Como Requires, pero si s se detiene, este tambien.
 Conflicts=s.service // No se pueden ejecutar a la vez 
  
 [Service]
+// Type indica el tipo de servicio que es
+// simple: ejecuta el proceso en background y systemd lo considera activo, sin 
+// esperar senales, forks o notificaciones
+// oneshot: ejecuta una tarea y termina. No se queda como demonio.
 Type=simple
 User=myapp
 Group=myapp
+// TimeoutSec indica el tiempo maximo de espera hasta que systemd mate el 
+// proceso cuando es de tipo oneshot.
+// TimeoutSec=60
 
 WorkingDirectory=/opt/myapp
 ExecStart=/usr/bin/python3 /usr/local/bin/my_script.py

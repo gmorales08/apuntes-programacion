@@ -1,0 +1,21 @@
+Los builtins de bash son programas o funcionalidades que vienen dentro del 
+propio bash y que son propios de bash o son extensiones de programas POSIX. 
+
+Con los comandos que son bash-builtins se puede usar el builtin help para 
+acceder al manual que ofrece la propia shell:
+$ help bg
+
+Cuando existe un builtin y un programa externo con el mismo nombre, tiene 
+prioridad el builtin. Se puede comprobar con type, que indica el programa que
+se ejecuta:
+
+$ type echo
+Si muestra "echo is a shell builtin" es que al escribir echo se esta ejecutando
+el builtin. Pero si se hace:
+$ type -a echo 
+que muestra todas las instancias del programa. Es posible que muestre algo como
+echo is /bin/echo. Lo que indica que hay otro echo en /bin, aunque por prioridad
+se ejecute el builtin.
+
+Para ver todos los builtins de la shell se puede ejecutar: 
+$ compgen -b

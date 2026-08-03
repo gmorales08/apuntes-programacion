@@ -438,6 +438,13 @@ nuevo ya deberia estar normalizado:
 $ git rm --cached fichero
 $ git add fichero 
 
+Para comprobar la terminacion de un fichero con file (si no se usa git):
+$ file fichero.cpp
+Si se quiere eliminar el CR de Windows, se puede usar sed:
+$ sed -i 's/\r$//' fichero.cpp
+o tr de coreutils:
+$ tr -d '\r' < fichero.cpp > fichero.cpp.lf
+$ mv fichero.cpp.lf fichero.cpp
 
 
 

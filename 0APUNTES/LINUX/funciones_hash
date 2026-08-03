@@ -1,0 +1,69 @@
+FUNCIONES HASH
+Generan un hash de longitud fija a partir de una entrada de x bits. Son 
+unidireccionales, por lo que no se puede obtener el contenido original a partir
+de un hash. Algunos usos son:
+-Para cifrar contrasenas. En lugar de guardar una contrasena en texto
+plano, se guarda su hash. Cuando el usuario introduce su contrasena en el 
+sistema, se calcula el hash del texto introducido y si coincide con el hash
+guardado, se autoriza el acceso.
+-Para verificar la intregridad de datos. Se calcula el hash de un bloque de 
+datos, y si el bloque de datos se modifica, el hash cambiara, por lo que se 
+puede identificar si el bloque de datos ha sido cambiado en el proceso. Al 
+descargar ficheros, se suele ofrecer el hash original en la web de descarga, 
+para que el usuario lo compruebe con el fichero que se acaba de descargar.
+-Para cifrar comunicaciones: En TLS se usa una funcion hash junto con la clave
+privada para cifrar los mensajes, de manera que un atacante MITM no puede 
+recalcular el hash sin conocer la clave simetrica secreta.
+
+Algunas funciones hash son:
+- MD5: salida de 128 bits. Obsoleta debido a que es muy facil generar colisiones
+- SHA-1: salida de 160 bits. Obsoleta.
+- SHA-2: es una familia de algoritmos:
+    SHA-224
+    SHA-256: es el mas usado por su equilibrio entre velocidad y seguridad
+    SHA-385
+    SHA-512: mas pesado que SHA-256. Utiliza palabras de 64 bits.
+
+Las funciones anteriores son muy rapidas de calcular y se usan para comprobacion
+de datos en comunicacion por redes. Para contrasenas, se usan otras funciones 
+que sean mas pesadas de calcular para evitar ataques por fuerza bruta. Algunas
+son (de mayor a menor complejidad): Argon2, yescrypt, scrypt, bcrypt
+
+SALT
+Es un componente adicional de seguridad que se utiliza al hashear contrasenas. 
+Son 8 bytes adicionales aleatorios que se agregan a la contrasena antes de hacer
+el cifrado. Luego al guardar la cadena con la contrasena, se guarda junto a la
+salt. Cuando el sistema va a calcular el hash de la contrasena para ver si es
+valida, lee la salt en el fichero de contrasenas y asi lo puede comprobar. Esto
+evita ataques por diccionarios de hashes precalculados, ya que el atacante 
+tendria que volver a calcular todos los hashes con cada salt. Tambien oculta
+contrasenas iguales, ya que al tener diferente salt, su hash sera diferente.
+
+IDENTIFICAR EL CIFRADO USADO PARA UN HASH CON SALT
+Las contrasenas se suelen guardar como texto plano con el siguiente formato:
+$funcion_hash$salt$hash
+La funcion hash se identifica con caracteres:
+$y$ o $7$: yescrypt
+$6$: sha-512
+$5$: sha-256
+$2b$ o $2y$: bcrypt
+$1$: md5
+
+Un ejemplo de contrasena es: 
+$1$y9Nbg807$xtb0NQ224ak7SLWg/I84v/
+Usa md5 y su salt es y9Nbg807
+
+GENERAR CONTRASENAS HASHEADAS
+Para generar una contrasena hasheada y con salt, se puede usar openssl: 
+$ openssl passwd -6 "password"
+openssl solo permite md5 (-1) y sha-256/512(-5, -6), para yescrypt (estandar
+actual en Linux) se puede usar mkpasswd: 
+$ mkpasswd -m yescrypt
+
+OBTENER EL HASH DE UN FICHERO
+gnu coreutils trae varios programas para obtener diferentes hash de ficheros:
+$ md5sum fichero
+$ sha256sum fichero
+$ sha512sum fichero 
+$ echo "texto" | sha256sum
+etc.

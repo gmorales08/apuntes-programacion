@@ -1,0 +1,1005 @@
+Classic Shell Scripting
+Arnold Robbins and Nelson H. F. Beebe
+ISBN: 978-0-596-00595-5
+
+******************************
+*** Ch. 2: Getting started ***
+******************************
+
+*** 2.4 Self-Contained Scripts: The #! First Line
+Cuando la shell ejecuta un programa, pide al kernel que inicie un nuevo proceso
+y ejecute el programa en el nuevo proceso. Esto funciona para programas 
+compilados. Para programas interpretados, es necesario indicar un shebang en la 
+primera linea, para que el kernel inicie una copia de ese programa en el 
+proceso y le pase el script a interpretar. Si no se indica shebang, se inicia 
+por defecto /bin/sh.
+Si la primera linea de un fichero comienza por #! el kernel la interpreta como
+un shebang. En el shebang se indica el nombre del ejecutable que debe 
+interpretar el script y se puede indicar como maximo un argumento para el 
+interprete.
+
+Si no se va a pasar un parametro para el interprete, es buena practica poner -
+para evitar ataques de spoofing:
+#!/bin/sh -
+(Esto me falta por comprobarlo, porque no he encontrado ningun caso en el que el
+- bloquee los argumentos del script).
+
+*** 2.5 Basic Shell Constructs
+--- 2.5.1 Commands and Arguments
+Los argumentos que consisten en una sola letra comienzan por - y se pueden 
+agrupar: ls -l -a es equivalente a ls -la
+
+Doble dash -- indica el final de las opciones. Todo lo que vaya despues de -- 
+se trata como argumentos en lugar de como opciones (por ejemplo como nombres de
+fichero). Esta caracteristica se puede utilizar cuando se quiere utilizar un 
+argumento que comience por -, para evitar que el programa lo interprete como un
+argumento. Por ejemplo: 
+$ grep "-foo" fichero
+fallara si no existe un fichero que se llame "oo" o devolvera una salida erronea
+$ grep -- "-foo" fichero
+interpreta "-foo" como un argumento y no como una opcion, por lo que funcionara
+como se espera
+
+Se puede usar ; para indicar varios comandos en una sola linea, que la shell 
+ejecutara secuencialmente: 
+$ cd work ; ls -la
+
+La shell reconoce tres tipos de comandos: 
+1. Built-in commands: son comandos que la propia shell ejecuta por necesidad 
+como cd o read. Algunos comandos tambien se incluyen por eficiencia si son 
+usados frecuentemente como test, echo o printf.
+2. Shell functions: son funciones escritas en lenguaje shell. Se invocan de la
+misma forma que un programa. (ch. 6.5)
+3. External commands: son programas que la shell ejecuta creando un proceso 
+separado. El proceso es: 
+ a. Se crea un nuevo proceso con una copia de la shell.
+ b. En el nuevo proceso se busca en los directorios contenidos en PATH.
+ c. Se ejecuta el programa encontrado sustituyendolo por el programa de shell en 
+el nuevo proceso.
+ d. Cuando el programa finaliza, la shell original continua leyendo el siguiente
+comando de la terminal o ejecutando el siguiente comando en el script.
+
+--- 2.5.2 Variables
+Las variables que no tienen valor asignado, tiene un valor null, que es util en
+ciertas ocasiones.
+
+Las variables son cualqier nombre seguido de un = sin espacios. Lo que hay a la
+derecha del igual se interpreta como su valor. Para hacer referencia a una 
+variable se pone un $ delante del nombre de la variable.
+
+$variable=valor
+$echo $variable
+
+--- 2.5.3 Simple Output with echo
+Originalmente echo servia para imprimir sus argumentos como salida. Pero con el
+paso del tiempo se han desarrollado diferentes versiones que usan flags no 
+estandar.
+Debido a que la mayoria de versiones son no estandar, se recomienda usar echo
+sin argumentos, y para output mas complejo usar printf.
+
+--- 2.5.4 Fancier Output with printf
+printf es un comando que se hizo despues del printf de C.
+Se puede usar como echo, a diferencia de que printf no imprime el \n.
+Se utiliza de manera similar a la funcion de C, como un string como primer 
+argumento, y el resto de argumentos se sustituyen en el primer string:
+$ printf "The first program always prints '%s, %s!'\n" Hello world
+
+--- 2.5.5 Basic I/O Redirection
+Los programas UNIX estan diseñados para que funcionen sin saber que hay 
+conectado a su entrada, salida o error. Por defecto estan conectados a stdin,
+stdout y stderr, que a su vez estan conectados a la terminal.
+
+2.5.5.1 Redirection and pipelines
+> sirve para redirigir la salida y < para redirigir la entrada: 
+$ tr -d '\r' < dos-file.txt > unix-file.txt
+
+El redirector > crea el fichero de salida si no existe. Y si existe, la trunca.
+Para hacer un append en lugar de truncar se puede usar >>:
+
+for f in dos-file*.txt
+do
+    tr -d '\r' < $f >> big-unix-file.txt
+done
+
+Los pipes | conectan la salida del comando de la izquierda con la entrada del de
+la derecha. Funcionan mucho mas rapido que crear ficheros temporales.
+
+2.5.5.2 Special files: /dev/null and /dev/tty
+/dev/null es un fichero unix que no esta conectado a ningun sitio. Enviar bytes
+a este fichero hace que se pierdan, lo que es util cuando no queremos que se 
+muestre la salida de un comando. 
+
+/dev/tty es un fichero unix que al abrirlo, unix redirecciona la terminal 
+asociada al proceso a ese fichero. Es util por ejemplo para leer contrasenas 
+introducidas por el usuario: 
+
+$ printf "Enter new password: "
+$ stty -echo
+$ read pass < /dev/tty
+$ stty echo
+
+Al leer explicitamente de tty, se evita que se pueda hacer redirecciones como 
+$ ./script.sh < /passwords.txt
+ya que sin argumentos, read lee de stdin.
+
+
+--- 2.5.6 Basic Command Searching
+La shell busca comandos en los directorios contenidos en la variable $PATH.
+El path por defecto varia en cada sistema, pero debe contener al menos /bin y
+/usr/bin.
+
+En el PATH un colon vacio indica el directorio actual: 
+PATH=:/bin:/usr/bin:/usr/X11R6/bin:/usr/local/bin # Current directory first
+PATH=/bin:/usr/bin:/usr/X11R6/bin:/usr/local/bin: # Current directory last
+PATH=/bin:/usr/bin:/usr/X11R6/bin::/usr/local/bin # Current directory in middle
+Pero no es recomendable incluirlo por motivos de seguridad.
+
+*** 2.6 Accessing Shell Script Arguments
+Los argumentos pasados a un script se guardan en variables accesibles por el 
+numero de argumento: 
+$ echo first argument $1
+$ echo tenth argument ${10}
+
+Por razones historicas los argumentos mayores que nueve tienen que especificarse
+entre llaves.
+
+*** 2.7 Simple Execution Tracing
+Con lo opcion x de sh se muestran los comandos que se ejecutan en un script: 
+
+$ sh -x script.sh
+
+Se puede establecer dentro de un script con el comando set:
+
+#!/bin/sh
+set -x
+echo "Debug"
+set +x
+echo "No debug"
+
+*** 2.8 Internationalization and Localization
+Las traducciones para programas se suelen guardar en un formato binario para que
+puedan ser comprobados por las librerias rapidamente. Los catalogos de mensajes
+compilados se suelen guardar en directorios como /usr/share/locale/ en GNU.
+
+En UNIX existen las siguentes variables que controlan la localizacion:
+
+-LANG: Default value for any LC_xxx variable that is not otherwise set
+-LC_ALL: Value that overrides all other LC_xxx variables
+-LC_COLLATE: Locale name for collation (sorting)
+-LC_CTYPE: Locale name for character types (alphabetic, digit, punctuation, and 
+so on)
+-LC_MESSAGES: Locale name for affirmative and negative responses and for 
+messages; POSIX only
+-LC_MONETARY: Locale name for currency formatting
+-LC_NUMERIC: Locale name for number formatting
+-LC_TIME: Locale name for date and time formatting
+
+En general se establece LC_ALL para forzar un unico locale, y LANG para proveer
+un fallback.
+
+Para listar todos los locale disponibles:
+$ locale -a
+
+
+*****************************************
+*** Ch. 3 Searching and Substitutions ***
+*****************************************
+
+*** 3.1 Searching for Text
+Existen dos tipos de expresiones regulares, las Basic Regular Expression (BREs),
+y las Extended Regular Expressions (EREs). Tradicionalmente existian tres 
+programas para buscar texto con regexp: 
+- grep: para BREs
+- egrep : para EREs.
+- fgrep: para texto plano que no es regexp
+Desde 1992 se mergearon en un solo program: grep
+
+--- 3.1.1. Simple grep
+El uso mas simple (sin flags, o con -F) equivale a fgrep, y busca texto plano.
+
+*** 3.2 Regular Expressions
+--- 3.2.1 What Is a Regular Expression?
+Las expresiones regulares estan compuestas por ordinary characters y special
+characters. Los ordinary characters son cualquiera que no sea special character.
+Los special characters se conocen comunmente como metacharacters.
+
+Metacaracters de BREs y EREs:
+\ : anula el significado del siguiente caracter, nomalmente para activar el 
+significado especial de ese caracter.
+. : cualquier caracter menos NUL. Algunos programas pueden deshabilitar el 
+reconocimiento del salto de linea.
+* : un caracter cualquier numero de veces o ninguna. En EREs lo que precede a * 
+puede ser una expresion regular. En BREs, * no es un caracter especial si es el
+primer caracter.
+^ : una expresion regular al comienzo de un string. En BREs es metacaracter solo
+al comienzo de la regexp. En EREs es metacaracter en cualquier posicion.
+$ : una expresion regular al final de un string. En BREs es metacaracter solo al
+final de la regexp. En EREs es metacaracter en cualquier posicion.
+[...] : si se cumple cualquier caracter dentro de los brackets. Un ~ indica un 
+rango de caracteres, pero es dependiente del locale y por tanto no portable.
+Un ^ al comienzo del contenido de los brackets indica que se debe cumplir 
+cualquier caracter que no este dentro de los brackets.
+
+Metacaracteres de BREs:
+\( \) y \n: guarda el patron dentro de los parentesis en un special holding 
+space. Se pueden guardar hasta nueve subpatrones de esta manera. El texto 
+guardado en el subpatron puede ser reutilizado en el mismo patron con las 
+secuencias de escape \1 hasta \9. Por ejemplo: \(ab\).*\1 se cumple con dos 
+secuencias "ab" con cualquier numero de caracteres entre ellas.
+
+Metacaracteres de EREs:
+\{n,m\} : cumple un rango de ocurrencias del caracter que lo precede. \{n\} 
+para exactamente n ocurrencias. \{n,\} para al menos n ocurrencias, y {n,m\}
+para cualquier numero de ocurrencia entre n y m incluidos. Por ejemplo: 
+'a\{2,3\}' se cumple para cadenas "aa" o "aaa"
+
+{n,m} : como \{n,m\} pero sin backslashes
+
++ : la regex se cumple una o mas veces
+
+? : la regex se cumple cero o una vez
+
+| : cumple la regex especificada despues o antes
+
+( ) : aplica un match al grupo de regex
+
+--- 3.2.1.1 POSIX bracket expressions
+Al dar soporte a varios locales, la expresion [a-z] no podria ser portable, dado
+que no todos los idiomas tienen esa secuencia de letras. Para solucionar esto
+existen las character classes.
+- Character classes: consiste en una keyword entre [: y :]. Describe diferentes
+clases de caracteres como alfanumericos, control, etc.
+- Collating symbols: es una secuencia de caracteres que debe ser tratada como 
+una unidad. Consiste en caracteres entre [. y .]. Los collating symbols son 
+especificos al locale. Ej.: [[.ch.]] para el caracter ch como un solo caracter.
+- Equivalence classes: lista un set de caracteres que deben ser considerados
+equivalentes. Consiste en caracteres entre [= y =]. Ej.: [[=e=]] para cualquier
+caracter de: e, è, ë, etc.
+
+Los tres constructos anteriores deben ir entre corchetes. Por ejemplo: 
+[[:alpha:]!] coincide con cualquier caracter alfanumerico o con el caracter !. 
+
+Los caracter classes de POSIX son:
+[:alnum:]: caracteres alfanumericos
+[:alpha:]: caracteres alfabeticos
+[:blank:]: espacios y tabs
+[:cntrl:]: caracteres de control
+[:digit:]: caracteres numericos
+[:graph]: caracteres imprimibles que no sean espacio en blanco
+[:lower:]: caracteres en minuscula
+[:print:]: caracteres imprimibles
+[:punct:]: caracteres de puntuacion
+[:space:]: espacios
+[:upper:]: caracteres en mayuscula
+[:xdigit:]: digitos hexadecimales
+
+--- 3.2.2 Basic Regular Expressions
+Las BREs se componen de  multiples componentes, comenzando por diferentes formas
+para hacer match de un caracter y combinandolo con metacaracteres para hacer
+match con multiples caracteres.
+--- 3.2.2.1 Matching single characters
+Si se quiere especificar un rango como [0123456789] o [ABCDEF] se puede usar la
+notacion de rango: [0-9] o [A-F]. Esta notacion originalmente se basada en el 
+character set de la maquina (ASCII o EBCDIC) por lo que no era 100% portable.
+Con los locale de POSIX los rangos se basan en el locale, por lo que son 
+todavia menos portables. La forma de hacerlo portable es usar el locale "POSIX".
+
+En las bracket expressions, los metacaracteres pierden su significado. Por 
+ejemplo: [*\.] hace match con un "*\." literalmente.
+
+--- 3.2.2.2 Backreferences
+--- 3.2.2.4 Anchoring text matches
+--- 3.2.2.5 BRE operator precedence
+Precendencia de mayor a menor prioridad:
+[..] [==] [::] : Bracket symbols for character collation
+\metacharacter : Escaped metacharacters
+[]             : Bracket expressions
+\(\) \digit    : Subexpressions and backreferences     
+* \{\}         : Repetition of the preceding single-character regular expression
+no symbol      : Concatenation
+^ $            : Anchors
+
+--- 3.2.3 Extended Regular Expressions
+Muchos metacaracteres son iguales que en las BREs, pero algunos cambian su 
+significado.
+
+--- 3.2.3.1 Matching single characters
+Para caracteres individuales, las EREs son igual que las BREs. Una excepcion
+notable es que en awk, \ es especial dentro de las bracket expressions. Para 
+hacer match con un \, un [ o un - se debe usar: [\[\-\]\\]
+
+--- 3.2.3.2 Backreferences don’t exist
+En las EREs, \( y \) hacen match con parentesis literales. Los grupos se forman
+con () (sin \).
+
+--- 3.2.3.3 Matching multiple regular expressions with one expression
+Las EREs se comportan diferente a las BREs con el * para hacer match de 
+multiples caracteres.
+Las llaves tambien se comportan diferente. \{ y \} son los caracteres literales
+y {n} es el comportamiento equivalente. Asi a{5} sirve para hacer match con a
+repetido 5 veces.
+
+--- 3.2.3.4 Alternation
+Con un pipe | se debe hacer match de lo que hay a su izquierda o de lo que hay
+a su derecha. Es el operador de menor prioridad, por lo que el operando 
+izquierdo abarca la expresion regular hasta el comienzo y el derecho abarca
+hasta el final de la expresion.
+
+--- 3.2.3.5 Grouping
+Los parentesis permite hacer grupos a los que afecta un metacaracter, por 
+ejemplo (ab)+ para ab, abab, etc.
+A diferencia de las BRE, no necesitan \
+
+--- 3.2.3.6 Anchoring text matches
+--- 3.2.3.7 ERE operator precedence
+De mayor a menor predecedencia:
+
+[..] [==] [::] : Bracket symbols for character collation
+\metacharacter : Escaped metacharacters
+[]             : Bracket expressions
+()             : Grouping
+* + ? {}       : Repetition of the preceding regular expression
+no symbol      : Concatenation
+^ $            : Anchors
+|              : Alternation
+
+--- 3.2.4 Regular Expression Extensions
+Muchos programas ofrecen extensiones para las expresiones regulares. Una 
+extension popular son los operadores \< y \>, que hace match del comienzo y el 
+final de una palabra, compuesta por letras, digitos y underscores.
+Por ejemplo \<chop hace match con chopsticks, pero no con foochop
+
+--- 3.2.5 Which Programs Use Which Regular Expressions?
+Programas Unix que usan regex:
+
+Type   grep  sed  ed  ex/vi  more  egrep  awk  lex
+BRE       x    x   x      x     x
+ERE                                    x    x    x
+\< \>     x    x   x      x     x
+
+--- 3.2.6 Making Substitutions in Text Files
+Para sustituir texto en ficheros, se suele usar sed, el Stream Editor.
+En la web http://sed.sourceforge.net/ se ofrece documentacion y ejemplos.
+
+--- 3.2.7 Basic Usage
+sed tiene diferentes commands que ejecutan diferentes acciones. El command 's'
+sirve para realizar sustituciones de texto. sed con el command s tiene la 
+siguiente estructura:
+$ sed 's/search_pattern/replacement_text/flags' file
+
+search_pattern es un BRE y replacement_text lo que lo sustituira Los flags
+pueden ser: 
+
+
+Normalmente se usa / como delimitador, pero se puede usar cualquier caracter
+imprimible. Ej: 
+$ sed 's/:.*//' /etc/passwd
+es igual que 
+$ sed 's#:.*##' /etc/passwd
+Esto es util cuando se tienen que usar metacaracteres escapados \( \) por 
+ejemplo.
+
+Cuando se quiere ejecutar multiples comandos en una linea se puede usar el flag
+-e: 
+$ sed -e 's/:.*//' -e 's/gabriel/root/' /etc/passwd
+
+--- 3.2.7.1 Substitution details
+sed usa BRE por defecto. Se pueden usar backreferences del search_pattern en el
+replacement_text:
+
+$ echo /home/tolstoy/ | sed 's;\(/home\)/tolstoy/;\1/lt/;'
+/home/lt/
+
+Tambien se pueden usar otros caracteres especiales en el reaplacement_text como
+&, que indica que se sustituya en ese punto todo el texto que hizo match con la 
+expresion regular. Por ejemplo:
+$ echo "Price: 50" | sed 's/[0-9]\+/EUR &/'
+Price: EUR 50
+
+Con el flag 'g' se indica que se haga la sustitucion del patron en todas las 
+ocurrencias, en lugar de solo en la primera, como se hace por defecto. Ej:
+
+$ echo "Price: 50 ; Price: 120" | sed 's/[0-9]\+/EUR &/'
+Price: EUR 50 ; Price: 120
+
+$ echo "Price: 50 ; Price: 120" | sed 's/[0-9]\+/EUR &/g'
+Price: EUR 50 ; Price: EUR 120
+
+Si se indica un numero como flag, se sustituira la n ocurrencia unicamente:
+
+$ echo "Price: 50 ; Price: 120" | sed 's/[0-9]\+/EUR &/2'
+Price: 50 ; Price: EUR 120
+
+Es posible poner multiples sustituciones en un fichero y luego invocarlo con -f:
+
+$ cat fixup.sed
+s/foo/bar/g
+s/chicken/cow/g
+s/draft animal/horse/g
+...
+$ sed -f fixup.sed myfile.xml > myfile2.xml
+
+--- 3.2.8 sed Operation
+sed lee la entrada y la procesa linea por linea, copiando las lineas a un area
+de memoria llamada pattern space. Luego hace los cambios en esas lineas en 
+memoria y emite la salida.
+
+Cuando se usan varios comandos se aplica uno y despues otro. Por ejemplo:
+
+// script.sed
+s/Unix/UNIX/
+s/UNIX System/UNIX Operating System/
+
+$ echo "The Unix System" | sed -f script.sed
+The UNIX Operating System
+
+El proceso en el que se aplican los cambios es:
+The Unix System
+The UNIX System
+The UNIX Operating System
+
+--- 3.2.8.1 To print or not to print
+Cuando se usa el flag -n, sed no imprime los contenidos finales del pattern 
+space cuando termina. En su lugar, los comandos p imprimenn explicitamente la 
+linea. De esta forma se puede simular grep. Por ejemplo, para imprimir solo 
+lineas con HTML: 
+
+sed -n '/<HTML>/p' *.html
+
+Para activar el flag n y hacer esto mismo en un script:
+// script.sed
+#n
+/<HTML>/p
+
+--- 3.2.9 Matching Specific Lines
+El comportamiento por defecto de sed es aplicar los comandos a todas las lineas
+de entrada:
+
+$ cat input.txt
+Foo Foo
+Foo
+$ cat script2.sed
+s/Foo/Fee/
+$ sed -f script2.sed input.txt
+Fee Foo
+Fee
+
+Si se quiere aplicar el comando solo a ciertas lineas, se tiene que usar una 
+address: 
+address command
+
+Existen diferentes tipos de address:
+- Regular expressions: si se prefija el comando con una regex, se aplica solo a
+las lineas que hagan match con esa regex. Por ejemplo:
+/oldfunc/ s/$/# XXX: migrate to newfunc/
+Agrega un comentario al final ($) de las lineas que contengan /oldfunc
+
+Una expresion vacia en el search_pattern reutiliza la ultima regex en la 
+ejecucion. Por ejemplo, si en el script se pone: 
+/Tolstoy/ s//& and Camus/g
+sed utiliza primero la regex Tolstoy para filtrar las lineas, y luego hace:
+s//& and Camus/g sobre esas lineas. Como la ultima regex usada es Tolstoy, 
+equivale a hacer: s/Tolstoy/& and Camus/g
+El g del final aplica a todas las ocurrencias en la linea.
+
+- The last line: aplica a la ultima linea de entrada. Si se introducen varios
+ficheros, se toma como ultima linea la del ultimo fichero. Por ejemplo, para 
+introducir un comentario al final del fichero:
+$ s/$/\n#Last line comment/
+
+- Numeros de linea y rangos: 
+Para imprimir las lineas 10 a 42:
+$ sed -n '10,42p' foo.xml
+Dos expresiones regulares separadas por comas son un range expression, e 
+incluyen al menos dos lineas.
+
+- Expresiones regulares negadas: 
+Si se pone una ! despues de una regex en el address, se filtran las lineas que
+no la contienen. Por ejemplo: 
+/used/! s/new/used/g
+Aplica la regex a las lineas que no contienen used. 
+Por motivos historicos, agregar un espacio despues de la ! es comportamiento
+indefinido, por eso se recomienda poner la expresion asi: 
+/used/!s/new/used/g
+
+Para usar un address en el comando sed directamente, se pone como primer 
+argumento: 
+$ sed '$ s/$/\n#Last line comment/' input.txt
+
+Si en el comando n se quiere usar un delimitador que no es /, se debe escapar,
+a diferencia del comando s: 
+$ sed -n '\#root:#p' /etc/passwd
+
+
+--- 3.2.10 How Much Text Gets Changed?
+Cuando se trabaja con sed y awk es importante saber dos cuestiones importantes:
+Cuanto texto cambia, y donde comienza un match.
+Una regex hace match con el texto coincidente mas largo y mas a la izquierda. En
+consecuencia, un match con un null string se considera mas largo que ningun 
+match. Por tanto, dada la regex ab*c, al hacer match con ac, b* hace match con
+el null string entre a y c. El estandar POSIX dice: "Consistetemente con que
+todo el match sea el match mas largo y mas a la izquierda, cada subpatron de 
+izquierda a derecha, debe hacer match con el string mas largo posible". Los 
+subpatrones son los encerrados entre () en EREs y entre \(\) en BREs de 
+programas que soporte la extension.
+Por ejemplo, en este caso:
+$ echo Tolstoy is worldly | sed 's/T.*y/Camus/'
+Camus
+La salida no es la esperada, dado que la regex T.*y ha hecho match hasta la y de
+worldly. En su lugar se podria refinar de la siguiente forma:
+$ echo Tolstoy is worldly | sed 's/T[[:alpha:]]*y/Camus/'
+Camus is worldly
+
+Otro ejemplo donde se hace match con el null string es el siguiente:
+$ echo abc | sed 's/b*/1/'
+1abc
+$ echo abc | sed 's/b*/1/g'
+1a1c1
+
+--- 3.2.11 Lines Versus Strings
+Los programas simples como grep, egrep y sed, suelen trabajar con lineas de 
+datos. En estos casos no hay caracter de salto de linea embebido en la entrada,
+y ^ y $ representan el comienzo y final de la linea.
+Los lenguajes de programacion que trabajan con regex como awk, Perl y Python,
+normalmente trabajan con strings. Aqui, cada string representa una entrada, pero
+^ y $ siguen representando principio y final de linea.
+
+
+*** 3.3 Working with Fields
+Un record es una coleccion de informacion relacionada, como customer o employee.
+Un field es un componente de un record, como nombre o direccion.
+
+--- 3.3.1 Text File Conventions
+En Unix se recomienda usar texto para representar datos. Existen dos 
+convenciones para guardar datos: usando espacios o tabs, o usando un delimitador
+como semicolon:
+
+$ cat myapp.data
+# model    units sold    salesperson
+xj11       23            jane
+rj45       12            joe
+cat6       65            chris
+
+$ cat myapp.data
+# model:units sold:salesperson
+xj11:23:jane
+rj45:12:joe
+cat6:65:chris
+
+La convencion a usar depende de los datos a incluir. Si se usan espacios para
+separar, no puede haber espacios en los datos, y lo mismo con otros 
+delimitadores. 
+Una diferencia importante es que al usar espacios se pueden poner cualquier 
+cantidad de espacios entre los datos, pero si se usa otro delimitador, al 
+ponerlo varias veces consecutivamente puede generar campos vacios (En d1::d2, 
+se genera un campo vacio entre d1 y d2).
+A pesar de ello, algunos ficheros trabajan mejor con delimitadores si tienen 
+campos opcionales, como /etc/passwd
+
+--- 3.3.2 Selecting Fields with cut
+Con cut, se pueden extraer fields en ficheros, separados por un delimitador.
+Por ejemplo para extraer los campos 1 y 5 de un fichero separado con ':':  
+$ cut -d : -f 1,5 /etc/passwd
+root:root
+...
+
+Con la opcion -c se pueden extraer caracteres. Por ejemplo para obtener los 10
+primeros caracteres de todas las columnas de un fichero:
+$ ls -l | cut -c 1-10
+total 2878
+-rw-r--r--
+drwxr-xr-x
+-r--r--r--
+-rw-r--r--
+...
+
+--- 3.3.3 Joining Fields with join
+El comando join permite mezcalr ficheros donde los records de cada fichero
+compartan una clave comun. Para que el join se haga correctamente, los ficheros
+deben de estar ordenados.
+
+$ cat sales
+# sales data
+# salesperson   amount
+joe     100
+jane    200
+herman  150
+chris   300
+
+$ cat quotas
+# quotas
+# salesperson   quota
+joe     50
+jane    75
+herman  80
+chris   95
+
+El siguiente programa sirve para mergear ambos ficheros:
+
+#! /bin/sh
+# merge-sales.sh
+#
+# Combine quota and sales data
+# Remove comments and sort datafiles
+sed '/^#/d' quotas | sort > quotas.sorted
+sed '/^#/d' sales | sort > sales.sorted
+# Combine on first key, results to standard output
+join quotas.sorted sales.sorted
+# Remove temporary files
+rm quotas.sorted sales.sorted
+
+$ ./merge-sales.sh
+chris 95 300
+herman 80 150
+jane 75 200
+joe 50 100
+
+--- 3.3.4 Rearranging Fields with awk
+awk es un lenguaje de programacion, pero fue diseñado para ser usado en shell
+scripting. Es util en extraccion de campos y reorganizacion. 
+
+--- 3.3.4.1 Patterns and actions
+El paradigma de awk es diferente al de la mayoria de lenguajes de programacion. 
+Su uso es mas parecido a sed:
+
+awk 'program' [ file … ]
+
+awk lee records (lineas) de una en una desde la entrada, ya sea standard input o
+un fichero. Para cada linea aplica comandos especificados por el programa. La
+estructura basica de un programa awk es: 
+
+pattern { action }
+pattern { action }
+...
+
+El pattern puede ser cualquier expresion, pero en one-liners, es tipicamente un
+ERE entre slashes.
+La action puede ser cualquier awk statement, pero en one-liners, es tipicamente
+un print. 
+Tanto el pattern como la action pueden ser omitidas, pero no se pueden omitir
+ambas. Cuando falta un pattern, se ejecuta la accion en todos los records de
+entrada. Cuando falta un accion, equivale a print, que imprime los records.
+
+Generalmente el los one-liners se suele hacer:
+... | awk '{ print some-stuff }' | ...
+
+
+--- 3.3.4.2 Fields
+awk tiene fields y records como parte central de su diseno. awk lee los records
+de entrada y automaticamente lo divide en fields. Mientras hace esto, establece
+la builtin variable NF con el numero de campos.
+
+Por defecto, se asume espacios y tabs como separador, pero se puede cambiar con 
+la variable FS y establecerla como un caracter, o incluso como un ERE que actue
+como separador.
+Los fields se identifican con $n, donde n es el numero de campo. $0 representa
+el record entero. Algunos ejemplos del uso de awk son: 
+
+awk '{ print $1 }'        Print first field (no pattern)
+awk '{ print $2, $5 }'    Print second and fifth fields (no pattern)
+awk '{ print $1, $NF }'   Print first and last fields (no pattern)
+awk 'NF > 0 { print $0 }' Print nonempty lines (pattern and action)
+awk 'NF > 0'              Same (no action, default is to print)
+
+--- 3.3.4.3 Setting the field separators
+Con -F se establece la variable FS:
+$ awk -F: '{ print $1, $5 }' /etc/passwd
+root root
+...
+
+En el ejemplo anterior se ve como awk trata diferente el separador de entrada 
+(:) que el de salida ( ). El separador de salida se configura con la variable
+OFS. Por ejemplo:
+$ awk -F: -v 'OFS=**' '{ print $1, $5 }' /etc/passwd
+root**root
+...
+
+--- 3.3.4.4 Printing lines
+Para imprimir se puede usar el statement print:
+$ awk -F: '{ print "User", $1, "is really", $5 }' /etc/passwd
+User root is really root
+
+Si se hace print sin parametros, equivale a print $0, que imprime el record 
+entero.
+
+awk tambien tiene un statement printf: 
+$ awk -F: '{ printf "User %s is really %s\n", $1, $5 }' /etc/passwd
+User root is really root
+
+Es importante separar los argumento de print con una coma, porque en caso 
+contrario awk los concatena:
+$ awk -F: '{ print "User" $1 "is really" $5 }' /etc/passwd
+Userrootis reallyroot
+
+--- 3.3.4.5 Startup and cleanup actions
+Los patrones BEGIN y END proveen acciones al comienzo y al final de la ejecucion
+de awk. Es mas comun usarlos el programas mas complejos de awk, generalmente
+escritos en ficheros independientes.
+
+Para programas simples, BEGIN se suele utilizar para establecer variables:
+$ awk 'BEGIN { FS = ":" ; OFS = "**" }
+> { print $1, $5 }' /etc/passwd
+root**root
+
+
+************************************
+*** Ch. 4: Text Processing Tools ***
+************************************
+
+*** 4.1 Sorting Text
+El programa sort ve su entrada como un stream de records delimitados por saltos
+de linea, compuestos por fields delimitados por espacios en blanco. 
+
+--- 4.1.1 Sorting by Lines
+Por defecto sort ordena por el locale. En el C locale esto implica orden ASCII.
+Para entender el orden de ASCII se puede usar el programa od, que hace un octal
+dump del codigo ascii de cada caracter:
+
+$ printf "Hello world" | od -a -b
+0000000   H   e   l   l   o  sp   w   o   r   l   d
+        110 145 154 154 157 040 167 157 162 154 144
+0000013
+
+La iso_8859 incluye muchas extensiones de 8 bits de ASCII. La iso_8859_1 es una
+extension para los lenguajes de europa del este (latin-1). Se puede ver los 
+caracteres que agrega en su manual:
+
+$ man iso_8859_1
+
+Si se quiere ordenar por orden ASCII tradicional: 
+
+$ cat french-english
+côte    coast
+cote    dimension
+coté    dimensioned
+côté    side
+$ LC_ALL=C sort french-english
+cote    dimension
+coté    dimensioned
+côte    coast
+côté    side
+
+--- 4.1.2 Sorting by Fields
+Con la opcion -k se puede especificar el field por el que se ordena. Y con -t
+se puede establecer el delimitador.
+Para ordenar passwd por username:
+$ sort -t: -k1,1 /etc/passwd
+Para ordenar passwd por uid:
+$ sort -t: -k3nr /etc/passwd
+Para ordenar primero por GID y luego por UID:
+$ sort -t: -k4n -k3n /etc/passwd
+
+--- 4.1.3 Sorting Text Blocks
+En casos en los que los datos vengan en varias lineas, no se puede usar -k para
+especificar un campo fijo. Por ejemplo:
+
+$ cat my-friends
+# SORTKEY: Schloß, Hans Jürgen
+Hans Jürgen Schloß
+Unter den Linden 78
+D-10117 Berlin
+Germany
+
+# SORTKEY: Jones, Adrian
+Adrian Jones
+371 Montgomery Park Road
+Henley-on-Thames RG9 4AJ
+UK
+
+Una estrategia para esto es usar la capacidad de awk para manejar separadores
+para reconocer saltos de linea, reemplazarlos con caracteres que no se usen 
+como caracteres no imprimibles, y luego reemplazar los saltos de parrafo con un
+salto de linea, para luego ordenarlos para que se vean asi:
+# SORTKEY: Schloß, Hans Jürgen^ZHans Jürgen Schloß^ZUnter den Linden 78^Z...
+# SORTKEY: Jones, Adrian^ZAdrian Jones^Z371 Montgomery Park Road^Z...
+
+El pipeline quedaria asi:
+$ cat my-friends |
+    awk -v RS="" '{ gsub("\n", "^Z"); print }' |
+        sort -f |
+            awk -v ORS="\n\n" '{ gsub("^Z", "\n"); print }' |
+                grep -v '# SORTKEY'
+
+La funcion gsub() de awk ejecuta sustituciones globales, de manera similar a 
+s/.../.../g de sed. La variable RS es el record separator, que normalmente es 
+\n. Con RS="" se separan records por espacios en blanco. ORS es el output 
+record separator.
+
+La salida queda asi:
+Adrian Jones
+371 Montgomery Park Road
+Henley-on-Thames RG9 4AJ
+UK
+
+Hans Jürgen Schloß
+Unter den Linden 78
+D-10117 Berlin
+Germany
+
+
+--- 4.1.4 Sort Efficiency
+El comando sort de unix utiliza un algoritmo de ordenamiento eficiente, 
+dificilmente mejorable con otras aproximaciones.
+
+--- 4.1.5 Sort Stability
+La estabilidad de la salida implica que los records iguales deben preservar el
+orden despues del algoritmo de ordenacion. POSIX no requiere que el orden sea
+estable, y muchas implementaciones no lo son.
+La implementacion de GNU coreutils ofrece el flag ––stable para preservar el 
+orden.
+
+--- 4.2 Removing Duplicates
+uniq es un programa que se suele usar en pipelines para eliminar records 
+duplicados. 
+
+$ sort file.txt | uniq
+
+Con -c imprime el numero de veces que se repite cada record. Con -d muestra 
+solo los duplicados y con -u solo los no duplicados.
+
+*** 4.3 Reformatting Paragraphs
+fmt es un programa para formatear texto, por ejemplo para dividir lineas para
+que no ocupen mas de x columnas en pantalla. No esta incluido en POSIX, pero es
+comun encontrarlo en sistema unix.
+
+*** 4.4 Counting Lines, Words, and Characters
+Con wc se pueden contar bytes con -c, lineas con -l y palabras con -w. 
+Originalmente -c era para contar caracteres, pero en los sistemas de caracteres
+multibyte los caracteres cuentan mas de uno. Por eso se introdujo la opcion -m
+para contar caracteres multibyte.
+
+*** 4.5 Printing
+En sistemas BSD y SystemV se han implementado multiples comandos para imprimir,
+pero POSIX solo define lp.
+
+Las diferencias son: 
+Berkeley    System V    Purpose
+lpr         lp          Send files to print queue
+lprm        cancel      Remove files from print queue
+lpq         lpstat      Report queue status
+
+--- 4.5.1 Evolution of Printing Technology
+Existen dos proyectos de unix que intentan remediar con la variedad de 
+tecnologias de impresion: CUPS y lpr next generation (LPRng).
+
+--- 4.5.2 Other Printing Software
+pr es un programa que prepara ficheros de texto para que sean impresos 
+agregandoles un page header por ejemplo.
+
+*** 4.6 Extracting the First and Last Lines
+Para imprimir las primeras n lineas de un fichero se puede usar cualquiera de
+estas opciones:
+
+head -n n
+head -n
+awk 'FNR <= n'
+sed -e nq
+sed nq
+
+Las ultimas n lineas se pueden ver con:
+
+tail -n n 
+tail -n
+
+Con el flag -f de tail permite monitorizar un fichero mientras todavia esta 
+siendo escrito. Esto es util con logs.
+
+
+**********************************************
+*** Ch. 5: Pipelines Can Do Amazing Things ***
+**********************************************
+
+*** 5.1 Extracting Data from Structured Text Files
+umask sirve para cambiar la mascara de permisos en la creacion de ficheros y 
+directorios. Por defecto es 666 para ficheros y 777 para directorios. Umask 
+sirve para restar permisos a estas mascaras predeterminadas. Por ejemplo con 
+umask 022 los permisos para ficheros pasan a ser 666 - 022 = 644, y para 
+directorios 777 - 022 = 755.
+umask establece la mascara para la sesion actual, por lo que en cada shell hay 
+una predeterminada hasta que se cambia. Para verla: 
+$ umask
+Y para ver los permisos efectivos: 
+$ umask -S
+
+Al trabajar con datos sensibles en los scripts, es recomendable usar umask 077 
+para restringir el acceso a ficheros temporales.
+Al crear ficheros temporales, una estrategia para evitar que colisionen los
+nombres es crear /tmp/fichero.pid, siendo pid el PID del proceso. Este valor se
+puede obtener desde el script con la variable $$: 
+FICHERO=/tmp/fichero.$$
+
+trap es una shell builtin que permite manejar senales que le llegan al proceso.
+Se puede ver la lista de senales que se pueden manejar con trap -l. Ademas de 
+esas, hay algunas senales especiales como EXIT, que se ejecuta al salir de la 
+shell; DEBUG, que se ejecuta antes de cada comando; RETURN, que se ejecuta 
+despues de cada funcion o source de un fichero; o ERR que se ejecuta despues de 
+una terminacion fallida de un comando.
+trap ejecuta un comando al procesar la senal:
+$ trap comando senal
+
+
+*** 5.2 Structured Data for the Web
+*** 5.3 Cheating at Word Puzzles
+*** 5.4 Word Lists
+*** 5.5 Tag Lists
+
+
+*****************************************************************
+*** Ch. 6: Variables, Making Decisions, and Repeating Actions ***
+*****************************************************************
+
+*** 6.1 Variables and Arithmetic
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+**********************************************************
+***** LISTA DE COMANDOS POSIX EXPLICADOS EN EL LIBRO *****
+**********************************************************
+
+* echo : para imprimir texto sencillo (sin argumentos)
+* printf : para imprimr texto con formato (como en C)
+* tr : para sustituir o eliminar caracteres
+* id : muestra id y grupos de un usuario. Sin argumentos muestra el usuario 
+logado (Alternativa POSIX a whoami)
+* who : muestra los usuarios logados leyendo /var/run/utmp.
+* set : activa o desactiva opciones de la shell
+* grep : por defecto hace match de BREs, con -F de EREs
+* sed : para sustitucion de texto en ficheros
+* cut : para extraer campos o caracteres de un fichero
+* awk : para extraer y reorganizar campos
+* sort : ordena lineas basandose en el locale (LC_ALL=C para ASCII)
+* od : imprime streams binarios en ASCII, octal o hexadecimal.
+* uniq : para mostrar, eliminar o contar records repetidos
+* wc : para contar lineas, bytes o palabras
+* head : para ver las primeras n lineas de un fichero
+* tail : para ver las ultimas lineas de un fichero o monitorizarlo
+* dd : para copiar datos en bloques
+* file : lee la cabecera de ficheros para determinar su tipo
+* strings : busca secuencias de cuatro o mas caracteres imprimibles en binarios
+* umask : establece la mascara de permisos por defecto en la creacion de 
+ficheros y directorios
+* trap : shell builtin para manejar signals
+

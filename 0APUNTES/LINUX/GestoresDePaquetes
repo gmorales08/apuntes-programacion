@@ -2,3 +2,33 @@
 
 Ver el paquete al que pertenece un binario:
 $ dnf provides $(which binario)
+
+Actualizar un solo paquete:
+$ sudo dnf upgrade --refresh gcc gcc-c++
+
+
+********** DPKG **********
+Ver el paquete al que pertenece un binario:
+dpkg -S $(which binario)
+
+
+********** PACMAN **********
+
+Actualizar un solo paquete (no recomendable al ser rolling release):
+$ sudo pacman -S gcc
+
+PROBLEMAS CON LA FIRMA DE UN PAQUETE. MARGINAL TRUST
+Cuando un paquete ha sido firmado por un desarrollador que tiene confianza 
+marginal (marginal trust), pacman lo interpreta como malicioso. Esto puede ser
+porque el desarrollador tenga un certificado publico emitido recientemente que
+no ha sido actualizado en el keyring de pacman (ver apuntes de pgp_gpg).
+
+Primero limpiar la cache de paquetes que no han sido instalados: 
+$ sudo pacman -Sc
+Actualizar el keyring de pacman:
+$ sudo pacman -Sy archlinux-keyring
+Repoblar el keyring:
+$ sudo pacman-key --init
+$ sudo pacman-key --populate archlinux
+Volver a descargar o actualizar el paquete original:
+$ sudo pacman -Syu 

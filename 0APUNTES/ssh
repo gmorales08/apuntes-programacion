@@ -1,0 +1,88 @@
+Secure Shell es un protocolo para realizar servicios de red de forma segura 
+sobre redes inseguras. Se usa principalmente para login remoto y ejecucion de 
+linea de comandos. 
+Lo usan SCP y SFTP, y tambien lo pueden usar programas como git o rsync.
+
+OpenSSH es un conjunto de programas libres para trabajar con este protocolo.
+
+La configuracion del cliente (ssh) se encuentra en: ~/.ssh/config
+La configuracion del servidor (sshd) se encuentra en /etc/ssh/sshd_config. El 
+servidor sshd se maneja con el servicio sshd.service. 
+
+Conectarse a un servidor
+$ ssh user@server-address
+
+Al conectarse a un servidor por primera vez, se pregunta si se confia en el, y
+pide la contraseña. Despues de acceder, en el fichero del cliente
+~/.ssh/known_hosts se agrega la firma publica del servidor para validar 
+futuras autenticaciones. Si no se hace ssh-copy-id, el servidor no guarda 
+informacion del cliente.
+
+Para probar si la configuracion del servidor es correcta se puede iniciar en 
+modo test, que no muestra salida si esta bien la configuracion: 
+$ sshd -t
+
+Configuracion del servidor:
+Banner /etc/issue # Muestra el mensaje contenido en issue al conectarse
+
+
+*** SSH KEYS
+La autenticacion por contraseña de ssh permite ataques por fuerza bruta, por lo 
+que a veces es conveniente utilizar autenticacion de clave publica en su lugar 
+(ver pgp_gpg). Con esta autenticacion, el cliente genera un par de claves y 
+envia la publica al servidor, que la almacena. Cuando el cliente intenta 
+conectarse al servidor, este cifra un challenge con la clave publica del cliente
+y se lo envia, para que este lo descrifre con su clave privada y le responda.
+
+Las claves privadas generalmente se guardan en ~/.ssh/
+
+--- Generar un par de keys
+$ ssh-keygen
+Se pueden cifrar con passphrase o no.
+Una opcion interesante es agregar un comentario identificativo:
+$ ssh-keygen -C "$(whoami)@$(uname -n)-$(date -I)"
+
+--- Copiar la key publica al servidor
+Para copiar la ultima clave publica generada:
+$ ssh-copy-id user@remote-server.example
+o para copiar una clave en concreto:
+$ ssh-copy-id -i ~/.ssh/your_key_name.pub user@remote-server.example
+
+--- Agente ssh
+Al igual que con gpg, existen clientes que cachean las passphrases de las keys
+cifradas para no tener que introducirlas en cada conexion. El que viene con 
+OpenSSH es ssh-agent
+
+
+--- Configurar un servidor de forma segura
+Una buena practica para configurar el servidor de forma segura es bloquear el 
+acceso por contraseña y solo permitir acceso con clave publica. El cliente que
+quiera autenticarse debe generar el par de claves y enviarle al administrador la
+publica por un canal segura. El administrador la agrega al fichero de claves 
+autorizadas y el cliente ya podria acceder.
+Desde el cliente generar el par de claves con:
+$ ssh-keygen
+En el servidor editar /etc/ssh/sshd_config: 
+PasswordAuthentication no
+Editar o crear ~/.ssh/authorized_keys y agregar la clave publica del cliente 
+(~/.ssh/id_ed25519.pub)
+Reiniciar el servicio en el servidor:
+$ systemctl restart sshd
+
+
+--- Ejemplo de /etc/ssh/sshd_config para conexion por clave publica:
+Banner /etc/issue
+PasswordAuthentication no
+
+--- Ejemplo de /etc/issue
+====================
+=== ARCH GABRIEL ===
+====================
+
+
+
+
+
+
+
+
